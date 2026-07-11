@@ -401,6 +401,18 @@ button {
   transition: color 130ms ease;
 }
 
+@keyframes project-content-in {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .project-content {
   display: grid;
   height: calc(100% - var(--row-height));
@@ -410,6 +422,7 @@ button {
   align-content: center;
   align-items: start;
   gap: clamp(48px, 7vw, 96px);
+  animation: project-content-in 240ms var(--ease-out) 40ms backwards;
   will-change: transform, opacity;
 }
 
@@ -1154,5 +1167,9 @@ button {
   .endpoint-card code,
   .endpoint-icon {
     transition: none;
+  }
+
+  .project-content {
+    animation: none;
   }
 }

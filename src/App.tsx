@@ -329,12 +329,15 @@ function ProjectPanel({
           className="project-content"
           custom={isExpanded}
           exit="exit"
-          initial={shouldReduceMotion ? false : { opacity: 0, y: 7 }}
+          initial={false}
           key={project.slug}
+          transition={{ duration: 0 }}
           variants={{
             // Fade out when handing off to the detail view; vanish instantly
             // when the active project changes so two text layers never
-            // overlap during a scroll switch.
+            // overlap during a scroll switch. The entrance fade is a CSS
+            // animation on .project-content so the layoutId title morph can
+            // never override it into an instant flash.
             exit: (towardDetail: boolean) =>
               towardDetail && !shouldReduceMotion
                 ? {
@@ -345,11 +348,6 @@ function ProjectPanel({
                     },
                   }
                 : { opacity: 0, transition: { duration: 0 } },
-          }}
-          transition={{
-            delay: shouldReduceMotion ? 0 : 0.055,
-            duration: shouldReduceMotion ? 0 : 0.18,
-            ease: [0.165, 0.84, 0.44, 1],
           }}
         >
           <div className="project-heading">
