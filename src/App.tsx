@@ -43,6 +43,15 @@ function projectSlugFromPath(): string | null {
   return slug && getProjectDetail(slug) ? slug : null;
 }
 
+function readDetailSection(): DetailSection | null {
+  const value = window.location.pathname.split("/")[3];
+  return value === "product" || value === "engineering" || value === "story"
+    ? value
+    : null;
+}
+
+const DEFAULT_TITLE = "Ezra Apple — Software Engineer";
+
 function formatIndex(index: number): string {
   return String(index + 1).padStart(2, "0");
 }
@@ -509,6 +518,20 @@ function ProjectCatalog({
     !isDetailOpen,
   );
   const trackHeight = `${100 + Math.max(projects.length - 1, 0) * 28}vh`;
+  const wasDetailOpen = useRef(isDetailOpen);
+
+  // Closing a detail unmounts the control that held focus; hand it back to
+  // the row of the project the visitor was reading.
+  useEffect(() => {
+    if (wasDetailOpen.current && !isDetailOpen) {
+      trackRef.current
+        ?.querySelector<HTMLElement>(
+          '.project-panel[data-active="true"] .project-row',
+        )
+        ?.focus({ preventScroll: true });
+    }
+    wasDetailOpen.current = isDetailOpen;
+  }, [isDetailOpen, trackRef]);
 
   useHotkeys(
     isDetailOpen ? [] : [
@@ -572,7 +595,7 @@ function ProjectCatalog({
                 </a>
               </nav>
             </div>
-            <p>Software engineer and former founder building AI products and developer tools.</p>
+            <h1 className="intro-tagline">Software engineer and former founder building AI products and developer tools.</h1>
           </header>
 
           <div aria-hidden={isDetailOpen || undefined} className="section-heading" inert={isDetailOpen || undefined}>
@@ -659,17 +682,53 @@ function ProjectDetailView({
   onClose: () => void;
   project: ProjectDetail;
 }) {
-  const readSection = (): DetailSection | null => {
-    const value = window.location.pathname.split("/")[3];
-    return value === "product" || value === "engineering" || value === "story" ? value : null;
-  };
-  const [section, setSection] = useState<DetailSection | null>(readSection);
+  const [section, setSection] = useState<DetailSection | null>(
+    readDetailSection,
+  );
   const [sectionCursor, setSectionCursor] = useState(() => {
-    const initialSection = readSection();
+    const initialSection = readDetailSection();
     const index = initialSection ? DETAIL_PATHS.findIndex((path) => path.id === initialSection) : 0;
     return Math.max(index, 0);
   });
   const shouldReduceMotion = useReducedMotion() ?? false;
+  const backButtonRef = useRef<HTMLButtonElement>(null);
+  // Whether this session pushed a section entry on top of the overview entry,
+  // so leaving the section can pop it instead of growing the history.
+  const didPushSection = useRef(false);
+
+  const changeSection = useCallback(
+    (nextSection: DetailSection | null) => {
+      setSection(nextSection);
+      if (nextSection) {
+        const index = DETAIL_PATHS.findIndex(
+          (path) => path.id === nextSection,
+        );
+        if (index >= 0) setSectionCursor(index);
+      }
+
+      const currentSection = readDetailSection();
+      if (nextSection === null) {
+        if (didPushSection.current) {
+          didPushSection.current = false;
+          window.history.back();
+        } else {
+          window.history.replaceState({}, "", `/projects/${project.slug}`);
+        }
+        return;
+      }
+
+      const target = `/projects/${project.slug}/${nextSection}`;
+      if (currentSection) {
+        // Section-to-section moves replace so arrowing through sections
+        // does not flood the history stack.
+        window.history.replaceState({}, "", target);
+      } else {
+        didPushSection.current = true;
+        window.history.pushState({}, "", target);
+      }
+    },
+    [project.slug],
+  );
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -699,11 +758,12 @@ function ProjectDetailView({
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [onClose, section, sectionCursor]);
+  }, [changeSection, onClose, section, sectionCursor]);
 
   useEffect(() => {
     const syncRoute = () => {
-      const nextSection = readSection();
+      didPushSection.current = false;
+      const nextSection = readDetailSection();
       setSection(nextSection);
       if (nextSection) {
         const index = DETAIL_PATHS.findIndex((path) => path.id === nextSection);
@@ -714,14 +774,18 @@ function ProjectDetailView({
     return () => window.removeEventListener("popstate", syncRoute);
   }, []);
 
-  const changeSection = (nextSection: DetailSection | null) => {
-    setSection(nextSection);
-    if (nextSection) {
-      const index = DETAIL_PATHS.findIndex((path) => path.id === nextSection);
-      if (index >= 0) setSectionCursor(index);
-    }
-    window.history.pushState({}, "", nextSection ? `/projects/${project.slug}/${nextSection}` : `/projects/${project.slug}`);
-  };
+  // Opening a project unmounts the control that held focus, so land it on
+  // the back control to keep keyboard and reader position inside the detail.
+  useEffect(() => {
+    backButtonRef.current?.focus({ preventScroll: true });
+  }, []);
+
+  useEffect(() => {
+    const path = section
+      ? DETAIL_PATHS.find((candidate) => candidate.id === section)
+      : null;
+    document.title = `${project.name}${path ? ` · ${path.label}` : ""} — Ezra Apple`;
+  }, [project.name, section]);
 
   return (
     <m.section
@@ -739,7 +803,11 @@ function ProjectDetailView({
       }}
     >
       <header className="detail-topbar">
-        <button onClick={() => section ? changeSection(null) : onClose()} type="button">
+        <button
+          onClick={() => section ? changeSection(null) : onClose()}
+          ref={backButtonRef}
+          type="button"
+        >
           ← {section ? "Back to overview" : "Back to projects"}
         </button>
         <span>{formatIndex(project.order)} / {project.name}</span>
@@ -812,9 +880,34 @@ export function App({
   });
   const isDetailOpen = openProjectSlug !== null;
   const activeProject = projects[activeIndex] ?? projects[0];
+  // Whether this session pushed the project entry on top of the catalog
+  // entry, so closing can pop it instead of growing the history.
+  const didPushProject = useRef(false);
+
+  const openProject = useCallback(
+    (slug: string) => {
+      const index = projects.findIndex((project) => project.slug === slug);
+      if (index >= 0) setActiveIndex(index);
+      setOpenProjectSlug(slug);
+      didPushProject.current = true;
+      window.history.pushState({}, "", `/projects/${slug}`);
+    },
+    [projects],
+  );
+
+  const closeProject = useCallback(() => {
+    setOpenProjectSlug(null);
+    if (didPushProject.current) {
+      didPushProject.current = false;
+      window.history.back();
+    } else {
+      window.history.replaceState({}, "", "/");
+    }
+  }, []);
 
   useEffect(() => {
     const syncRoute = () => {
+      didPushProject.current = false;
       const slug = projectSlugFromPath();
       setOpenProjectSlug(slug);
       if (slug) {
@@ -834,6 +927,10 @@ export function App({
       document.documentElement.classList.remove("project-open");
       document.body.classList.remove("project-open");
     };
+  }, [isDetailOpen]);
+
+  useEffect(() => {
+    if (!isDetailOpen) document.title = DEFAULT_TITLE;
   }, [isDetailOpen]);
 
   if (!activeProject) return null;
@@ -858,16 +955,8 @@ export function App({
           <section className="work-section" id="work">
             <ProjectCatalog
               activeIndex={activeIndex}
-              onCloseProject={() => {
-                setOpenProjectSlug(null);
-                window.history.pushState({}, "", "/");
-              }}
-              onOpenProject={(slug) => {
-                const index = projects.findIndex((project) => project.slug === slug);
-                if (index >= 0) setActiveIndex(index);
-                setOpenProjectSlug(slug);
-                window.history.pushState({}, "", `/projects/${slug}`);
-              }}
+              onCloseProject={closeProject}
+              onOpenProject={openProject}
               openProjectSlug={openProjectSlug}
               projects={projects}
               setActiveIndex={setActiveIndex}

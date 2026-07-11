@@ -1,6 +1,9 @@
 import { AnimatePresence, m } from "motion/react";
 import { useEffect, useState, type ReactNode } from "react";
 
+const moveEase = [0.645, 0.045, 0.355, 1] as const;
+const revealEase = [0.165, 0.84, 0.44, 1] as const;
+
 export type MorphSection<SectionId extends string> = {
   id: SectionId;
   label: string;
@@ -26,8 +29,6 @@ export function MorphingProjectDetail<SectionId extends string>({
   sections: MorphSection<SectionId>[];
   shouldReduceMotion: boolean;
 }) {
-  const moveEase = [0.645, 0.045, 0.355, 1] as const;
-  const revealEase = [0.165, 0.84, 0.44, 1] as const;
   const isExploring = activeSection !== null;
   const [hideSupplemental, setHideSupplemental] = useState(isExploring);
   const [centerHeader, setCenterHeader] = useState(isExploring);
