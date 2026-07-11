@@ -16,7 +16,7 @@ Selected Work
   01 ShoutOut
   02 Decyphr
   03 Spatium
-  04 Le Harness
+  04 LeHarness
   05 Cosmic Hot Potato
   06 skills-init
 

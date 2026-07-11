@@ -83,7 +83,7 @@ project pages can decide how much of it is visible or interactive.
 1. ShoutOut - local-first macOS dictation
 2. Decyphr - closed-beta founder project for AI video translation
 3. Spatium - real-time collaborative apartment layout editor
-4. Le Harness - experimental CLI agent harness
+4. LeHarness - experimental CLI agent harness
 5. Cosmic Hot Potato - 2D and 3D semantic word game
 6. skills-init - portable project context and skills for coding agents
 

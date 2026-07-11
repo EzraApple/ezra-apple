@@ -59,7 +59,7 @@ follow a single hue gradient:
 ShoutOut           blue
 Decyphr            blue cyan
 Spatium            teal
-Le Harness         warm amber
+LeHarness          warm amber
 Cosmic Hot Potato  violet
 skills-init        restrained lime
 ```

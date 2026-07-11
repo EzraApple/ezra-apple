@@ -5,7 +5,7 @@ export const leHarness = defineProject({
   slug: "leharness",
   order: 3,
   published: true,
-  name: "Le Harness",
+  name: "LeHarness",
   category: "Agent runtime",
   status: "Open source",
   summary:
@@ -47,7 +47,7 @@ export const leHarness = defineProject({
   depth: {
     what: {
       headline: "A harness built as a study of the machinery underneath agents.",
-      body: "Le Harness keeps the core loop explicit while growing durable sessions, tools, background work, subagents, artifacts, skills, and MCP support around it.",
+      body: "LeHarness keeps the core loop explicit while growing durable sessions, tools, background work, subagents, artifacts, skills, and MCP support around it.",
       highlights: ["Interactive CLI", "Multiple model providers", "Persistent local sessions"],
     },
     experience: {

@@ -54,7 +54,7 @@ wrangler.jsonc      Cloudflare routing and deployment
 ## Initial implementation sequence
 
 1. Define and validate the project content model. Complete.
-2. Add ShoutOut, Decyphr, Spatium, Le Harness, Cosmic Hot Potato, and
+2. Add ShoutOut, Decyphr, Spatium, LeHarness, Cosmic Hot Potato, and
    skills-init. Complete.
 3. Expose summaries and details through Hono. Complete.
 4. Seed TanStack Query synchronously with project summaries. Complete.

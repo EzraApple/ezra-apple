@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useHotkeys } from "@tanstack/react-hotkeys";
-import { domAnimation, LazyMotion, m, useReducedMotion } from "motion/react";
+import { domAnimation, LayoutGroup, LazyMotion, m, useReducedMotion } from "motion/react";
 import { FaGithub, FaLinkedinIn, FaXTwitter } from "react-icons/fa6";
 import {
   useCallback,
@@ -9,13 +9,14 @@ import {
   useState,
   type CSSProperties,
 } from "react";
-import type { ProjectSummary } from "@/content/projects";
+import { getProjectDetail, type ProjectDetail, type ProjectSummary } from "@/content/projects";
 import {
   CircleCheckIcon,
   CopyIcon,
   type AnimatedIconHandle,
 } from "./animated-icons";
 import { projectsQueryOptions } from "./projects-query";
+import { MorphingProjectDetail, type MorphSection } from "./project-detail/MorphingProjectDetail";
 
 type ThemeStyle = CSSProperties & {
   "--page-bg": string;
@@ -30,13 +31,20 @@ type ThemeStyle = CSSProperties & {
 const PROJECT_HOTKEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9"] as const;
 const API_ENDPOINT = new URL("/api/projects", window.location.origin).href;
 const MCP_ENDPOINT = new URL("/mcp", window.location.origin).href;
+type DetailSection = "product" | "engineering" | "story";
+const DETAIL_PATHS: MorphSection<DetailSection>[] = [
+  { id: "product", label: "Product", description: "Problem, interaction, and experience" },
+  { id: "engineering", label: "Engineering", description: "Architecture, systems, and decisions" },
+  { id: "story", label: "Story", description: "Why it exists and what shipped" },
+];
+
+function projectSlugFromPath(): string | null {
+  const slug = window.location.pathname.split("/")[2];
+  return slug && getProjectDetail(slug) ? slug : null;
+}
 
 function formatIndex(index: number): string {
   return String(index + 1).padStart(2, "0");
-}
-
-function prefersReducedMotion(): boolean {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 async function copyToClipboard(value: string): Promise<boolean> {
@@ -59,6 +67,7 @@ async function copyToClipboard(value: string): Promise<boolean> {
 function useCatalogScroll(
   count: number,
   setActiveIndex: (index: number) => void,
+  enabled = true,
 ) {
   const trackRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef(0);
@@ -71,6 +80,7 @@ function useCatalogScroll(
       const track = trackRef.current;
       if (
         !track ||
+        !enabled ||
         count < 2 ||
         window.matchMedia("(max-width: 760px)").matches
       ) {
@@ -104,10 +114,11 @@ function useCatalogScroll(
       window.removeEventListener("scroll", scheduleUpdate);
       window.removeEventListener("resize", scheduleUpdate);
     };
-  }, [count, setActiveIndex]);
+  }, [count, enabled, setActiveIndex]);
 
   const goTo = useCallback(
-    (index: number, source: "pointer" | "keyboard") => {
+    (index: number, _source: "pointer" | "keyboard") => {
+      if (!enabled) return;
       const track = trackRef.current;
       if (!track) return;
 
@@ -130,41 +141,56 @@ function useCatalogScroll(
 
       window.scrollTo({
         top: top + distance * ratio,
-        behavior:
-          source === "keyboard" || prefersReducedMotion() ? "auto" : "smooth",
+        behavior: "auto",
       });
     },
-    [count, setActiveIndex],
+    [count, enabled, setActiveIndex],
   );
 
   return { trackRef, goTo };
 }
 
 function ProjectPanel({
+  detail,
   project,
   index,
   isActive,
   onSelect,
+  onOpen,
+  onClose,
+  isAnyDetailOpen,
+  isExpanded,
 }: {
+  detail: ProjectDetail;
   project: ProjectSummary;
   index: number;
   isActive: boolean;
   onSelect: (index: number) => void;
+  onOpen: () => void;
+  onClose: () => void;
+  isAnyDetailOpen: boolean;
+  isExpanded: boolean;
 }) {
   const shouldReduceMotion = useReducedMotion() ?? false;
 
   return (
-    <article
+    <m.article
+      aria-hidden={isAnyDetailOpen && !isExpanded || undefined}
       className="project-panel"
       data-active={isActive}
+      data-detail-open={isExpanded}
       data-testid={`project-${project.slug}`}
+      layoutId={`project-panel-${project.slug}`}
     >
       <button
         aria-expanded={isActive}
         className="project-row"
+        tabIndex={isAnyDetailOpen && !isExpanded ? -1 : 0}
         onClick={(event) => {
           event.currentTarget.blur();
-          onSelect(index);
+          if (isExpanded) onClose();
+          else if (isActive) onOpen();
+          else onSelect(index);
         }}
         type="button"
       >
@@ -172,7 +198,9 @@ function ProjectPanel({
         <span className="project-row-name">{project.name}</span>
       </button>
 
-      {isActive ? (
+      {isExpanded ? (
+        <ProjectDetailView onClose={onClose} project={detail} />
+      ) : isActive ? (
         <m.div
           animate={{ opacity: 1, y: 0 }}
           className="project-content"
@@ -185,12 +213,12 @@ function ProjectPanel({
           }}
         >
           <div className="project-heading">
-            <h2>{project.name}</h2>
+            <m.h2 layoutId={`project-title-${project.slug}`}>{project.name}</m.h2>
           </div>
-          <p className="project-summary">{project.summary}</p>
+          <m.p className="project-summary" layoutId={`project-summary-${project.slug}`}>{project.summary}</m.p>
         </m.div>
       ) : null}
-    </article>
+    </m.article>
   );
 }
 
@@ -262,9 +290,14 @@ function EndpointCopyCard({
   );
 }
 
-function StructuredAccess() {
+function StructuredAccess({ hidden = false }: { hidden?: boolean }) {
   return (
-    <section className="machine-access" aria-label="Machine-readable endpoints">
+    <section
+      aria-hidden={hidden || undefined}
+      className="machine-access"
+      inert={hidden || undefined}
+      aria-label="Machine-readable endpoints"
+    >
       <EndpointCopyCard endpoint={API_ENDPOINT} />
       <EndpointCopyCard endpoint={MCP_ENDPOINT} />
     </section>
@@ -275,19 +308,27 @@ function ProjectCatalog({
   projects,
   activeIndex,
   setActiveIndex,
+  onOpenProject,
+  onCloseProject,
+  openProjectSlug,
 }: {
   projects: ProjectSummary[];
   activeIndex: number;
   setActiveIndex: (index: number) => void;
+  onOpenProject: (slug: string) => void;
+  onCloseProject: () => void;
+  openProjectSlug: string | null;
 }) {
+  const isDetailOpen = openProjectSlug !== null;
   const { trackRef, goTo } = useCatalogScroll(
     projects.length,
     setActiveIndex,
+    !isDetailOpen,
   );
   const trackHeight = `${100 + Math.max(projects.length - 1, 0) * 28}vh`;
 
   useHotkeys(
-    [
+    isDetailOpen ? [] : [
       {
         hotkey: "ArrowUp",
         callback: () => goTo(activeIndex - 1, "keyboard"),
@@ -300,6 +341,13 @@ function ProjectCatalog({
       {
         hotkey: "End",
         callback: () => goTo(projects.length - 1, "keyboard"),
+      },
+      {
+        hotkey: "ArrowRight",
+        callback: () => {
+          const project = projects[activeIndex];
+          if (project) onOpenProject(project.slug);
+        },
       },
       ...PROJECT_HOTKEYS.slice(0, projects.length).map((hotkey, index) => ({
         hotkey,
@@ -315,7 +363,12 @@ function ProjectCatalog({
   );
 
   return (
-    <div className="catalog-track" ref={trackRef} style={{ height: trackHeight }}>
+    <div
+      className="catalog-track"
+      data-detail-open={isDetailOpen}
+      ref={trackRef}
+      style={{ height: isDetailOpen ? "auto" : trackHeight }}
+    >
       <div className="catalog-sticky">
         <div className="catalog-frame">
           <header className="intro">
@@ -339,9 +392,9 @@ function ProjectCatalog({
             <p>Software engineer and former founder building AI products and developer tools.</p>
           </header>
 
-          <div className="section-heading">
+          <div aria-hidden={isDetailOpen || undefined} className="section-heading" inert={isDetailOpen || undefined}>
             <p>Selected work</p>
-            <span className="keyboard-hint">↑ ↓ or 1–{projects.length}</span>
+            <span className="keyboard-hint">↑ ↓ select · → open · 1–{projects.length}</span>
             <div className="catalog-controls" aria-label="Project navigation">
               <button
                 aria-label="Previous project"
@@ -365,22 +418,186 @@ function ProjectCatalog({
             </div>
           </div>
 
-          <div className="project-stack">
-            {projects.map((project, index) => (
-              <ProjectPanel
-                index={index}
-                isActive={index === activeIndex}
-                key={project.slug}
-                onSelect={(projectIndex) => goTo(projectIndex, "pointer")}
-                project={project}
-              />
-            ))}
+          <div className="project-stack" data-detail-open={isDetailOpen}>
+            {projects.map((project, index) => {
+              const detail = getProjectDetail(project.slug);
+              if (!detail) return null;
+
+              return (
+                <ProjectPanel
+                  detail={detail}
+                  index={index}
+                  isActive={index === activeIndex}
+                  isAnyDetailOpen={isDetailOpen}
+                  isExpanded={openProjectSlug === project.slug}
+                  key={project.slug}
+                  onClose={onCloseProject}
+                  onSelect={(projectIndex) => goTo(projectIndex, "pointer")}
+                  onOpen={() => onOpenProject(project.slug)}
+                  project={project}
+                />
+              );
+            })}
           </div>
 
-          <StructuredAccess />
+          <StructuredAccess hidden={isDetailOpen} />
         </div>
       </div>
     </div>
+  );
+}
+
+function ProjectArtifactVisual({ project }: { project: ProjectDetail }) {
+  if (project.slug === "shoutout") {
+    return (
+      <div className="signal-art" aria-hidden="true">
+        {Array.from({ length: 17 }, (_, index) => <i key={index} style={{ height: `${18 + ((index * 19) % 68)}%` }} />)}
+      </div>
+    );
+  }
+
+  return (
+    <div className="detail-artifact" aria-hidden="true">
+      <span>{project.artifact.label}</span>
+      {project.artifact.items.map((item) => (
+        <div key={`${item.label}-${item.detail}`}>
+          <strong>{item.label}</strong>
+          <small>{item.detail}</small>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ProjectDetailView({
+  onClose,
+  project,
+}: {
+  onClose: () => void;
+  project: ProjectDetail;
+}) {
+  const readSection = (): DetailSection | null => {
+    const value = window.location.pathname.split("/")[3];
+    return value === "product" || value === "engineering" || value === "story" ? value : null;
+  };
+  const [section, setSection] = useState<DetailSection | null>(readSection);
+  const [sectionCursor, setSectionCursor] = useState(() => {
+    const initialSection = readSection();
+    const index = initialSection ? DETAIL_PATHS.findIndex((path) => path.id === initialSection) : 0;
+    return Math.max(index, 0);
+  });
+  const shouldReduceMotion = useReducedMotion() ?? false;
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" || event.key === "ArrowLeft") {
+        event.preventDefault();
+        if (section) changeSection(null);
+        else onClose();
+        return;
+      }
+
+      if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+        event.preventDefault();
+        const direction = event.key === "ArrowDown" ? 1 : -1;
+        const currentIndex = section
+          ? DETAIL_PATHS.findIndex((path) => path.id === section)
+          : sectionCursor;
+        const nextIndex = Math.min(Math.max(currentIndex + direction, 0), DETAIL_PATHS.length - 1);
+        setSectionCursor(nextIndex);
+        if (section) changeSection(DETAIL_PATHS[nextIndex].id);
+        return;
+      }
+
+      if (event.key === "ArrowRight" && !section) {
+        event.preventDefault();
+        changeSection(DETAIL_PATHS[sectionCursor].id);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onClose, section, sectionCursor]);
+
+  useEffect(() => {
+    const syncRoute = () => {
+      const nextSection = readSection();
+      setSection(nextSection);
+      if (nextSection) {
+        const index = DETAIL_PATHS.findIndex((path) => path.id === nextSection);
+        if (index >= 0) setSectionCursor(index);
+      }
+    };
+    window.addEventListener("popstate", syncRoute);
+    return () => window.removeEventListener("popstate", syncRoute);
+  }, []);
+
+  const changeSection = (nextSection: DetailSection | null) => {
+    setSection(nextSection);
+    if (nextSection) {
+      const index = DETAIL_PATHS.findIndex((path) => path.id === nextSection);
+      if (index >= 0) setSectionCursor(index);
+    }
+    window.history.pushState({}, "", nextSection ? `/projects/${project.slug}/${nextSection}` : `/projects/${project.slug}`);
+  };
+
+  return (
+    <m.section className="detail-shell" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      <header className="detail-topbar">
+        <button onClick={() => section ? changeSection(null) : onClose()} type="button">
+          ← {section ? "Back to overview" : "Back to projects"}
+        </button>
+        <span>{formatIndex(project.order)} / {project.name}</span>
+      </header>
+
+      <MorphingProjectDetail
+        activeSection={section}
+        highlightedSection={DETAIL_PATHS[sectionCursor].id}
+        hero={(
+          <div className="detail-hero">
+            <div>
+              <p className="detail-eyebrow">{project.category}</p>
+              <m.h1 layoutId={`project-title-${project.slug}`}>{project.name}</m.h1>
+              <m.p className="detail-summary" layoutId={`project-summary-${project.slug}`}>{project.summary}</m.p>
+            </div>
+            <ProjectArtifactVisual project={project} />
+          </div>
+        )}
+        onSectionChange={changeSection}
+        onSectionHighlight={(nextSection) => {
+          const index = DETAIL_PATHS.findIndex((path) => path.id === nextSection);
+          if (index >= 0) setSectionCursor(index);
+        }}
+        renderSection={(activeSection) => {
+          const narrative = activeSection === "product" ? project.depth.experience : project.depth.what;
+          return (
+            <article className="detail-section">
+              <h1>{activeSection === "engineering" ? "Architecture" : narrative.headline}</h1>
+              <p className="detail-section-intro">
+                {activeSection === "engineering" ? project.depth.system.body : narrative.body}
+              </p>
+              {activeSection === "engineering" ? (
+                <div className="system-flow">
+                  {project.depth.system.flow.map((step, index) => (
+                    <div key={step}><span>{formatIndex(index)}</span><strong>{step}</strong></div>
+                  ))}
+                </div>
+              ) : (
+                <div className="narrative-grid">
+                  {narrative.highlights.map((item, index) => (
+                    <div key={item}><span>{formatIndex(index)}</span><strong>{item}</strong></div>
+                  ))}
+                </div>
+              )}
+              <div className="detail-exits">
+                {project.links.map((link) => <a href={link.href} key={link.href} target="_blank" rel="noreferrer">{link.label} ↗</a>)}
+              </div>
+            </article>
+          );
+        }}
+        sections={DETAIL_PATHS}
+        shouldReduceMotion={shouldReduceMotion}
+      />
+    </m.section>
   );
 }
 
@@ -391,33 +608,77 @@ export function App({
 }) {
   const { data } = useQuery(projectsQueryOptions(initialProjects));
   const projects = data ?? initialProjects;
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [openProjectSlug, setOpenProjectSlug] = useState<string | null>(projectSlugFromPath);
+  const [activeIndex, setActiveIndex] = useState(() => {
+    const initialSlug = projectSlugFromPath();
+    const index = initialSlug ? initialProjects.findIndex((project) => project.slug === initialSlug) : 0;
+    return Math.max(index, 0);
+  });
+  const isDetailOpen = openProjectSlug !== null;
   const activeProject = projects[activeIndex] ?? projects[0];
+
+  useEffect(() => {
+    const syncRoute = () => {
+      const slug = projectSlugFromPath();
+      setOpenProjectSlug(slug);
+      if (slug) {
+        const index = projects.findIndex((project) => project.slug === slug);
+        if (index >= 0) setActiveIndex(index);
+      }
+    };
+    window.addEventListener("popstate", syncRoute);
+    return () => window.removeEventListener("popstate", syncRoute);
+  }, [projects]);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("project-open", isDetailOpen);
+    document.body.classList.toggle("project-open", isDetailOpen);
+    if (isDetailOpen) window.scrollTo({ top: 0, behavior: "auto" });
+    return () => {
+      document.documentElement.classList.remove("project-open");
+      document.body.classList.remove("project-open");
+    };
+  }, [isDetailOpen]);
 
   if (!activeProject) return null;
 
+  const themeProject = isDetailOpen
+    ? projects.find((project) => project.slug === openProjectSlug) ?? activeProject
+    : activeProject;
   const themeStyle: ThemeStyle = {
-    "--page-bg": activeProject.theme.background,
-    "--page-surface": activeProject.theme.surface,
-    "--page-fg": activeProject.theme.foreground,
-    "--page-muted": activeProject.theme.muted,
-    "--page-border": activeProject.theme.border,
-    "--page-accent": activeProject.theme.accent,
-    "--page-accent-soft": activeProject.theme.accentSoft,
+    "--page-bg": themeProject.theme.background,
+    "--page-surface": themeProject.theme.surface,
+    "--page-fg": themeProject.theme.foreground,
+    "--page-muted": themeProject.theme.muted,
+    "--page-border": themeProject.theme.border,
+    "--page-accent": themeProject.theme.accent,
+    "--page-accent-soft": themeProject.theme.accentSoft,
   };
 
   return (
     <LazyMotion features={domAnimation} strict>
-      <main className="site-shell" style={themeStyle}>
-        <section className="work-section" id="work">
-          <ProjectCatalog
-            activeIndex={activeIndex}
-            projects={projects}
-            setActiveIndex={setActiveIndex}
-          />
-        </section>
-
-      </main>
+      <LayoutGroup>
+        <main className="site-shell" style={themeStyle}>
+          <section className="work-section" id="work">
+            <ProjectCatalog
+              activeIndex={activeIndex}
+              onCloseProject={() => {
+                setOpenProjectSlug(null);
+                window.history.pushState({}, "", "/");
+              }}
+              onOpenProject={(slug) => {
+                const index = projects.findIndex((project) => project.slug === slug);
+                if (index >= 0) setActiveIndex(index);
+                setOpenProjectSlug(slug);
+                window.history.pushState({}, "", `/projects/${slug}`);
+              }}
+              openProjectSlug={openProjectSlug}
+              projects={projects}
+              setActiveIndex={setActiveIndex}
+            />
+          </section>
+        </main>
+      </LayoutGroup>
     </LazyMotion>
   );
 }

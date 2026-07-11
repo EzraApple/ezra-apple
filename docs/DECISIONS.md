@@ -18,7 +18,7 @@
 - The first render receives project summaries synchronously; TanStack Query has
   no loading-state branch.
 - The deployed runtime is Vite, React, Hono, and one Cloudflare Worker.
-- The prototype catalog is ordered as ShoutOut, Decyphr, Spatium, Le Harness,
+- The prototype catalog is ordered as ShoutOut, Decyphr, Spatium, LeHarness,
   Cosmic Hot Potato, and skills-init: current shipped product, founder
   experience, collaborative product, systems depth, technical play, then
   developer utility.
