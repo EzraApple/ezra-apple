@@ -326,6 +326,12 @@ button {
   background: color-mix(in oklch, var(--page-surface) 66%, transparent);
 }
 
+/* While geometry is driven per-frame from scroll progress, the flex-basis
+   transition would lag one step behind the pointer. */
+.project-stack[data-scrub="true"] .project-panel {
+  transition: background-color 180ms ease;
+}
+
 .project-row {
   display: grid;
   width: 100%;
@@ -397,6 +403,32 @@ button {
   font-weight: 410;
   letter-spacing: -0.032em;
   line-height: 1.2;
+}
+
+.project-link {
+  width: fit-content;
+  margin-top: 24px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid color-mix(in oklch, var(--page-border) 80%, transparent);
+  color: var(--page-muted);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  transition:
+    border-color 130ms ease,
+    color 130ms ease;
+}
+
+.project-link:hover,
+.project-link:focus-visible {
+  border-color: var(--page-accent);
+  color: var(--page-accent);
+}
+
+.project-link:focus-visible {
+  outline: 1px solid var(--page-accent);
+  outline-offset: 3px;
 }
 
 .machine-access {
@@ -571,9 +603,11 @@ button {
   border-bottom: 0;
 }
 
+/* flex uses !important so per-frame inline scrub styles from the catalog
+   can never leak into the detail composition. */
 .project-stack[data-detail-open="true"] .project-panel:not([data-detail-open="true"]) {
   min-height: 0;
-  flex-basis: 0;
+  flex: 0 0 0px !important;
   border: 0;
   opacity: 0;
   pointer-events: none;
@@ -582,7 +616,7 @@ button {
 .project-panel[data-detail-open="true"] {
   height: 100%;
   min-height: 0;
-  flex: 1 0 auto;
+  flex: 1 0 auto !important;
   overflow: hidden;
   border: 1px solid var(--page-border);
   background: color-mix(in oklch, var(--page-surface) 66%, transparent);

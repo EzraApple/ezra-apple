@@ -41,6 +41,16 @@
   hot reload cannot make one keypress skip multiple projects.
 - The app does not use React's development-only Strict Mode double mount while
   the global TanStack Hotkeys manager is active.
+- Catalog geometry is interpolated per-frame from scroll progress; the two
+  panels adjacent to the fractional position share the expanded height, so
+  scrolling reads as travel rather than a threshold switch.
+- Discrete navigation (row clicks, arrows, number keys) animates the scroll
+  position itself, keeping scroll as the single motion source for geometry.
+- Closing a project detail restores the scroll position of the project that
+  was open instead of resetting the catalog to the first project.
+- The open panel shows the project's primary link (its first authored link)
+  under the title; the full link set stays on the project detail sections so
+  the homepage keeps pulling visitors into the deeper flow.
 
 ## Provisional
 

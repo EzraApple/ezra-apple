@@ -71,19 +71,40 @@ function useCatalogScroll(
 ) {
   const trackRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef(0);
+  const scrollFrame = useRef(0);
+  const scrollAnimating = useRef(false);
+  const wasEnabled = useRef(enabled);
+
+  const cancelScrollAnimation = useCallback(() => {
+    if (scrollFrame.current) cancelAnimationFrame(scrollFrame.current);
+    scrollFrame.current = 0;
+    scrollAnimating.current = false;
+  }, []);
 
   useEffect(() => {
     let animationFrame = 0;
 
+    const panels = (): HTMLElement[] => {
+      const track = trackRef.current;
+      return track
+        ? Array.from(track.querySelectorAll<HTMLElement>(".project-panel"))
+        : [];
+    };
+
+    const clearScrub = () => {
+      const stack = trackRef.current?.querySelector<HTMLElement>(
+        ".project-stack",
+      );
+      if (stack) delete stack.dataset.scrub;
+      for (const panel of panels()) panel.style.flex = "";
+    };
+
     const update = () => {
       animationFrame = 0;
       const track = trackRef.current;
-      if (
-        !track ||
-        !enabled ||
-        count < 2 ||
-        window.matchMedia("(max-width: 760px)").matches
-      ) {
+      if (!track || !enabled || count < 2) return;
+      if (window.matchMedia("(max-width: 760px)").matches) {
+        clearScrub();
         return;
       }
 
@@ -93,28 +114,114 @@ function useCatalogScroll(
         Math.max((window.scrollY - top) / distance, 0),
         1,
       );
-      const nextIndex = Math.round(progress * (count - 1));
+      const exact = progress * (count - 1);
+      const nextIndex = Math.round(exact);
 
-      if (nextIndex !== activeRef.current) {
+      if (!scrollAnimating.current && nextIndex !== activeRef.current) {
         activeRef.current = nextIndex;
         setActiveIndex(nextIndex);
       }
+
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        clearScrub();
+        return;
+      }
+
+      const stack = track.querySelector<HTMLElement>(".project-stack");
+      const items = panels();
+      if (!stack || items.length !== count) return;
+
+      const rowHeight =
+        Number.parseFloat(
+          getComputedStyle(stack).getPropertyValue("--row-height"),
+        ) || 50;
+      const expandedHeight = stack.clientHeight - (count - 1) * rowHeight;
+      if (expandedHeight <= rowHeight) return;
+
+      const lower = Math.floor(exact);
+      const fraction = exact - lower;
+
+      stack.dataset.scrub = "true";
+      items.forEach((panel, index) => {
+        const share =
+          index === lower ? 1 - fraction : index === lower + 1 ? fraction : 0;
+        const basis = rowHeight + (expandedHeight - rowHeight) * share;
+        panel.style.flex = `0 0 ${basis}px`;
+      });
     };
 
     const scheduleUpdate = () => {
       if (!animationFrame) animationFrame = requestAnimationFrame(update);
     };
 
+    const cancelOnUserScroll = () => cancelScrollAnimation();
+
+    if (enabled && !wasEnabled.current && trackRef.current && count > 1) {
+      // Returning from the detail view: restore the scroll position that
+      // corresponds to the project the visitor was on before the catalog
+      // handler reads the scroll and resets the selection.
+      const track = trackRef.current;
+      if (!window.matchMedia("(max-width: 760px)").matches) {
+        const top = window.scrollY + track.getBoundingClientRect().top;
+        const distance = Math.max(track.offsetHeight - window.innerHeight, 0);
+        window.scrollTo(0, top + distance * (activeRef.current / (count - 1)));
+      }
+    }
+    wasEnabled.current = enabled;
+
     update();
     window.addEventListener("scroll", scheduleUpdate, { passive: true });
     window.addEventListener("resize", scheduleUpdate);
+    window.addEventListener("wheel", cancelOnUserScroll, { passive: true });
+    window.addEventListener("touchstart", cancelOnUserScroll, {
+      passive: true,
+    });
 
     return () => {
       if (animationFrame) cancelAnimationFrame(animationFrame);
       window.removeEventListener("scroll", scheduleUpdate);
       window.removeEventListener("resize", scheduleUpdate);
+      window.removeEventListener("wheel", cancelOnUserScroll);
+      window.removeEventListener("touchstart", cancelOnUserScroll);
+      cancelScrollAnimation();
+      clearScrub();
     };
-  }, [count, enabled, setActiveIndex]);
+  }, [cancelScrollAnimation, count, enabled, setActiveIndex]);
+
+  const animateScrollTo = useCallback(
+    (targetY: number) => {
+      cancelScrollAnimation();
+
+      const startY = window.scrollY;
+      const delta = targetY - startY;
+      if (
+        Math.abs(delta) < 1 ||
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ) {
+        window.scrollTo({ top: targetY, behavior: "auto" });
+        return;
+      }
+
+      const duration = 320;
+      const start = performance.now();
+      scrollAnimating.current = true;
+
+      const step = (now: number) => {
+        const t = Math.min((now - start) / duration, 1);
+        const eased =
+          t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        window.scrollTo(0, startY + delta * eased);
+        if (t < 1) {
+          scrollFrame.current = requestAnimationFrame(step);
+        } else {
+          scrollFrame.current = 0;
+          scrollAnimating.current = false;
+        }
+      };
+      scrollFrame.current = requestAnimationFrame(step);
+    },
+    [cancelScrollAnimation],
+  );
 
   const goTo = useCallback(
     (index: number, _source: "pointer" | "keyboard") => {
@@ -139,12 +246,9 @@ function useCatalogScroll(
       const distance = Math.max(track.offsetHeight - window.innerHeight, 0);
       const ratio = count > 1 ? targetIndex / (count - 1) : 0;
 
-      window.scrollTo({
-        top: top + distance * ratio,
-        behavior: "auto",
-      });
+      animateScrollTo(top + distance * ratio);
     },
-    [count, enabled, setActiveIndex],
+    [animateScrollTo, count, enabled, setActiveIndex],
   );
 
   return { trackRef, goTo };
@@ -214,6 +318,17 @@ function ProjectPanel({
         >
           <div className="project-heading">
             <m.h2 layoutId={`project-title-${project.slug}`}>{project.name}</m.h2>
+            {project.links[0] ? (
+              <a
+                className="project-link"
+                href={project.links[0].href}
+                rel="noreferrer"
+                target="_blank"
+              >
+                {project.links[0].label}
+                <span aria-hidden="true"> ↗</span>
+              </a>
+            ) : null}
           </div>
           <m.p className="project-summary" layoutId={`project-summary-${project.slug}`}>{project.summary}</m.p>
         </m.div>
