@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useHotkeys } from "@tanstack/react-hotkeys";
-import { domAnimation, LayoutGroup, LazyMotion, m, useReducedMotion } from "motion/react";
+import { AnimatePresence, domAnimation, LayoutGroup, LazyMotion, m, useReducedMotion } from "motion/react";
 import { FaGithub, FaLinkedinIn, FaXTwitter } from "react-icons/fa6";
 import {
   useCallback,
@@ -251,7 +251,16 @@ function useCatalogScroll(
     [animateScrollTo, count, enabled, setActiveIndex],
   );
 
-  return { trackRef, goTo };
+  // Stepping reads the live index ref so a burst of key presses can never
+  // compound against a stale render snapshot.
+  const goBy = useCallback(
+    (delta: number, source: "pointer" | "keyboard") => {
+      goTo(activeRef.current + delta, source);
+    },
+    [goTo],
+  );
+
+  return { trackRef, goTo, goBy };
 }
 
 function ProjectPanel({
@@ -285,6 +294,15 @@ function ProjectPanel({
       data-detail-open={isExpanded}
       data-testid={`project-${project.slug}`}
       layoutId={`project-panel-${project.slug}`}
+      onClick={(event) => {
+        // The whole open panel is a door into the detail; real controls and
+        // text selections keep their own behavior.
+        if (!isActive || isExpanded || isAnyDetailOpen) return;
+        const target = event.target as HTMLElement;
+        if (target.closest("button, a")) return;
+        if (window.getSelection()?.toString()) return;
+        onOpen();
+      }}
     >
       <button
         aria-expanded={isActive}
@@ -302,14 +320,32 @@ function ProjectPanel({
         <span className="project-row-name">{project.name}</span>
       </button>
 
+      <AnimatePresence custom={isExpanded} initial={false} mode="popLayout">
       {isExpanded ? (
-        <ProjectDetailView onClose={onClose} project={detail} />
+        <ProjectDetailView key="detail" onClose={onClose} project={detail} />
       ) : isActive ? (
         <m.div
           animate={{ opacity: 1, y: 0 }}
           className="project-content"
+          custom={isExpanded}
+          exit="exit"
           initial={shouldReduceMotion ? false : { opacity: 0, y: 7 }}
           key={project.slug}
+          variants={{
+            // Fade out when handing off to the detail view; vanish instantly
+            // when the active project changes so two text layers never
+            // overlap during a scroll switch.
+            exit: (towardDetail: boolean) =>
+              towardDetail && !shouldReduceMotion
+                ? {
+                    opacity: 0,
+                    transition: {
+                      duration: 0.14,
+                      ease: [0.165, 0.84, 0.44, 1],
+                    },
+                  }
+                : { opacity: 0, transition: { duration: 0 } },
+          }}
           transition={{
             delay: shouldReduceMotion ? 0 : 0.055,
             duration: shouldReduceMotion ? 0 : 0.18,
@@ -339,6 +375,7 @@ function ProjectPanel({
           <m.p className="project-summary" layoutId={`project-summary-${project.slug}`}>{project.summary}</m.p>
         </m.div>
       ) : null}
+      </AnimatePresence>
     </m.article>
   );
 }
@@ -441,7 +478,7 @@ function ProjectCatalog({
   openProjectSlug: string | null;
 }) {
   const isDetailOpen = openProjectSlug !== null;
-  const { trackRef, goTo } = useCatalogScroll(
+  const { trackRef, goTo, goBy } = useCatalogScroll(
     projects.length,
     setActiveIndex,
     !isDetailOpen,
@@ -452,11 +489,11 @@ function ProjectCatalog({
     isDetailOpen ? [] : [
       {
         hotkey: "ArrowUp",
-        callback: () => goTo(activeIndex - 1, "keyboard"),
+        callback: () => goBy(-1, "keyboard"),
       },
       {
         hotkey: "ArrowDown",
-        callback: () => goTo(activeIndex + 1, "keyboard"),
+        callback: () => goBy(1, "keyboard"),
       },
       { hotkey: "Home", callback: () => goTo(0, "keyboard") },
       {
@@ -520,7 +557,7 @@ function ProjectCatalog({
               <button
                 aria-label="Previous project"
                 disabled={activeIndex === 0}
-                onClick={() => goTo(activeIndex - 1, "pointer")}
+                onClick={() => goBy(-1, "pointer")}
                 type="button"
               >
                 ↑
@@ -531,7 +568,7 @@ function ProjectCatalog({
               <button
                 aria-label="Next project"
                 disabled={activeIndex === projects.length - 1}
-                onClick={() => goTo(activeIndex + 1, "pointer")}
+                onClick={() => goBy(1, "pointer")}
                 type="button"
               >
                 ↓
@@ -662,7 +699,20 @@ function ProjectDetailView({
   };
 
   return (
-    <m.section className="detail-shell" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+    <m.section
+      animate={{ opacity: 1 }}
+      className="detail-shell"
+      exit={{
+        opacity: 0,
+        transition: { duration: shouldReduceMotion ? 0 : 0.14 },
+      }}
+      initial={{ opacity: 0 }}
+      transition={{
+        delay: shouldReduceMotion ? 0 : 0.1,
+        duration: shouldReduceMotion ? 0 : 0.26,
+        ease: [0.165, 0.84, 0.44, 1],
+      }}
+    >
       <header className="detail-topbar">
         <button onClick={() => section ? changeSection(null) : onClose()} type="button">
           ← {section ? "Back to overview" : "Back to projects"}
