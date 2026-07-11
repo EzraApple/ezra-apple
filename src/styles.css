@@ -414,16 +414,28 @@ button {
 }
 
 .project-content {
-  display: grid;
   height: calc(100% - var(--row-height));
+  animation: project-content-in 240ms var(--ease-out) 40ms backwards;
+  will-change: transform, opacity;
+}
+
+/* Layout lives on an inner wrapper whose opacity the catalog scrub drives
+   from scroll distance; Motion never writes to this element. */
+.project-content-fade {
+  display: grid;
+  height: 100%;
   padding: clamp(28px, 4vh, 42px) 18px clamp(28px, 4vh, 42px) 72px;
   grid-template-columns: minmax(240px, 520px) minmax(320px, 620px);
   justify-content: center;
   align-content: center;
   align-items: start;
   gap: clamp(48px, 7vw, 96px);
-  animation: project-content-in 240ms var(--ease-out) 40ms backwards;
-  will-change: transform, opacity;
+}
+
+/* Until the first scrub frame writes a value, freshly mounted content stays
+   hidden so a fast crossing can never flash at full opacity. */
+.project-stack[data-scrub="true"] .project-content-fade {
+  opacity: 0;
 }
 
 .project-heading {
@@ -998,7 +1010,7 @@ button {
 .detail-exits a { padding-bottom: 5px; border-bottom: 1px solid var(--page-accent); font-size: 13px; }
 
 @media (max-width: 900px) {
-  .project-content {
+  .project-content-fade {
     padding-left: 72px;
     grid-template-columns: minmax(210px, 0.75fr) minmax(280px, 1.25fr);
     gap: 36px;
@@ -1086,6 +1098,10 @@ button {
 
   .project-content {
     height: auto;
+    min-height: calc(430px - var(--row-height));
+  }
+
+  .project-content-fade {
     min-height: calc(430px - var(--row-height));
     padding: 26px 12px 30px 56px;
     grid-template-columns: 1fr;

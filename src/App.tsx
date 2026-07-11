@@ -96,7 +96,11 @@ function useCatalogScroll(
         ".project-stack",
       );
       if (stack) delete stack.dataset.scrub;
-      for (const panel of panels()) panel.style.flex = "";
+      for (const panel of panels()) {
+        panel.style.flex = "";
+        const fade = panel.querySelector<HTMLElement>(".project-content-fade");
+        if (fade) fade.style.opacity = "";
+      }
     };
 
     const update = () => {
@@ -147,6 +151,15 @@ function useCatalogScroll(
           index === lower ? 1 - fraction : index === lower + 1 ? fraction : 0;
         const basis = rowHeight + (expandedHeight - rowHeight) * share;
         panel.style.flex = `0 0 ${basis}px`;
+
+        // Content legibility follows scroll distance, not a clock: it fades
+        // over the half-open -> mostly-open stretch of the panel, so fast
+        // scrolls pass through dim instead of strobing timed fades.
+        const fade = panel.querySelector<HTMLElement>(".project-content-fade");
+        if (fade) {
+          const legibility = Math.min(Math.max((share - 0.5) / 0.35, 0), 1);
+          fade.style.opacity = String(legibility);
+        }
       });
     };
 
@@ -177,8 +190,20 @@ function useCatalogScroll(
       passive: true,
     });
 
+    // Content mounts one React commit after the index crossing; if the
+    // scroll gesture ended on that exact frame no further scroll event will
+    // write its scrubbed opacity, so re-run the scrub whenever the stack's
+    // subtree changes.
+    const mountObserver = new MutationObserver(scheduleUpdate);
+    const stackElement =
+      trackRef.current?.querySelector<HTMLElement>(".project-stack");
+    if (stackElement) {
+      mountObserver.observe(stackElement, { childList: true, subtree: true });
+    }
+
     return () => {
       if (animationFrame) cancelAnimationFrame(animationFrame);
+      mountObserver.disconnect();
       window.removeEventListener("scroll", scheduleUpdate);
       window.removeEventListener("resize", scheduleUpdate);
       window.removeEventListener("wheel", cancelOnUserScroll);
@@ -350,6 +375,7 @@ function ProjectPanel({
                 : { opacity: 0, transition: { duration: 0 } },
           }}
         >
+          <div className="project-content-fade">
           <div className="project-heading">
             <m.h2 layoutId={`project-title-${project.slug}`}>{project.name}</m.h2>
             <div className="project-actions">
@@ -371,6 +397,7 @@ function ProjectPanel({
             </div>
           </div>
           <m.p className="project-summary" layoutId={`project-summary-${project.slug}`}>{project.summary}</m.p>
+          </div>
         </m.div>
       ) : null}
       </AnimatePresence>
