@@ -2,71 +2,62 @@
 
 ## Status
 
-Provisional stack aligned with the current direction.
+Implemented for the initial local prototype.
 
 ## Application
 
-- TypeScript
-- React
-- Vite
-- Hono for HTTP routing and server interfaces
-- pnpm for package management
+- TypeScript with strict checking
+- React 19
+- Vite 8
+- TanStack Query for the client data boundary
+- TanStack Hotkeys for keyboard project navigation
+- Motion with `LazyMotion` and `domAnimation` for code-split, transform-and-
+  opacity-based project and icon transitions
+- React Icons for the small social-link icon set
+- self-hosted Instrument Sans variable font files
+- Zod for runtime schemas and inferred TypeScript types
+- Hono for public HTTP routes
+- npm for package management
 
-The exact styling and animation libraries should be chosen after a small sticky
-catalog prototype proves the interaction. CSS should handle simple transitions;
-a motion library is justified only where scroll progress, interruption, or
-shared-element continuity is materially easier to maintain.
+This is a standard Vite SPA, not Next.js or a proprietary site framework.
 
-## Deployment
+## Cloudflare
 
-Primary target: Cloudflare.
+The Cloudflare Vite plugin runs the frontend and Worker together during local
+development. `wrangler.jsonc` defines one deployment containing:
 
-The intended shape is a Vite-built frontend and Hono routes deployed together
-on Cloudflare Workers, with static assets and `/api` plus `/mcp` available on
-the same origin.
+- static Vite assets;
+- SPA fallback routing;
+- a Worker that runs first for `/api/*`;
+- the Hono API inside that Worker.
 
-Start with static, version-controlled content. Do not introduce a database
-until the product needs runtime-authored data.
+Production deploys with `npm run deploy`. The `ezraapple.dev` custom domain can
+be attached to that Worker after the local experience is approved.
 
-Potential later Cloudflare services:
+## Runtime services
 
-- KV for small cached or derived public data;
-- D1 if the site gains genuinely relational runtime content;
-- Queues for asynchronous ingestion;
-- Analytics Engine or another provider for aggregate product analytics.
+None beyond Cloudflare Workers and static assets.
 
-These are options, not current requirements.
+There is currently no D1, KV, R2, queue, database, CMS, or external hosting
+dependency. Project data is small, curated, and compiled into the deployment.
 
-## Content ingestion
-
-Authored repository content is canonical. Public GitHub metadata may be fetched
-at build or scheduled-ingestion time for fields such as repository URL, latest
-release, or update timestamp.
-
-Do not make page rendering depend on live GitHub API availability.
-
-## Suggested workspace shape
+## Current source shape
 
 ```text
-apps/
-  web/          Vite + React site
-  worker/       Hono API and MCP routes
-packages/
-  content/      schemas and authored public data
-  ui/           shared components if reuse emerges
-docs/           product and architecture decisions
+content/projects/   schemas, authored projects, public selectors
+src/                Vite React application
+worker/             Hono API Worker
+docs/               product and architecture decisions
+wrangler.jsonc      Cloudflare routing and deployment
 ```
-
-A single app is acceptable for the prototype. Do not create packages merely to
-match this diagram.
 
 ## Initial implementation sequence
 
-1. Create the typed project content model.
-2. Build the static homepage structure.
-3. Prototype the one-open sticky catalog with native scroll.
-4. Add project-responsive OKLCH interpolation.
-5. Add arrows, keyboard navigation, and reduced-motion behavior.
-6. Expose the same content through a small JSON API.
-7. Add the public MCP interface after the content contract stabilizes.
-8. Design deeper project pages later.
+1. Define and validate the project content model. Complete.
+2. Add ShoutOut, Decyphr, Spatium, Le Harness, Cosmic Hot Potato, and
+   skills-init. Complete.
+3. Expose summaries and details through Hono. Complete.
+4. Seed TanStack Query synchronously with project summaries. Complete.
+5. Prototype the one-open sticky catalog and project-responsive color. Complete.
+6. Refine layout, scroll behavior, and copy in the local browser. Next.
+7. Add MCP after the content contract and project detail flow stabilize.

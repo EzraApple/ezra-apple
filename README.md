@@ -10,18 +10,38 @@ truth:
 - developers querying its public API;
 - agents connecting through MCP.
 
-The project is currently in design and architecture planning. The first product
-surface is the homepage and its one-open-at-a-time sticky project catalog.
+The first working prototype includes a typed project content system, a public
+JSON API, and the homepage's one-open-at-a-time sticky project catalog.
+
+## Local development
+
+```bash
+npm install
+npm run dev
+```
+
+Vite serves the React app and runs the Hono API in Cloudflare's local Workers
+runtime. The production build is verified with `npm run build`.
 
 ## Planning documents
 
 - [Central architecture](docs/CENTRAL_ARCHITECTURE.md)
+- [Project content model](docs/PROJECT_CONTENT_MODEL.md)
+- [Data flow](docs/DATA_FLOW.md)
 - [Homepage and sticky catalog](docs/HOMEPAGE_STICKY_CATALOG.md)
 - [Motion and transitions](docs/MOTION_AND_TRANSITIONS.md)
 - [Project-responsive color](docs/PROJECT_RESPONSIVE_COLOR.md)
 - [Structured content, API, and MCP](docs/STRUCTURED_CONTENT_API_MCP.md)
 - [Stack and deployment](docs/STACK_AND_DEPLOYMENT.md)
 - [Decision log](docs/DECISIONS.md)
+
+## Current stack
+
+- React and TypeScript
+- Vite with the Cloudflare Vite plugin
+- Hono on Cloudflare Workers
+- Zod schemas with inferred TypeScript types
+- TanStack Query with synchronously seeded project data
 
 ## Content boundary
 

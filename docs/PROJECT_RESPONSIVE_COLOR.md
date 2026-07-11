@@ -49,16 +49,19 @@ feel reactive or flashy.
 Background changes should remain subtle. Accents carry most of the identity.
 Collapsed projects retain only a faint trace of their color.
 
-## Provisional palette path
+## Provisional palette system
 
-The projects should be ordered or colored so adjacent themes travel through a
-short, intentional path:
+The page keeps a closely related dark blue base across all six projects.
+Project identity lives primarily in the accent, so ordering does not need to
+follow a single hue gradient:
 
 ```text
-ShoutOut     deep blue
-Spatium      blue-green / teal
-skills-init  moss / restrained lime
-Agent Memory olive / warm amber
+ShoutOut           blue
+Decyphr            blue cyan
+Spatium            teal
+Le Harness         warm amber
+Cosmic Hot Potato  violet
+skills-init        restrained lime
 ```
 
 Secondary colors may come from the real products, but should not create

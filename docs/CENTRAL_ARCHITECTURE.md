@@ -20,18 +20,19 @@ system gradually influences the whole page.
 
 ```mermaid
 flowchart TD
-    Content["Typed public content\nprofile, projects, decisions, proof, themes"]
-    Content --> Site["React site\nhuman presentation and interaction"]
-    Content --> API["Hono JSON API\nstructured public access"]
-    Content --> MCP["Remote MCP server\nagent tools and search"]
-    Site --> Worker["Cloudflare deployment"]
+    Authored["Authored TypeScript project modules"] --> Schema["Zod validation and inferred types"]
+    Schema --> Public["Explicit public projections"]
+    Public --> Site["Vite + React site\nhuman interaction"]
+    Public --> API["Hono JSON API\nstructured public access"]
+    Public -. later .-> MCP["Remote MCP server\nagent tools and search"]
+    Site --> Worker["Cloudflare assets + Worker"]
     API --> Worker
     MCP --> Worker
 ```
 
-The initial source of truth should be authored, version-controlled content in
-this repository. GitHub metadata can enrich it later, but GitHub should not be
-queried on every page request and should not replace editorial control.
+The source of truth is authored, version-controlled content in this repository.
+GitHub metadata can enrich it later, but GitHub is not queried on page requests
+and does not replace editorial control.
 
 ## Core product principles
 
@@ -80,9 +81,14 @@ project pages can decide how much of it is visible or interactive.
 ## Public projects in the initial catalog
 
 1. ShoutOut - local-first macOS dictation
-2. Spatium - real-time collaborative apartment layout editor
-3. skills-init - portable project context and skills for coding agents
-4. Agent Memory - persistent memory SDK for agentic systems
+2. Decyphr - closed-beta founder project for AI video translation
+3. Spatium - real-time collaborative apartment layout editor
+4. Le Harness - experimental CLI agent harness
+5. Cosmic Hot Potato - 2D and 3D semantic word game
+6. skills-init - portable project context and skills for coding agents
 
-The exact order remains editorially adjustable, especially if a different
-order produces a better color progression.
+Cosmic Hot Potato publishes only its hosted product link because its source
+repository is private. Decyphr also keeps its original product repository
+private and links only to its current public site. The order moves from a
+current shipped product to founder experience, collaborative product, systems
+depth, technical play, and finally developer utility.

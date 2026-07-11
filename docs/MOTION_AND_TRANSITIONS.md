@@ -32,12 +32,15 @@ The reverse scroll direction must produce the exact reverse spatial story.
 
 - Scroll-driven transforms follow scroll position and therefore have no fixed
   duration.
-- Arrow or row-click navigation uses approximately `260ms ease-in-out` for
-  moving existing elements.
-- Newly revealed content uses a short `ease-out` entrance.
+- Arrow or row-click navigation scrolls the selected row into place smoothly.
+- Outgoing project text is removed immediately while the panel geometry moves;
+  keeping two text layers alive caused a visible overlap flash. Incoming
+  content enters from `7px` below over `180ms` with a restrained ease-out,
+  beginning `55ms` into the panel's `280ms` ease-in-out geometry transition.
 - Hover and color feedback uses `ease`.
-- Exit motion can be slightly faster than entrance motion.
 - Avoid bounce.
+- Theme colors interpolate over roughly `620ms ease`; adjacent background
+  colors remain close while accents carry most project identity.
 
 These are starting values, not immutable constants.
 

@@ -13,11 +13,37 @@
 - The whole site gradually adopts the active project's color system.
 - Project colors interpolate through an intentional OKLCH path.
 - The first prototype stops at the homepage interaction.
+- Project content is authored as validated TypeScript modules.
+- Zod schemas are the source for runtime validation and inferred types.
+- The first render receives project summaries synchronously; TanStack Query has
+  no loading-state branch.
+- The deployed runtime is Vite, React, Hono, and one Cloudflare Worker.
+- The prototype catalog is ordered as ShoutOut, Decyphr, Spatium, Le Harness,
+  Cosmic Hot Potato, and skills-init: current shipped product, founder
+  experience, collaborative product, systems depth, technical play, then
+  developer utility.
+- The homepage has a compact identity introduction, social profile links, the
+  project catalog, and two side-by-side endpoint code blocks. The endpoint
+  blocks have no explanatory heading, status labels, or marketing copy.
+- Endpoint copy controls transition from the copied Replo icon treatment to a
+  themed checkmark for five seconds, with reduced-motion support.
+- Open project cards use an editorial two-column composition: title and links
+  on the left, description on the right.
+- The homepage omits stack/status tags and placeholder project graphics.
+- Instrument Sans is the initial interface typeface.
+- Open and selected are one state; a clicked row does not retain a second
+  visual focus state after navigation.
+- Arrow keys, number keys, Home, and End select projects through TanStack
+  Hotkeys.
+- Keyboard shortcuts require a key release before firing again so a single
+  press cannot repeat through the catalog.
+- Duplicate hotkey registrations replace prior registrations so development
+  hot reload cannot make one keypress skip multiple projects.
+- The app does not use React's development-only Strict Mode double mount while
+  the global TanStack Hotkeys manager is active.
 
 ## Provisional
 
-- React, Vite, TypeScript, Hono, pnpm, and Cloudflare Workers.
-- The initial project order: ShoutOut, Spatium, skills-init, Agent Memory.
 - The draft homepage introduction.
 - Five semantic depth labels: What it is, How it feels, Why, How it is built,
   and Shipped.
@@ -29,6 +55,7 @@
 - Writing and cross-project decision archives.
 - Live GitHub enrichment.
 - Runtime storage, analytics, and ingestion infrastructure.
+- Build-time GitHub metadata enrichment.
 - Final copy, typography, palettes, and project ordering.
 
 ## Rejected central directions

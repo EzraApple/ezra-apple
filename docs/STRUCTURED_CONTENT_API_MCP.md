@@ -2,7 +2,8 @@
 
 ## Status
 
-Committed product direction; schemas and transport details remain provisional.
+The project schema and JSON routes are implemented. MCP transport and tool
+details remain future work.
 
 ## One source of truth
 
@@ -36,16 +37,39 @@ proof       Where it shipped and the evidence
 The site can reveal these progressively. The API and MCP server can return the
 requested depth directly.
 
-## Provisional API
+## Current API
 
 ```text
 GET /api/profile
 GET /api/projects
 GET /api/projects/:slug
-GET /api/projects/:slug?depth=decisions
-GET /api/decisions
-GET /api/search?q=local-first
 ```
+
+Depth filtering, decision indexes, and search come after project detail pages
+prove which structured slices are useful.
+
+`GET /api/projects` is the catalog list call. It returns only the fields needed
+to identify and render each project:
+
+```json
+{
+  "data": [
+    {
+      "slug": "shoutout",
+      "name": "ShoutOut",
+      "summary": "...",
+      "tags": ["macOS", "Swift", "Local AI", "Product"],
+      "links": [],
+      "theme": {},
+      "artifact": {}
+    }
+  ],
+  "meta": { "schemaVersion": 1, "source": "curated", "count": 5 }
+}
+```
+
+`GET /api/projects/shoutout` returns the full public project object, including
+`what`, `experience`, `decisions`, `system`, and `proof`.
 
 Responses should contain structured facts, concise authored summaries, and
 links to supporting public evidence. They should not return rendered HTML as
@@ -86,11 +110,6 @@ Safety and operational controls:
 
 ## Site affordance
 
-Structured access should be a quiet reveal near the bottom of the homepage:
-
-```text
-This site is also structured for software and agents.
-JSON API / MCP
-```
-
-It is evidence of the architecture, not the homepage's primary gimmick.
+The homepage exposes the API and reserved MCP URLs as two quiet, side-by-side
+code blocks with icon-only copy controls. It does not add explanatory headings,
+status labels, or API marketing copy around them.

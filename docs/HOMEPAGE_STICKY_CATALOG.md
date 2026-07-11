@@ -7,27 +7,28 @@ Committed direction for the first homepage prototype.
 ## Homepage structure
 
 ```text
-Navigation
-
-Short factual introduction
+Compact introduction
+  Ezra Apple / San Francisco
+  One software-engineering sentence
+  GitHub / LinkedIn / X
 
 Selected Work
   01 ShoutOut
-  02 Spatium
-  03 skills-init
-  04 Agent Memory
+  02 Decyphr
+  03 Spatium
+  04 Le Harness
+  05 Cosmic Hot Potato
+  06 skills-init
 
-Structured access
-  JSON API
-  MCP
-
-Footer
+Machine-readable endpoints
+  [https://ezraapple.dev/api/projects] [copy]
+  [https://ezraapple.dev/mcp]          [copy]
 ```
 
 Draft introduction:
 
-> Ezra Apple is a software engineer in San Francisco. I build AI products,
-> developer tools, and small software worth keeping.
+> Software engineer and former founder building AI products and developer
+> tools.
 
 The copy is provisional. Its job is to orient the visitor without turning the
 hero into a slogan or marketing conversion surface.
@@ -55,10 +56,16 @@ between separate cards.
 The homepage version of an open project should remain concise:
 
 - project number and name;
-- one-sentence premise;
-- one real product artifact, interaction, or grounded diagram;
-- a small amount of status or stack metadata;
-- a quiet indication that the project can be opened more deeply.
+- project title and useful external links in the left column;
+- a short product description in the right column.
+
+The title, links, and description form one vertically centered content band.
+Links sit directly below the title rather than at the bottom of the expanded
+panel, and the description aligns with the title's top edge.
+
+The homepage deliberately omits stack tags, status pills, and improvised
+project graphics. Those elements can return only when they add grounded,
+project-specific information rather than decorative density.
 
 The homepage should not render the complete project dossier. The detailed
 semantic levels belong to the future project experience.
@@ -72,13 +79,17 @@ Equivalent controls:
 
 - click a collapsed project row;
 - small previous/next arrow controls;
-- keyboard Arrow Up and Arrow Down when focus is within the catalog;
+- global Arrow Up and Arrow Down shortcuts through TanStack Hotkeys;
+- number keys 1 through 5, plus Home and End;
 - touch scrolling on mobile.
+
+The open project is the selected project. Row clicks release focus after
+selection so browser focus styling cannot imply a second, stale selection.
 
 A possible compact control is:
 
 ```text
-up arrow    02 / 04    down arrow
+up arrow    02 / 05    down arrow
 ```
 
 The control should appear only while the catalog is the active page region. It
@@ -86,9 +97,9 @@ is navigation, not a carousel indicator.
 
 ## Sticky region
 
-The catalog may use one sticky viewport in which the project stack is composed.
-The document itself remains normally scrollable. Each project receives enough
-scroll distance to move between collapsed, active, and upcoming states.
+The catalog uses one sticky viewport in which the project stack is composed.
+The document itself remains normally scrollable. Scroll distance between
+projects stays short so the catalog never feels like it traps the visitor.
 
 The active project should not be perfectly locked to the center at every pixel.
 A small amount of travel makes the interaction feel connected to the user's
