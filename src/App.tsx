@@ -318,17 +318,23 @@ function ProjectPanel({
         >
           <div className="project-heading">
             <m.h2 layoutId={`project-title-${project.slug}`}>{project.name}</m.h2>
-            {project.links[0] ? (
-              <a
-                className="project-link"
-                href={project.links[0].href}
-                rel="noreferrer"
-                target="_blank"
-              >
-                {project.links[0].label}
-                <span aria-hidden="true"> ↗</span>
-              </a>
-            ) : null}
+            <div className="project-actions">
+              <button className="project-open-cta" onClick={onOpen} type="button">
+                Explore project
+                <span aria-hidden="true">→</span>
+              </button>
+              {project.links[0] ? (
+                <a
+                  className="project-link"
+                  href={project.links[0].href}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  {project.links[0].label}
+                  <span aria-hidden="true"> ↗</span>
+                </a>
+              ) : null}
+            </div>
           </div>
           <m.p className="project-summary" layoutId={`project-summary-${project.slug}`}>{project.summary}</m.p>
         </m.div>

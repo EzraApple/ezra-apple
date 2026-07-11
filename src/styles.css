@@ -337,12 +337,32 @@ button {
   width: 100%;
   height: var(--row-height);
   padding: 0 18px;
-  grid-template-columns: 54px minmax(0, 1fr);
+  grid-template-columns: 54px minmax(0, 1fr) auto;
   align-items: center;
   border: 0;
   background: transparent;
   text-align: left;
   cursor: pointer;
+}
+
+/* The active row is a door into the project detail; say so at its edge. */
+.project-row::after {
+  color: color-mix(in oklch, var(--page-muted) 55%, transparent);
+  content: "";
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  transition: color 130ms ease, transform 130ms var(--ease-out);
+}
+
+.project-panel[data-active="true"]:not([data-detail-open="true"]) .project-row::after {
+  content: "open →";
+}
+
+.project-panel[data-active="true"] .project-row:hover::after,
+.project-panel[data-active="true"] .project-row:focus-visible::after {
+  color: var(--page-accent);
+  transform: translateX(3px);
 }
 
 .project-row:hover .project-row-name,
@@ -405,9 +425,55 @@ button {
   line-height: 1.2;
 }
 
+.project-actions {
+  display: flex;
+  margin-top: 26px;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+}
+
+.project-open-cta {
+  display: inline-flex;
+  height: 38px;
+  padding: 0 16px;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid color-mix(in oklch, var(--page-accent) 55%, var(--page-border));
+  background: color-mix(in oklch, var(--page-accent-soft) 40%, transparent);
+  color: var(--page-accent);
+  cursor: pointer;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  transition:
+    border-color 130ms ease,
+    background-color 130ms ease;
+}
+
+.project-open-cta span {
+  transition: transform 130ms var(--ease-out);
+}
+
+.project-open-cta:hover,
+.project-open-cta:focus-visible {
+  border-color: var(--page-accent);
+  background: color-mix(in oklch, var(--page-accent-soft) 72%, transparent);
+}
+
+.project-open-cta:hover span,
+.project-open-cta:focus-visible span {
+  transform: translateX(3px);
+}
+
+.project-open-cta:focus-visible {
+  outline: 1px solid var(--page-accent);
+  outline-offset: 3px;
+}
+
 .project-link {
   width: fit-content;
-  margin-top: 24px;
   padding-bottom: 4px;
   border-bottom: 1px solid color-mix(in oklch, var(--page-border) 80%, transparent);
   color: var(--page-muted);
