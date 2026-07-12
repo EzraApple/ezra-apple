@@ -659,6 +659,9 @@ button {
   width: 100%;
   min-height: calc(100svh - var(--row-height));
   padding: 0 0 64px;
+  /* Inside a project, the whole reading experience adopts its face; mono
+     metadata labels keep their own explicit font-family. */
+  font-family: var(--title-font, inherit);
 }
 
 .catalog-track[data-detail-open="true"] .catalog-sticky {
@@ -1022,7 +1025,7 @@ button {
 .system-flow strong, .narrative-grid strong { font-size: 18px; font-weight: 540; }
 .narrative-grid { grid-template-columns: repeat(3, 1fr); }
 
-.detail-exits { display: flex; margin-top: 28px; justify-content: flex-end; }
+.detail-exits { display: flex; margin-top: 28px; justify-content: flex-end; gap: 26px; }
 .detail-exits a { padding-bottom: 5px; border-bottom: 1px solid var(--page-accent); font-size: 13px; }
 
 @media (max-width: 900px) {
