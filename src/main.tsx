@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client";
-import "@fontsource-variable/instrument-sans";
+import "@fontsource-variable/instrument-sans/wdth.css";
 import { listProjectSummaries } from "@/content/projects";
 import { App } from "./App";
 import { Providers } from "./providers";

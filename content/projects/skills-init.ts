@@ -31,6 +31,8 @@ export const skillsInit = defineProject({
     border: "oklch(0.365 0.045 145)",
     accent: "oklch(0.78 0.15 119)",
     accentSoft: "oklch(0.33 0.07 126)",
+    titleWeight: 445,
+    titleWidth: 88,
   },
   artifact: {
     kind: "tree",

@@ -51,6 +51,11 @@
 - The open panel shows the project's primary link (its first authored link)
   under the title; the full link set stays on the project detail sections so
   the homepage keeps pulling visitors into the deeper flow.
+- Typography is part of the theme: each project's title owns a coordinate in
+  Instrument Sans Variable's weight and width axes (authored as
+  titleWeight/titleWidth theme tokens), and the catalog scrub interpolates
+  between adjacent coordinates so titles reshape continuously with scroll.
+  One family everywhere; identity comes from axes, not font swaps.
 
 ## Provisional
 

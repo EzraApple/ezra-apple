@@ -31,6 +31,8 @@ export const spatium = defineProject({
     border: "oklch(0.36 0.045 205)",
     accent: "oklch(0.76 0.13 182)",
     accentSoft: "oklch(0.32 0.065 190)",
+    titleWeight: 415,
+    titleWidth: 100,
   },
   artifact: {
     kind: "canvas",

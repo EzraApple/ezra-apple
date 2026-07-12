@@ -109,7 +109,21 @@ function useCatalogScroll(
         panel.style.flex = "";
         const fade = panel.querySelector<HTMLElement>(".project-content-fade");
         if (fade) fade.style.opacity = "";
+        const title = panel.querySelector<HTMLElement>(".project-heading h2");
+        if (title) title.style.fontVariationSettings = "";
       }
+    };
+
+    const titleAxis = (
+      panel: HTMLElement | undefined,
+      name: "--title-wght" | "--title-wdth",
+      fallback: number,
+    ) => {
+      if (!panel) return fallback;
+      const value = Number.parseFloat(
+        getComputedStyle(panel).getPropertyValue(name),
+      );
+      return Number.isNaN(value) ? fallback : value;
     };
 
     const update = () => {
@@ -153,6 +167,22 @@ function useCatalogScroll(
 
       const lower = Math.floor(exact);
       const fraction = exact - lower;
+
+      // Letterforms are theme too: interpolate the title's variable-font
+      // axes between the two adjacent projects so the incoming and outgoing
+      // titles pass through the same shape at the crossing.
+      const wght =
+        titleAxis(items[lower], "--title-wght", 520) * (1 - fraction) +
+        titleAxis(items[lower + 1], "--title-wght", 520) * fraction;
+      const wdth =
+        titleAxis(items[lower], "--title-wdth", 100) * (1 - fraction) +
+        titleAxis(items[lower + 1], "--title-wdth", 100) * fraction;
+      const activeTitle = items[nextIndex]?.querySelector<HTMLElement>(
+        ".project-heading h2",
+      );
+      if (activeTitle) {
+        activeTitle.style.fontVariationSettings = `"wght" ${wght.toFixed(1)}, "wdth" ${wdth.toFixed(1)}`;
+      }
 
       stack.dataset.scrub = "true";
       items.forEach((panel, index) => {
@@ -328,6 +358,12 @@ function ProjectPanel({
       data-detail-open={isExpanded}
       data-testid={`project-${project.slug}`}
       layoutId={`project-panel-${project.slug}`}
+      style={
+        {
+          "--title-wght": project.theme.titleWeight,
+          "--title-wdth": project.theme.titleWidth,
+        } as CSSProperties
+      }
       onClick={(event) => {
         // The whole open panel is a door into the detail; real controls and
         // text selections keep their own behavior.

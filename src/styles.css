@@ -452,6 +452,16 @@ button {
   line-height: 0.92;
 }
 
+/* Each project's title owns a coordinate in the variable font's
+   weight x width space; the catalog scrub interpolates between them. */
+.project-heading h2,
+.detail-hero h1,
+.detail-section h1 {
+  font-variation-settings:
+    "wght" var(--title-wght, 520),
+    "wdth" var(--title-wdth, 100);
+}
+
 .project-summary {
   max-width: 620px;
   margin: 2px 0 0;

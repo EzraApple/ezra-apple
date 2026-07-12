@@ -26,6 +26,8 @@ export const shoutout = defineProject({
     border: "oklch(0.35 0.045 250)",
     accent: "oklch(0.72 0.15 235)",
     accentSoft: "oklch(0.31 0.08 243)",
+    titleWeight: 560,
+    titleWidth: 100,
   },
   artifact: {
     kind: "flow",

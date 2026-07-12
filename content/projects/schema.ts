@@ -17,6 +17,10 @@ export const ProjectThemeSchema = z.object({
   border: OklchSchema,
   accent: OklchSchema,
   accentSoft: OklchSchema,
+  // Instrument Sans Variable axis coordinates for the project title; the
+  // catalog interpolates between adjacent projects as part of the theme.
+  titleWeight: z.number().min(400).max(700).default(520),
+  titleWidth: z.number().min(75).max(100).default(100),
 });
 
 const ArtifactItemSchema = z.object({
@@ -130,10 +134,11 @@ export const ProjectsResponseSchema = z.object({
 });
 
 export type Project = z.infer<typeof ProjectSchema>;
+export type ProjectInput = z.input<typeof ProjectSchema>;
 export type ProjectSummary = z.infer<typeof ProjectSummarySchema>;
 export type ProjectDetail = z.infer<typeof ProjectDetailSchema>;
 export type ProjectsResponse = z.infer<typeof ProjectsResponseSchema>;
 
-export function defineProject(project: Project): Project {
+export function defineProject(project: ProjectInput): Project {
   return ProjectSchema.parse(project);
 }
