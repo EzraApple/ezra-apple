@@ -2,8 +2,15 @@
 
 ## Status
 
-The project schema and JSON routes are implemented. MCP transport and tool
-details remain future work.
+Implemented. The profile and project schemas, the JSON routes (including
+`GET /api` as a self-describing index and `GET /api/profile`), and the
+remote MCP server at `/mcp` (Streamable HTTP, stateless, official TypeScript
+SDK over @hono/mcp) all read the same curated content modules the site
+renders. Current MCP tools: `get_profile`, `list_projects`,
+`get_project(slug, depth?)`, `list_decisions(slug?)`, and
+`search_work(query)` with word-boundary matching and bounded results.
+Agent-facing projections omit theme and artifact. `get_related_work` remains
+future work; rate limiting is deferred to edge configuration.
 
 ## One source of truth
 

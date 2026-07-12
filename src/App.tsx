@@ -8,7 +8,9 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type ReactNode,
 } from "react";
+import { profile } from "@/content/profile";
 import { getProjectDetail, type ProjectDetail, type ProjectSummary } from "@/content/projects";
 import {
   CircleCheckIcon,
@@ -29,6 +31,11 @@ type ThemeStyle = CSSProperties & {
 };
 
 const PROJECT_HOTKEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9"] as const;
+const SOCIAL_ICONS: Record<string, ReactNode> = {
+  GitHub: <FaGithub aria-hidden="true" />,
+  LinkedIn: <FaLinkedinIn aria-hidden="true" />,
+  X: <FaXTwitter aria-hidden="true" />,
+};
 const API_ENDPOINT = new URL("/api/projects", window.location.origin).href;
 const MCP_ENDPOINT = new URL("/mcp", window.location.origin).href;
 type DetailSection = "product" | "engineering" | "story";
@@ -586,22 +593,24 @@ function ProjectCatalog({
           <header className="intro">
             <div className="intro-meta">
               <div className="intro-label">
-                <span>Ezra Apple</span>
-                <span>San Francisco</span>
+                <span>{profile.name}</span>
+                <span>{profile.location}</span>
               </div>
               <nav className="social-links" aria-label="Social profiles">
-                <a aria-label="GitHub" href="https://github.com/EzraApple" rel="noreferrer" target="_blank">
-                  <FaGithub aria-hidden="true" />
-                </a>
-                <a aria-label="LinkedIn" href="https://www.linkedin.com/in/ezraapple/" rel="noreferrer" target="_blank">
-                  <FaLinkedinIn aria-hidden="true" />
-                </a>
-                <a aria-label="X / Twitter" href="https://x.com/ezra_sf" rel="noreferrer" target="_blank">
-                  <FaXTwitter aria-hidden="true" />
-                </a>
+                {profile.links.map((link) => (
+                  <a
+                    aria-label={link.label}
+                    href={link.href}
+                    key={link.href}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    {SOCIAL_ICONS[link.label] ?? null}
+                  </a>
+                ))}
               </nav>
             </div>
-            <h1 className="intro-tagline">Software engineer and former founder building AI products and agent infrastructure.</h1>
+            <h1 className="intro-tagline">{profile.headline}</h1>
           </header>
 
           <div aria-hidden={isDetailOpen || undefined} className="section-heading" inert={isDetailOpen || undefined}>
