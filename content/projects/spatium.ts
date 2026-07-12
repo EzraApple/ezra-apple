@@ -9,7 +9,7 @@ export const spatium = defineProject({
   category: "Collaborative tool",
   status: "Live",
   summary:
-    "A lightweight, real-time apartment layout editor built so remote roommates can plan one physical space together.",
+    "A lightweight real-time apartment layout editor built so remote roommates can plan one physical space together.",
   tags: ["React", "Vite", "PartyKit", "Realtime"],
   links: [
     {
@@ -46,13 +46,13 @@ export const spatium = defineProject({
   depth: {
     what: {
       headline: "A shared canvas for a shared apartment.",
-      body: "Spatium began as a fast solution for two roommates in different places who needed to agree on one room layout.",
-      highlights: ["Live cursors", "Shared state", "Purpose-built editor"],
+      body: "Spatium started with a real move: one roommate across the country, one floor plan, and no good way to agree on where the couch goes.",
+      highlights: ["Live cursors", "Snappable furniture", "One shared layout"],
     },
     experience: {
       headline: "Move furniture instead of describing coordinates.",
       body: "Both people can manipulate the same floor plan and immediately see what the other person means.",
-      highlights: ["Direct manipulation", "Realtime presence", "No heavyweight setup"],
+      highlights: ["Direct manipulation", "Realtime presence", "Nothing to install"],
     },
     decisions: [
       {

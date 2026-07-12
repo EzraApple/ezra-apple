@@ -9,7 +9,7 @@ export const decyphr = defineProject({
   category: "Founder project",
   status: "Closed beta",
   summary:
-    "An AI video translation product I co-founded and took through a small creator beta, building the full-stack app and its AWS media pipeline before we simplified the product direction.",
+    "An AI video translation startup I co-founded, built end to end, and ran through a closed creator beta.",
   tags: ["Founder", "Next.js", "AWS", "Video AI", "Product validation"],
   links: [
     {
@@ -51,7 +51,7 @@ export const decyphr = defineProject({
     },
     experience: {
       headline: "One upload, then a visible long-running workflow.",
-      body: "The app covered authentication, onboarding, project creation, media upload, job progress, downloads, account usage, and the internal admin tools needed to support a beta.",
+      body: "One product covered the whole loop: onboarding, upload, job progress, delivery, account usage, and the admin tooling a real beta needs.",
       highlights: ["Creator onboarding", "Processing status", "Admin and usage tooling"],
     },
     decisions: [
@@ -61,7 +61,7 @@ export const decyphr = defineProject({
       },
       {
         title: "Complexity outran validation",
-        summary: "The AWS pipeline solved production-shaped reliability problems before demand was established, so the later direction became a lighter marketing surface for reevaluating the product thesis.",
+        summary: "The AWS pipeline solved reliability problems demand had not earned yet, so the next direction became a lighter surface for retesting the thesis.",
       },
     ],
     system: {

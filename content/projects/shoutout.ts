@@ -41,12 +41,12 @@ export const shoutout = defineProject({
   depth: {
     what: {
       headline: "Dictation that behaves like a native input method.",
-      body: "ShoutOut records from a global shortcut, runs its normal transcription path locally, and inserts the result into the focused app.",
-      highlights: ["No account required", "Local transcription", "Works across macOS"],
+      body: "ShoutOut listens on a global shortcut, transcribes on-device with WhisperKit, and pastes clean text into whatever field has focus.",
+      highlights: ["No account, no cloud", "On-device WhisperKit", "Pastes into any app"],
     },
     experience: {
       headline: "Press, speak, and stay in flow.",
-      body: "The product is designed around the app already in front of you, with hands-free and hold-to-talk modes plus careful paste formatting.",
+      body: "The product is designed around the app already in front of you: hold to talk or go hands-free, and the transcript lands formatted for the field it enters.",
       highlights: ["Fn/Globe shortcut", "Hands-free mode", "Context-aware insertion"],
     },
     decisions: [
@@ -61,7 +61,7 @@ export const shoutout = defineProject({
     ],
     system: {
       headline: "A native pipeline from hotkey to focused field.",
-      body: "A Swift macOS app coordinates recording, WhisperKit transcription, optional cleanup, validation, and smart insertion.",
+      body: "A Swift macOS app coordinates capture, WhisperKit transcription, cleanup validation, and smart insertion, shipped as a signed and notarized DMG with Sparkle updates.",
       stack: ["Swift", "SwiftUI", "WhisperKit", "Core ML", "Sparkle"],
       flow: ["Global shortcut", "Audio capture", "Local transcription", "Validation", "Smart paste"],
     },

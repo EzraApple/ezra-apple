@@ -9,7 +9,7 @@ export const skillsInit = defineProject({
   category: "Cross-harness tooling",
   status: "Open source",
   summary:
-    "A small CLI that sets a repo up for cross-harness agent development by installing sensible defaults once and linking them into the skill directories used by Codex, Claude, Cursor, and other tools.",
+    "A CLI that installs one canonical set of agent skills into a repo and links it into the directories Codex, Claude, Cursor, and OpenCode read.",
   tags: ["Agent harnesses", "CLI", "Symlinks", "Open source"],
   links: [
     {
@@ -48,7 +48,7 @@ export const skillsInit = defineProject({
     what: {
       headline: "Sensible repo defaults for cross-harness agent development.",
       body: "skills-init installs a baseline under .agents, then symlinks that canonical source into the skill paths expected by Codex, Claude, Cursor, OpenCode, and other harnesses.",
-      highlights: ["Shared .agents source", "Harness-compatible symlinks", "Version-controlled defaults"],
+      highlights: ["One .agents source", "Symlinked tool views", "Ships a core skill pack"],
     },
     experience: {
       headline: "One command, then the context travels with the repo.",

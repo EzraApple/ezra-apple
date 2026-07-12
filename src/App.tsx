@@ -595,7 +595,7 @@ function ProjectCatalog({
                 </a>
               </nav>
             </div>
-            <h1 className="intro-tagline">Software engineer and former founder building AI products and developer tools.</h1>
+            <h1 className="intro-tagline">Software engineer and former founder building AI products and agent infrastructure.</h1>
           </header>
 
           <div aria-hidden={isDetailOpen || undefined} className="section-heading" inert={isDetailOpen || undefined}>

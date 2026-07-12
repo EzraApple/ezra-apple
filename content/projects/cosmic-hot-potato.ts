@@ -61,8 +61,8 @@ export const cosmicHotPotato = defineProject({
     ],
     system: {
       headline: "High-dimensional word meaning projected into a playable scene.",
-      body: "Words begin as 50-dimensional GloVe vectors, guesses use cosine similarity, and UMAP projects neighborhoods into the 3D field shown by the game.",
-      stack: ["GloVe", "Cosine similarity", "UMAP", "Interactive 3D canvas"],
+      body: "Words ship as int8-quantized GloVe vectors, so any of 317,000 guesses scores inside the deployment with no embedding service, and UMAP projects each neighborhood into the playable 3D field.",
+      stack: ["Next.js", "Three.js", "GloVe 50d", "UMAP", "Int8 vector store"],
       flow: ["Daily answer", "Word guess", "Vector similarity", "UMAP position", "2D or 3D render"],
     },
     proof: [

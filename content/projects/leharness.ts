@@ -9,7 +9,7 @@ export const leHarness = defineProject({
   category: "Agent runtime",
   status: "Open source",
   summary:
-    "An experimental CLI agent harness built to understand loops, event logs, tools, background work, subagents, and compaction from the inside out.",
+    "An agent harness written from scratch to understand loops, event logs, tools, background work, subagents, and compaction from the inside out.",
   tags: ["Agent runtime", "CLI", "Event sourcing", "MCP"],
   links: [
     {
@@ -52,8 +52,8 @@ export const leHarness = defineProject({
     },
     experience: {
       headline: "Run it as a TUI or send it one task and leave.",
-      body: "The published lh command supports interactive sessions and one-shot prompts while keeping state under the working directory.",
-      highlights: ["lh interactive TUI", "One-shot commands", "Local session state"],
+      body: "The published lh command runs as an interactive TUI or a single one-shot prompt, speaks OpenAI, DeepSeek, and Ollama, and keeps session state under the working directory.",
+      highlights: ["lh interactive TUI", "One-shot mode", "OpenAI, DeepSeek, Ollama", "Local session state"],
     },
     decisions: [
       {
