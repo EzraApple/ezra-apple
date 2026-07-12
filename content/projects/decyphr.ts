@@ -26,8 +26,8 @@ export const decyphr = defineProject({
     border: "oklch(0.36 0.052 225)",
     accent: "oklch(0.75 0.135 215)",
     accentSoft: "oklch(0.32 0.075 220)",
-    titleWeight: 470,
-    titleWidth: 85,
+    titleFont: '"Space Grotesk Variable", sans-serif',
+    titleWeight: 540,
   },
   artifact: {
     kind: "flow",

@@ -17,10 +17,10 @@ export const ProjectThemeSchema = z.object({
   border: OklchSchema,
   accent: OklchSchema,
   accentSoft: OklchSchema,
-  // Instrument Sans Variable axis coordinates for the project title; the
-  // catalog interpolates between adjacent projects as part of the theme.
-  titleWeight: z.number().min(400).max(700).default(520),
-  titleWidth: z.number().min(75).max(100).default(100),
+  // Each project's title renders in its own display face; the catalog's
+  // scroll-linked fade carries the swap between adjacent projects.
+  titleFont: TextSchema,
+  titleWeight: z.number().min(100).max(900).default(600),
 });
 
 const ArtifactItemSchema = z.object({

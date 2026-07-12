@@ -26,8 +26,8 @@ export const cosmicHotPotato = defineProject({
     border: "oklch(0.365 0.05 270)",
     accent: "oklch(0.76 0.14 300)",
     accentSoft: "oklch(0.32 0.075 285)",
-    titleWeight: 620,
-    titleWidth: 93,
+    titleFont: '"Unbounded Variable", sans-serif',
+    titleWeight: 560,
   },
   artifact: {
     kind: "orbit",

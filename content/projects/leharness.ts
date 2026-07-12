@@ -31,8 +31,8 @@ export const leHarness = defineProject({
     border: "oklch(0.37 0.045 100)",
     accent: "oklch(0.79 0.14 82)",
     accentSoft: "oklch(0.34 0.065 90)",
-    titleWeight: 680,
-    titleWidth: 78,
+    titleFont: '"JetBrains Mono Variable", monospace',
+    titleWeight: 750,
   },
   artifact: {
     kind: "log",
