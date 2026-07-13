@@ -60,6 +60,11 @@
   all serve exactly what the content modules author — including deep-link
   fallback, JSON 404s, agent projections omitting theme and artifact, and
   depth slicing.
+- Each project carries an abstract single-stroke micro-mark (waveform, play
+  triangle, floor plan, terminal prompt, orbit, branch) shown beside its row
+  name and detail eyebrow — one grid and stroke weight across the set, muted
+  at rest, accent when active. Marks are drawn from what each product is;
+  invented logos stay rejected.
 - Typography is part of the theme: each project's title renders in its own
   display face (authored as titleFont/titleWeight theme tokens — Bricolage
   Grotesque, Space Grotesk, Outfit, JetBrains Mono, Unbounded, Martian

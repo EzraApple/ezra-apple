@@ -63,6 +63,55 @@ function readDetailSection(): DetailSection | null {
 
 const DEFAULT_TITLE = "Ezra Apple — Software Engineer";
 
+// One abstract micro-mark per project: a single-stroke glyph drawn from
+// what the thing is, sharing one grid and stroke weight so the set reads
+// as a system. Rendering concern, so it lives beside the components.
+const MARK_PROPS = {
+  viewBox: "0 0 16 16",
+  width: 15,
+  height: 15,
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.3,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+} as const;
+
+const PROJECT_MARKS: Record<string, ReactNode> = {
+  shoutout: (
+    <svg {...MARK_PROPS} aria-hidden="true">
+      <path d="M4 6.5v3M8 3.5v9M12 5.5v5" />
+    </svg>
+  ),
+  decyphr: (
+    <svg {...MARK_PROPS} aria-hidden="true">
+      <path d="M5.5 4.5v7l6-3.5z" />
+    </svg>
+  ),
+  spatium: (
+    <svg {...MARK_PROPS} aria-hidden="true">
+      <rect height="9" rx="0.5" width="9" x="3.5" y="3.5" />
+      <path d="M8.5 3.5V8h4" />
+    </svg>
+  ),
+  leharness: (
+    <svg {...MARK_PROPS} aria-hidden="true">
+      <path d="M4 5l3.5 3L4 11M9.5 11.5H13" />
+    </svg>
+  ),
+  "cosmic-hot-potato": (
+    <svg {...MARK_PROPS} aria-hidden="true">
+      <circle cx="8" cy="8.5" r="4" />
+      <circle cx="12.6" cy="4" fill="currentColor" r="1.2" stroke="none" />
+    </svg>
+  ),
+  "skills-init": (
+    <svg {...MARK_PROPS} aria-hidden="true">
+      <path d="M4.5 3.5v9M4.5 6.5c4 0 3-2 7-2M4.5 10.5c4 0 3 2 7 2" />
+    </svg>
+  ),
+};
+
 const THEME_VARS = [
   ["--page-bg", "background"],
   ["--page-surface", "surface"],
@@ -422,6 +471,9 @@ function ProjectPanel({
         type="button"
       >
         <span className="project-number">{formatIndex(index)}</span>
+        <span aria-hidden="true" className="project-mark">
+          {PROJECT_MARKS[project.slug] ?? null}
+        </span>
         <span className="project-row-name">{project.name}</span>
       </button>
 
@@ -941,7 +993,12 @@ function ProjectDetailView({
         hero={(
           <div className="detail-hero">
             <div>
-              <p className="detail-eyebrow">{project.category}</p>
+              <p className="detail-eyebrow">
+                <span aria-hidden="true" className="project-mark">
+                  {PROJECT_MARKS[project.slug] ?? null}
+                </span>
+                {project.category}
+              </p>
               <m.h1 layoutId={`project-title-${project.slug}`}>{project.name}</m.h1>
               <m.p className="detail-summary" layoutId={`project-summary-${project.slug}`}>{project.summary}</m.p>
             </div>

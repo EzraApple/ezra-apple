@@ -355,7 +355,7 @@ button {
   width: 100%;
   height: var(--row-height);
   padding: 0 18px;
-  grid-template-columns: 54px minmax(0, 1fr) auto;
+  grid-template-columns: 54px 26px minmax(0, 1fr) auto;
   align-items: center;
   border: 0;
   background: transparent;
@@ -391,6 +391,27 @@ button {
 .project-row:focus-visible {
   outline: 1px solid var(--page-accent);
   outline-offset: -1px;
+}
+
+.project-mark {
+  display: grid;
+  place-items: center;
+  justify-content: start;
+  color: color-mix(in oklch, var(--page-muted) 62%, transparent);
+  transition: color 130ms ease;
+}
+
+.project-panel[data-active="true"] .project-row .project-mark,
+.project-row:hover .project-mark,
+.project-row:focus-visible .project-mark {
+  color: var(--page-accent);
+}
+
+.detail-eyebrow .project-mark {
+  display: inline-grid;
+  margin-right: 9px;
+  color: var(--page-accent);
+  vertical-align: -3px;
 }
 
 .project-number {
@@ -1248,7 +1269,7 @@ button {
 
   .project-row {
     padding: 0 12px;
-    grid-template-columns: 44px minmax(0, 1fr);
+    grid-template-columns: 44px 24px minmax(0, 1fr) auto;
   }
 
   .project-content {
@@ -1353,6 +1374,7 @@ button {
   .social-links a,
   .catalog-controls button,
   .project-panel,
+  .project-mark,
   .project-row-name,
   .endpoint-card,
   .endpoint-card code,
