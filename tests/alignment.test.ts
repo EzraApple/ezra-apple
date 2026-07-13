@@ -104,7 +104,7 @@ describe("content source", () => {
 
 describe("site", () => {
   it("serves the app shell at / and for deep links", async () => {
-    for (const path of ["/", "/projects/shoutout", "/projects/shoutout/product"]) {
+    for (const path of ["/", "/projects/shoutout", "/projects/shoutout/experience"]) {
       const response = await fetch(`${BASE}${path}`);
       expect(response.status, path).toBe(200);
       const html = await response.text();

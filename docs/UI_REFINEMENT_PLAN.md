@@ -21,7 +21,13 @@ direction is correct and focuses on finishing quality, not new metaphors.
 
 ## Gaps, in priority order
 
-### 1. The detail sections underuse the authored depth model
+### 1. The detail sections underuse the authored depth model — SHIPPED
+
+Sections are now Experience / System / Origin: System renders its authored
+headline plus the decisions list, Origin renders the what narrative with
+proof links as exits. Remaining from the original idea: nothing.
+
+### (original notes)
 
 `renderSection` currently maps Product → `depth.experience` and both Story and
 Engineering fall back to `depth.what` / `depth.system`. Unused entirely:

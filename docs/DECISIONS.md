@@ -68,6 +68,10 @@
 - The draft homepage introduction.
 - Five semantic depth labels: What it is, How it feels, Why, How it is built,
   and Shipped.
+- Detail sections are named Experience, System, and Origin, replacing the
+  earlier Product/Engineering/Story: Experience renders the experience
+  narrative, System renders the system plus the authored decisions, and
+  Origin renders the what/origin narrative with proof links as its exits.
 - Public unauthenticated API and MCP access protected by rate limits.
 
 ## Later

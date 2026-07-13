@@ -38,11 +38,11 @@ const SOCIAL_ICONS: Record<string, ReactNode> = {
 };
 const API_ENDPOINT = new URL("/api/projects", window.location.origin).href;
 const MCP_ENDPOINT = new URL("/mcp", window.location.origin).href;
-type DetailSection = "product" | "engineering" | "story";
+type DetailSection = "experience" | "system" | "origin";
 const DETAIL_PATHS: MorphSection<DetailSection>[] = [
-  { id: "product", label: "Product", description: "Problem, interaction, and experience" },
-  { id: "engineering", label: "Engineering", description: "Architecture, systems, and decisions" },
-  { id: "story", label: "Story", description: "Why it exists and what shipped" },
+  { id: "experience", label: "Experience", description: "How it feels and the core interaction" },
+  { id: "system", label: "System", description: "How it is built, and the decisions behind it" },
+  { id: "origin", label: "Origin", description: "Why it exists and what shipped" },
 ];
 
 function projectSlugFromPath(): string | null {
@@ -52,7 +52,7 @@ function projectSlugFromPath(): string | null {
 
 function readDetailSection(): DetailSection | null {
   const value = window.location.pathname.split("/")[3];
-  return value === "product" || value === "engineering" || value === "story"
+  return value === "experience" || value === "system" || value === "origin"
     ? value
     : null;
 }
@@ -890,29 +890,55 @@ function ProjectDetailView({
           if (index >= 0) setSectionCursor(index);
         }}
         renderSection={(activeSection) => {
-          const narrative = activeSection === "product" ? project.depth.experience : project.depth.what;
-          return (
-            <article className="detail-section">
-              <h1>{activeSection === "engineering" ? "Architecture" : narrative.headline}</h1>
-              <p className="detail-section-intro">
-                {activeSection === "engineering" ? project.depth.system.body : narrative.body}
-              </p>
-              {activeSection === "engineering" ? (
+          if (activeSection === "system") {
+            const system = project.depth.system;
+            return (
+              <article className="detail-section">
+                <h1>{system.headline}</h1>
+                <p className="detail-section-intro">{system.body}</p>
                 <div className="system-flow">
-                  {project.depth.system.flow.map((step, index) => (
+                  {system.flow.map((step, index) => (
                     <div key={step}><span>{formatIndex(index)}</span><strong>{step}</strong></div>
                   ))}
                 </div>
-              ) : (
-                <div className="narrative-grid">
-                  {narrative.highlights.map((item, index) => (
-                    <div key={item}><span>{formatIndex(index)}</span><strong>{item}</strong></div>
+                <div className="decision-list">
+                  {project.depth.decisions.map((decision) => (
+                    <div key={decision.title}>
+                      <strong>{decision.title}</strong>
+                      <p>{decision.summary}</p>
+                    </div>
                   ))}
                 </div>
-              )}
-              <div className="detail-exits">
-                {project.links.map((link) => <a href={link.href} key={link.href} target="_blank" rel="noreferrer">{link.label} ↗</a>)}
+                <div className="detail-exits">
+                  {project.links.map((link) => <a href={link.href} key={link.href} target="_blank" rel="noreferrer">{link.label} ↗</a>)}
+                </div>
+              </article>
+            );
+          }
+
+          const narrative = activeSection === "experience" ? project.depth.experience : project.depth.what;
+          const exits =
+            activeSection === "origin"
+              ? project.depth.proof.map((evidence) => (
+                  <a href={evidence.href} key={evidence.href} rel="noreferrer" target="_blank" title={evidence.note}>
+                    {evidence.label} ↗
+                  </a>
+                ))
+              : project.links.map((link) => (
+                  <a href={link.href} key={link.href} rel="noreferrer" target="_blank">
+                    {link.label} ↗
+                  </a>
+                ));
+          return (
+            <article className="detail-section">
+              <h1>{narrative.headline}</h1>
+              <p className="detail-section-intro">{narrative.body}</p>
+              <div className="narrative-grid">
+                {narrative.highlights.map((item, index) => (
+                  <div key={item}><span>{formatIndex(index)}</span><strong>{item}</strong></div>
+                ))}
               </div>
+              <div className="detail-exits">{exits}</div>
             </article>
           );
         }}

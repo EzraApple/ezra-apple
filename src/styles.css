@@ -1110,6 +1110,31 @@ button {
 .system-flow strong, .narrative-grid strong { font-size: 18px; font-weight: 540; }
 .narrative-grid { grid-template-columns: repeat(3, 1fr); }
 
+.decision-list {
+  display: grid;
+  margin-top: clamp(24px, 4vh, 44px);
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0 clamp(28px, 4vw, 64px);
+}
+
+.decision-list div {
+  padding: 18px 0;
+  border-top: 1px solid var(--page-border);
+}
+
+.decision-list strong {
+  font-size: 17px;
+  font-weight: 560;
+}
+
+.decision-list p {
+  max-width: 520px;
+  margin: 8px 0 0;
+  color: var(--page-muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
 .detail-exits { display: flex; margin-top: 28px; justify-content: flex-end; gap: 26px; }
 .detail-exits a { padding-bottom: 5px; border-bottom: 1px solid var(--page-accent); font-size: 13px; }
 
