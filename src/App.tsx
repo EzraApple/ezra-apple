@@ -100,14 +100,18 @@ const PROJECT_MARKS: Record<string, ReactNode> = {
     </svg>
   ),
   "cosmic-hot-potato": (
+    // Two vectors from one origin with the angle between them: cos(theta).
     <svg {...MARK_PROPS} aria-hidden="true">
-      <circle cx="8" cy="8.5" r="4" />
-      <circle cx="12.6" cy="4" fill="currentColor" r="1.2" stroke="none" />
+      <path d="M3.5 12.5L8 3.5M3.5 12.5L13 10.5" />
+      <path d="M7.4 11.7A4 4 0 0 0 5.3 8.9" />
+      <circle cx="8" cy="3.5" fill="currentColor" r="1.1" stroke="none" />
+      <circle cx="13" cy="10.5" fill="currentColor" r="1.1" stroke="none" />
     </svg>
   ),
   "skills-init": (
+    // A small file tree: root entry with two nested children.
     <svg {...MARK_PROPS} aria-hidden="true">
-      <path d="M4.5 3.5v9M4.5 6.5c4 0 3-2 7-2M4.5 10.5c4 0 3 2 7 2" />
+      <path d="M4.5 3.75h4M5.75 5.75v6.5M5.75 8.5h2M9.25 8.5h3.25M5.75 12.25h2M9.25 12.25h2.25" />
     </svg>
   ),
 };
