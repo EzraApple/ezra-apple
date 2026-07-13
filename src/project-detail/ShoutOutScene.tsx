@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
 
-// The ShoutOut hero: the app's current wall-crawling mascot climbing the
-// edge of a Mac display, occasionally raising its boom mic while a
-// dictated line lands in the focused window — the product, acted out.
-// Frames and timing mirror apps/macos/Sources/Views/FloatingIndicator.swift
-// on shoutout main.
+// The ShoutOut hero is a pseudo-demo: the app's wall-crawling mascot (or
+// its classic capsule indicator) dictates into a Mac, and the visitor can
+// flip the real app settings — overlay style and writing tone. Sprites,
+// timing, overlay styles, and tone semantics mirror shoutout main
+// (FloatingIndicator.swift, LanguagePassStyle).
 
 const IDLE_FRAMES = Array.from(
   { length: 4 },
@@ -21,14 +21,42 @@ const IDLE_FRAME_MS = 130;
 const BOOM_INTRO_FRAME_MS = 68;
 const BOOM_OUTRO_FRAME_MS = 46;
 const PAUSE_RANGE_MS: [number, number] = [520, 880];
-const TYPE_MS = 42;
-const MAX_OFFSET = 118;
+const TYPE_MS = 40;
+const MAX_OFFSET = 132;
 
-const DICTATIONS = [
-  "hold to talk, release to paste.",
-  "speech becomes clean text.",
-  "no account, no cloud.",
-  "the transcript lands formatted.",
+type Overlay = "crab" | "classic";
+type Tone = "standard" | "casual" | "formal";
+
+const TONES: { id: Tone; label: string }[] = [
+  { id: "standard", label: "Normal" },
+  { id: "casual", label: "Casual" },
+  { id: "formal", label: "Formal" },
+];
+
+// One utterance, three cleanup outcomes — matching the app's tone rules:
+// normal balances casing and punctuation, casual stays lowercase with no
+// punctuation, formal polishes casing and punctuation.
+const DICTATIONS: Record<Tone, string>[] = [
+  {
+    standard: "Hold to talk, release to paste.",
+    casual: "hold to talk release to paste",
+    formal: "Hold to talk; release to paste.",
+  },
+  {
+    standard: "Speech becomes clean text, right where you are typing.",
+    casual: "speech becomes clean text right where you are typing",
+    formal: "Speech becomes clean text precisely where you are typing.",
+  },
+  {
+    standard: "No account, no cloud. Everything stays on this Mac.",
+    casual: "no account no cloud everything stays on this mac",
+    formal: "No account and no cloud; everything remains on this Mac.",
+  },
+  {
+    standard: "Fillers like um and uh are removed before pasting.",
+    casual: "fillers like um and uh are removed before pasting",
+    formal: "Fillers such as um and uh are removed before pasting.",
+  },
 ];
 
 const randomBetween = (min: number, max: number) =>
@@ -40,11 +68,18 @@ export function ShoutOutScene() {
   const [offset, setOffset] = useState(0);
   const [typed, setTyped] = useState("");
   const [recording, setRecording] = useState(false);
+  const [overlay, setOverlay] = useState<Overlay>("crab");
+  const [tone, setTone] = useState<Tone>("standard");
+  const overlayRef = useRef<Overlay>("crab");
+  const toneRef = useRef<Tone>("standard");
   const cancelled = useRef(false);
+
+  overlayRef.current = overlay;
+  toneRef.current = tone;
 
   useEffect(() => {
     if (shouldReduceMotion) {
-      setTyped(DICTATIONS[0]);
+      setTyped(DICTATIONS[0][tone]);
       return;
     }
 
@@ -64,51 +99,60 @@ export function ShoutOutScene() {
       let dictationIndex = 0;
 
       while (!cancelled.current) {
-        // A burst of strides along the display edge.
-        const steps = 8 + Math.floor(Math.random() * 7);
-        for (let step = 0; step < steps; step += 1) {
-          if (cancelled.current) return;
-          position += direction * randomBetween(3.2, 5.4);
-          position = Math.min(Math.max(position, -MAX_OFFSET), MAX_OFFSET);
-          if (Math.abs(position) >= MAX_OFFSET - 2) direction *= -1;
-          setOffset(position);
-          setFrame(IDLE_FRAMES[frameIndex % IDLE_FRAMES.length]);
-          frameIndex += 1;
-          await sleep(IDLE_FRAME_MS);
+        if (overlayRef.current === "crab") {
+          // A burst of strides along the display edge.
+          const steps = 8 + Math.floor(Math.random() * 7);
+          for (let step = 0; step < steps; step += 1) {
+            if (cancelled.current) return;
+            position += direction * randomBetween(3.2, 5.4);
+            position = Math.min(Math.max(position, -MAX_OFFSET), MAX_OFFSET);
+            if (Math.abs(position) >= MAX_OFFSET - 2) direction *= -1;
+            setOffset(position);
+            setFrame(IDLE_FRAMES[frameIndex % IDLE_FRAMES.length]);
+            frameIndex += 1;
+            await sleep(IDLE_FRAME_MS);
+          }
+          if (Math.random() < 0.5) direction *= -1;
+        } else {
+          await sleep(1100);
         }
 
         await sleep(randomBetween(...PAUSE_RANGE_MS));
-        if (Math.random() < 0.5) direction *= -1;
         burstsSinceBoom += 1;
 
-        // Occasionally: raise the boom and dictate a line.
-        if (burstsSinceBoom >= 2 && Math.random() < 0.55) {
+        // Occasionally: record and dictate a line in the current tone.
+        if (burstsSinceBoom >= 2 && Math.random() < 0.6) {
           burstsSinceBoom = 0;
           setRecording(true);
 
-          for (const boomFrame of BOOM_FRAMES) {
-            if (cancelled.current) return;
-            setFrame(boomFrame);
-            await sleep(BOOM_INTRO_FRAME_MS);
+          if (overlayRef.current === "crab") {
+            for (const boomFrame of BOOM_FRAMES) {
+              if (cancelled.current) return;
+              setFrame(boomFrame);
+              await sleep(BOOM_INTRO_FRAME_MS);
+            }
+            setFrame(HOLD_FRAME);
           }
-          setFrame(HOLD_FRAME);
 
           const line = DICTATIONS[dictationIndex % DICTATIONS.length];
           dictationIndex += 1;
-          for (let length = 1; length <= line.length; length += 1) {
+          const text = line[toneRef.current];
+          for (let length = 1; length <= text.length; length += 1) {
             if (cancelled.current) return;
-            setTyped(line.slice(0, length));
+            setTyped(text.slice(0, length));
             await sleep(TYPE_MS);
           }
-          await sleep(950);
+          await sleep(1050);
 
-          for (const boomFrame of [...BOOM_FRAMES].reverse()) {
-            if (cancelled.current) return;
-            setFrame(boomFrame);
-            await sleep(BOOM_OUTRO_FRAME_MS);
+          if (overlayRef.current === "crab") {
+            for (const boomFrame of [...BOOM_FRAMES].reverse()) {
+              if (cancelled.current) return;
+              setFrame(boomFrame);
+              await sleep(BOOM_OUTRO_FRAME_MS);
+            }
+            setFrame(IDLE_FRAMES[0]);
           }
           setRecording(false);
-          setFrame(IDLE_FRAMES[0]);
           await sleep(randomBetween(1400, 2200));
           setTyped("");
         }
@@ -119,11 +163,20 @@ export function ShoutOutScene() {
     return () => {
       cancelled.current = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- the loop reads
+    // overlay and tone through refs; restarting it on toggle would reset the
+    // scene.
   }, [shouldReduceMotion]);
 
+  useEffect(() => {
+    if (shouldReduceMotion) setTyped(DICTATIONS[0][tone]);
+  }, [shouldReduceMotion, tone]);
+
+  const toneLabel = TONES.find((entry) => entry.id === tone)?.label ?? "Normal";
+
   return (
-    <div aria-hidden="true" className="shoutout-scene">
-      <div className="shoutout-mac">
+    <div className="shoutout-scene">
+      <div aria-hidden="true" className="shoutout-mac">
         <div className="shoutout-display" data-recording={recording}>
           <div className="shoutout-menubar">
             <span className="shoutout-menu-apple"></span>
@@ -131,8 +184,9 @@ export function ShoutOutScene() {
             <span>File</span>
             <span>Edit</span>
             <span>View</span>
+            <span>Window</span>
             <span className="shoutout-menu-right">
-              {recording ? "● rec" : "9:41"}
+              {recording ? "● rec" : "Mon 9:41"}
             </span>
           </div>
           <div className="shoutout-desktop">
@@ -142,18 +196,46 @@ export function ShoutOutScene() {
                 <i className="shoutout-light shoutout-light-min" />
                 <i className="shoutout-light shoutout-light-max" />
                 <span>notes.md</span>
+                <em>{toneLabel} tone · cleanup on</em>
               </div>
               <div className="shoutout-window-body">
                 {typed}
                 <i className="shoutout-caret" />
               </div>
             </div>
-            <span
-              className="shoutout-crab"
-              style={{ transform: `translateY(${offset}px)` }}
-            >
-              <img alt="" src={frame} />
-            </span>
+
+            <div className="shoutout-dock">
+              <i className="shoutout-dock-tile">
+                <img alt="" src={IDLE_FRAMES[0]} />
+              </i>
+              <i className="shoutout-dock-tile" />
+              <i className="shoutout-dock-tile" />
+              <i className="shoutout-dock-tile" />
+              <i className="shoutout-dock-tile" />
+            </div>
+
+            {overlay === "crab" ? (
+              <span
+                className="shoutout-crab"
+                style={{ transform: `translateY(${offset}px)` }}
+              >
+                <img alt="" src={frame} />
+              </span>
+            ) : (
+              <span className="shoutout-capsule" data-recording={recording}>
+                {recording ? (
+                  <span className="shoutout-capsule-bars">
+                    <i />
+                    <i />
+                    <i />
+                    <i />
+                    <i />
+                  </span>
+                ) : (
+                  <i className="shoutout-capsule-dot" />
+                )}
+              </span>
+            )}
           </div>
         </div>
         <div className="shoutout-chin">
@@ -161,6 +243,39 @@ export function ShoutOutScene() {
         </div>
         <div className="shoutout-foot" />
         <div className="shoutout-base" />
+      </div>
+
+      <div aria-label="ShoutOut demo settings" className="shoutout-controls" role="group">
+        <div className="shoutout-control">
+          <span>Overlay</span>
+          <button
+            data-active={overlay === "crab"}
+            onClick={() => setOverlay("crab")}
+            type="button"
+          >
+            Crab
+          </button>
+          <button
+            data-active={overlay === "classic"}
+            onClick={() => setOverlay("classic")}
+            type="button"
+          >
+            Classic
+          </button>
+        </div>
+        <div className="shoutout-control">
+          <span>Tone</span>
+          {TONES.map((entry) => (
+            <button
+              data-active={tone === entry.id}
+              key={entry.id}
+              onClick={() => setTone(entry.id)}
+              type="button"
+            >
+              {entry.label}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
