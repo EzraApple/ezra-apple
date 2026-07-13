@@ -463,9 +463,15 @@ button {
 .project-heading h2,
 .detail-hero h1,
 .detail-section h1 {
+  min-width: 0;
   font-family: var(--title-font, inherit);
   font-weight: var(--title-wght, 600);
   letter-spacing: -0.02em;
+  overflow-wrap: break-word;
+}
+
+.detail-hero > div {
+  min-width: 0;
 }
 
 .project-summary {
@@ -1115,7 +1121,11 @@ button {
   }
 
   .project-heading h2 {
-    font-size: clamp(44px, 7vw, 68px);
+    font-size: clamp(36px, 4.8vw, 60px);
+  }
+
+  .detail-hero h1 {
+    font-size: clamp(44px, 7.5vw, 96px);
   }
 
   .project-summary {
