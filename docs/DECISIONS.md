@@ -51,6 +51,11 @@
 - The open panel shows the project's primary link (its first authored link)
   under the title; the full link set stays on the project detail sections so
   the homepage keeps pulling visitors into the deeper flow.
+- CI (GitHub Actions) typechecks, builds, and runs an alignment suite that
+  boots the built worker and asserts the site shell, JSON API, and MCP tools
+  all serve exactly what the content modules author — including deep-link
+  fallback, JSON 404s, agent projections omitting theme and artifact, and
+  depth slicing.
 - Typography is part of the theme: each project's title renders in its own
   display face (authored as titleFont/titleWeight theme tokens — Bricolage
   Grotesque, Space Grotesk, Outfit, JetBrains Mono, Unbounded, Martian
