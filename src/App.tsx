@@ -429,16 +429,30 @@ function ProjectPanel({
 
 function EndpointCopyCard({
   endpoint,
+  tipId,
+  tip,
 }: {
   endpoint: string;
+  tipId: string;
+  tip: ReactNode;
 }) {
   const shouldReduceMotion = useReducedMotion() ?? false;
   const copyIconRef = useRef<AnimatedIconHandle>(null);
+  const tipRef = useRef<HTMLSpanElement>(null);
   const [phase, setPhase] = useState<"idle" | "copying" | "copied">("idle");
+  const [tipAbove, setTipAbove] = useState(false);
   const transitionTimer = useRef<number | undefined>(undefined);
   const resetTimer = useRef<number | undefined>(undefined);
   const isCopied = phase !== "idle";
   const showCheck = phase === "copied";
+
+  // The tip prefers to open below the card; flip above only when the
+  // viewport bottom would clip it.
+  const placeTip = (card: HTMLElement) => {
+    const tipHeight = tipRef.current?.offsetHeight ?? 0;
+    const spaceBelow = window.innerHeight - card.getBoundingClientRect().bottom;
+    setTipAbove(spaceBelow < tipHeight + 12);
+  };
 
   const handleCopy = () => {
     copyIconRef.current?.startAnimation();
@@ -470,11 +484,15 @@ function EndpointCopyCard({
 
   return (
     <button
+      aria-describedby={tipId}
       aria-label={isCopied ? `Copied ${endpoint}` : `Copy ${endpoint}`}
       className="endpoint-card"
       data-copied={isCopied}
+      data-tip-above={tipAbove || undefined}
       onClick={handleCopy}
-      onMouseEnter={() => {
+      onFocus={(event) => placeTip(event.currentTarget)}
+      onMouseEnter={(event) => {
+        placeTip(event.currentTarget);
         if (!isCopied) copyIconRef.current?.startAnimation();
       }}
       onMouseLeave={() => {
@@ -491,6 +509,9 @@ function EndpointCopyCard({
           <CopyIcon ref={copyIconRef} size={15} />
         )}
       </span>
+      <span className="endpoint-tip" id={tipId} ref={tipRef} role="tooltip">
+        {tip}
+      </span>
     </button>
   );
 }
@@ -503,8 +524,30 @@ function StructuredAccess({ hidden = false }: { hidden?: boolean }) {
       inert={hidden || undefined}
       aria-label="Machine-readable endpoints"
     >
-      <EndpointCopyCard endpoint={API_ENDPOINT} />
-      <EndpointCopyCard endpoint={MCP_ENDPOINT} />
+      <EndpointCopyCard
+        endpoint={API_ENDPOINT}
+        tip={
+          <>
+            <span className="endpoint-tip-line">
+              <code>/api</code> · <code>/api/profile</code> · <code>/api/projects</code> · <code>/api/projects/:slug</code>
+            </span>
+            <span className="endpoint-tip-note">GET · JSON · no auth · self-describing index at /api</span>
+          </>
+        }
+        tipId="api-endpoint-tip"
+      />
+      <EndpointCopyCard
+        endpoint={MCP_ENDPOINT}
+        tip={
+          <>
+            <span className="endpoint-tip-line">
+              <code>get_profile</code> · <code>list_projects</code> · <code>get_project</code> · <code>list_decisions</code> · <code>search_work</code>
+            </span>
+            <span className="endpoint-tip-note">Streamable HTTP · no auth · works with any MCP client</span>
+          </>
+        }
+        tipId="mcp-endpoint-tip"
+      />
     </section>
   );
 }

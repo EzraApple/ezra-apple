@@ -559,12 +559,14 @@ button {
   flex-wrap: wrap;
   gap: 14px;
   max-height: 110px;
-  overflow: hidden;
+  /* overflow clipping lives on the detail-open rule so endpoint tips can
+     extend past the strip while the catalog is the active surface. */
   transition: max-height 280ms var(--ease-move), padding 280ms var(--ease-move), opacity 160ms ease;
 }
 
 .endpoint-card {
   display: flex;
+  position: relative;
   width: fit-content;
   max-width: 100%;
   min-height: 66px;
@@ -619,6 +621,79 @@ button {
   color: var(--page-accent);
 }
 
+.endpoint-tip {
+  display: flex;
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  width: max-content;
+  max-width: min(560px, 88vw);
+  padding: 10px 14px 9px;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid var(--page-border);
+  background: var(--page-bg);
+  box-shadow: 0 12px 32px color-mix(in oklch, #000 40%, transparent);
+  color: var(--page-muted);
+  cursor: default;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  opacity: 0;
+  pointer-events: none;
+  text-align: left;
+  text-transform: none;
+  transform: translate(-50%, 3px);
+  transition:
+    opacity 150ms ease,
+    transform 170ms var(--ease-out);
+  z-index: 6;
+}
+
+.endpoint-card:hover .endpoint-tip,
+.endpoint-card:focus-visible .endpoint-tip {
+  transform: translate(-50%, 0);
+}
+
+.endpoint-card[data-tip-above] .endpoint-tip {
+  top: auto;
+  bottom: calc(100% + 14px);
+  transform: translate(-50%, -3px);
+}
+
+.endpoint-card[data-tip-above]:hover .endpoint-tip,
+.endpoint-card[data-tip-above]:focus-visible .endpoint-tip {
+  transform: translate(-50%, 0);
+}
+
+.endpoint-card:hover .endpoint-tip,
+.endpoint-card:focus-visible .endpoint-tip {
+  opacity: 1;
+  transition-delay: 260ms;
+}
+
+.endpoint-tip-line {
+  white-space: nowrap;
+}
+
+.endpoint-card .endpoint-tip code {
+  overflow: visible;
+  color: color-mix(in oklch, var(--page-fg) 86%, transparent);
+  font-size: 10px;
+  text-decoration: none;
+}
+
+.endpoint-tip-note {
+  margin-top: 2px;
+  padding-top: 7px;
+  white-space: nowrap;
+  border-top: 1px solid color-mix(in oklch, var(--page-border) 60%, transparent);
+  color: color-mix(in oklch, var(--page-muted) 80%, transparent);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .endpoint-icon {
   display: grid;
   flex: 0 0 32px;
@@ -670,6 +745,10 @@ button {
   min-height: 0;
   padding: 0;
   align-items: flex-start;
+}
+
+.catalog-track[data-detail-open="true"] .machine-access {
+  overflow: hidden;
 }
 
 .catalog-track[data-detail-open="true"] .section-heading,
@@ -1158,6 +1237,10 @@ button {
   .endpoint-card code {
     font-size: 10px;
   }
+
+  .endpoint-tip {
+    display: none;
+  }
 }
 
 @media (max-height: 760px) and (min-width: 761px) {
@@ -1200,7 +1283,8 @@ button {
   .project-row-name,
   .endpoint-card,
   .endpoint-card code,
-  .endpoint-icon {
+  .endpoint-icon,
+  .endpoint-tip {
     transition: none;
   }
 
