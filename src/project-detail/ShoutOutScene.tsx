@@ -121,7 +121,7 @@ export function ShoutOutScene() {
         burstsSinceBoom += 1;
 
         // Occasionally: record and dictate a line in the current tone.
-        if (burstsSinceBoom >= 2 && Math.random() < 0.6) {
+        if (burstsSinceBoom >= 1 && Math.random() < 0.55) {
           burstsSinceBoom = 0;
           setRecording(true);
 
