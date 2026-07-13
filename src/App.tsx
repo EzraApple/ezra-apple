@@ -59,6 +59,27 @@ function readDetailSection(): DetailSection | null {
 
 const DEFAULT_TITLE = "Ezra Apple — Software Engineer";
 
+const THEME_VARS = [
+  ["--page-bg", "background"],
+  ["--page-surface", "surface"],
+  ["--page-fg", "foreground"],
+  ["--page-muted", "muted"],
+  ["--page-border", "border"],
+  ["--page-accent", "accent"],
+  ["--page-accent-soft", "accentSoft"],
+] as const;
+
+// Colors hold steady through the middle 80% of each project's scroll range
+// and blend across the 20% window straddling each boundary.
+const THEME_BLEND_START = 0.4;
+const THEME_BLEND_END = 0.6;
+
+function mixThemeColor(from: string, to: string, t: number): string {
+  if (t <= 0 || from === to) return from;
+  if (t >= 1) return to;
+  return `color-mix(in oklch, ${from} ${((1 - t) * 100).toFixed(1)}%, ${to})`;
+}
+
 function formatIndex(index: number): string {
   return String(index + 1).padStart(2, "0");
 }
@@ -83,7 +104,8 @@ async function copyToClipboard(value: string): Promise<boolean> {
 function useCatalogScroll(
   count: number,
   setActiveIndex: (index: number) => void,
-  enabled = true,
+  enabled: boolean,
+  projects: ProjectSummary[],
 ) {
   const trackRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef(0);
@@ -116,6 +138,16 @@ function useCatalogScroll(
         panel.style.flex = "";
         const fade = panel.querySelector<HTMLElement>(".project-content-fade");
         if (fade) fade.style.opacity = "";
+      }
+      // Hand color control back to React with the active theme in place so
+      // the 620ms variable transitions resume for discrete changes.
+      const shell = trackRef.current?.closest<HTMLElement>(".site-shell");
+      const theme = projects[activeRef.current]?.theme;
+      if (shell && theme) {
+        delete shell.dataset.themeScrub;
+        for (const [variable, key] of THEME_VARS) {
+          shell.style.setProperty(variable, theme[key]);
+        }
       }
     };
 
@@ -160,6 +192,28 @@ function useCatalogScroll(
 
       const lower = Math.floor(exact);
       const fraction = exact - lower;
+
+      // Scroll-linked theme: hold each project's colors through the middle
+      // of its range, then blend in OKLCH across the boundary window.
+      const shell = track.closest<HTMLElement>(".site-shell");
+      const fromTheme = projects[lower]?.theme;
+      const toTheme = projects[lower + 1]?.theme ?? fromTheme;
+      if (shell && fromTheme && toTheme) {
+        const blend =
+          fraction <= THEME_BLEND_START
+            ? 0
+            : fraction >= THEME_BLEND_END
+              ? 1
+              : (fraction - THEME_BLEND_START) /
+                (THEME_BLEND_END - THEME_BLEND_START);
+        shell.dataset.themeScrub = "true";
+        for (const [variable, key] of THEME_VARS) {
+          shell.style.setProperty(
+            variable,
+            mixThemeColor(fromTheme[key], toTheme[key], blend),
+          );
+        }
+      }
 
       stack.dataset.scrub = "true";
       items.forEach((panel, index) => {
@@ -227,7 +281,7 @@ function useCatalogScroll(
       cancelScrollAnimation();
       clearScrub();
     };
-  }, [cancelScrollAnimation, count, enabled, setActiveIndex]);
+  }, [cancelScrollAnimation, count, enabled, projects, setActiveIndex]);
 
   const animateScrollTo = useCallback(
     (targetY: number) => {
@@ -572,6 +626,7 @@ function ProjectCatalog({
     projects.length,
     setActiveIndex,
     !isDetailOpen,
+    projects,
   );
   const trackHeight = `${100 + Math.max(projects.length - 1, 0) * 28}vh`;
   const wasDetailOpen = useRef(isDetailOpen);

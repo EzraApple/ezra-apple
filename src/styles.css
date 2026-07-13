@@ -123,6 +123,12 @@ button {
     color 420ms ease;
 }
 
+/* While the scrub drives colors from scroll distance, the time-based
+   variable transitions would lag a step behind the pointer. */
+.site-shell[data-theme-scrub="true"] {
+  transition: none;
+}
+
 .intro {
   display: grid;
   min-height: 108px;
