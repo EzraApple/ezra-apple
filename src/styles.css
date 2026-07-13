@@ -596,6 +596,22 @@ button {
     color 150ms ease;
 }
 
+.endpoint-kind {
+  padding: 3px 7px;
+  border: 1px solid color-mix(in oklch, var(--page-border) 80%, transparent);
+  color: color-mix(in oklch, var(--page-muted) 85%, transparent);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+}
+
+.endpoint-card:hover .endpoint-kind,
+.endpoint-card:focus-visible .endpoint-kind,
+.endpoint-card[data-copied="true"] .endpoint-kind {
+  border-color: color-mix(in oklch, var(--page-accent) 55%, var(--page-border));
+  color: var(--page-accent);
+}
+
 .endpoint-card code {
   min-width: 0;
   overflow: hidden;
@@ -1275,7 +1291,23 @@ button {
   .system-flow, .narrative-grid { margin-top: 48px; grid-template-columns: 1fr; }
   .system-flow div, .narrative-grid div { min-height: 96px; }
 
-  .endpoint-card code {
+  .endpoint-kind {
+  padding: 3px 7px;
+  border: 1px solid color-mix(in oklch, var(--page-border) 80%, transparent);
+  color: color-mix(in oklch, var(--page-muted) 85%, transparent);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+}
+
+.endpoint-card:hover .endpoint-kind,
+.endpoint-card:focus-visible .endpoint-kind,
+.endpoint-card[data-copied="true"] .endpoint-kind {
+  border-color: color-mix(in oklch, var(--page-accent) 55%, var(--page-border));
+  color: var(--page-accent);
+}
+
+.endpoint-card code {
     font-size: 10px;
   }
 

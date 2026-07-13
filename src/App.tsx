@@ -36,8 +36,12 @@ const SOCIAL_ICONS: Record<string, ReactNode> = {
   LinkedIn: <FaLinkedinIn aria-hidden="true" />,
   X: <FaXTwitter aria-hidden="true" />,
 };
-const API_ENDPOINT = new URL("/api/projects", window.location.origin).href;
+const API_ENDPOINT = new URL("/api", window.location.origin).href;
 const MCP_ENDPOINT = new URL("/mcp", window.location.origin).href;
+
+function displayEndpoint(endpoint: string): string {
+  return endpoint.replace(/^https?:\/\//, "");
+}
 type DetailSection = "experience" | "system" | "origin";
 const DETAIL_PATHS: MorphSection<DetailSection>[] = [
   { id: "experience", label: "Experience", description: "How it feels and the core interaction" },
@@ -483,10 +487,12 @@ function ProjectPanel({
 
 function EndpointCopyCard({
   endpoint,
+  kind,
   tipId,
   tip,
 }: {
   endpoint: string;
+  kind: string;
   tipId: string;
   tip: ReactNode;
 }) {
@@ -539,7 +545,7 @@ function EndpointCopyCard({
   return (
     <button
       aria-describedby={tipId}
-      aria-label={isCopied ? `Copied ${endpoint}` : `Copy ${endpoint}`}
+      aria-label={isCopied ? `Copied ${endpoint}` : `Copy the ${kind} URL ${endpoint}`}
       className="endpoint-card"
       data-copied={isCopied}
       data-tip-above={tipAbove || undefined}
@@ -555,7 +561,8 @@ function EndpointCopyCard({
       title={isCopied ? "Copied" : "Copy endpoint"}
       type="button"
     >
-      <code>{endpoint}</code>
+      <span aria-hidden="true" className="endpoint-kind">{kind}</span>
+      <code>{displayEndpoint(endpoint)}</code>
       <span className="endpoint-icon" aria-hidden="true">
         {showCheck ? (
           <CircleCheckIcon animateOnMount size={15} />
@@ -580,6 +587,7 @@ function StructuredAccess({ hidden = false }: { hidden?: boolean }) {
     >
       <EndpointCopyCard
         endpoint={API_ENDPOINT}
+        kind="API"
         tip={
           <>
             <span className="endpoint-tip-line">
@@ -592,6 +600,7 @@ function StructuredAccess({ hidden = false }: { hidden?: boolean }) {
       />
       <EndpointCopyCard
         endpoint={MCP_ENDPOINT}
+        kind="MCP"
         tip={
           <>
             <span className="endpoint-tip-line">

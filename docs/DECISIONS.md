@@ -27,6 +27,10 @@
   blocks have no explanatory heading, status labels, or marketing copy.
 - Endpoint copy controls transition from the copied Replo icon treatment to a
   themed checkmark for five seconds, with reduced-motion support.
+- Endpoint cards carry a small mono kind chip (API / MCP), display the URL
+  without its protocol, and copy the full URL; the API card hands out the
+  self-describing /api index rather than a specific route. Hover reveals a
+  compact spec-sheet tooltip; explanation stays out of the resting layout.
 - Open project cards use an editorial two-column composition: title and links
   on the left, description on the right.
 - The homepage omits stack/status tags and placeholder project graphics.
