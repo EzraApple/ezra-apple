@@ -1056,14 +1056,25 @@ function ProjectDetailView({
             <article className="detail-section">
               <h1>{narrative.headline}</h1>
               <p className="detail-section-intro">{narrative.body}</p>
-              <div className="narrative-grid">
-                {narrative.highlights.map((item, index) => (
-                  <div key={item}><span>{formatIndex(index)}</span><strong>{item}</strong></div>
-                ))}
-              </div>
               {activeSection === "experience" && project.slug === "shoutout" ? (
-                <ShoutOutHoldToTalk />
-              ) : null}
+                <>
+                  <p className="narrative-inline">
+                    {narrative.highlights.map((item, index) => (
+                      <span key={item}>
+                        <i>{formatIndex(index)}</i>
+                        {item}
+                      </span>
+                    ))}
+                  </p>
+                  <ShoutOutHoldToTalk />
+                </>
+              ) : (
+                <div className="narrative-grid">
+                  {narrative.highlights.map((item, index) => (
+                    <div key={item}><span>{formatIndex(index)}</span><strong>{item}</strong></div>
+                  ))}
+                </div>
+              )}
               <div className="detail-exits">{exits}</div>
             </article>
           );

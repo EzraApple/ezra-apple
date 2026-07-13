@@ -1289,26 +1289,53 @@ button {
   color: var(--page-accent);
 }
 
+/* Highlights as a quiet inline strip when a section has a real demo to
+   carry it, instead of the boxed grid. */
+.narrative-inline {
+  display: flex;
+  margin: clamp(26px, 4vh, 40px) 0 0;
+  align-items: center;
+  gap: 26px;
+  flex-wrap: wrap;
+  color: var(--page-muted);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.narrative-inline span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.narrative-inline i {
+  color: var(--page-accent);
+  font-size: 9px;
+  font-style: normal;
+}
+
 .shoutout-key-demo {
   display: grid;
-  margin-top: clamp(30px, 5vh, 54px);
+  margin-top: clamp(44px, 8vh, 84px);
   justify-items: center;
-  gap: 14px;
+  gap: 18px;
 }
 
 .shoutout-key-row {
   display: flex;
-  width: min(560px, 100%);
+  width: min(660px, 100%);
   align-items: center;
-  gap: 22px;
+  gap: 28px;
 }
 
 .shoutout-keycap {
   display: grid;
   position: relative;
-  width: 84px;
-  height: 84px;
-  flex: 0 0 84px;
+  width: 104px;
+  height: 104px;
+  flex: 0 0 104px;
   place-items: center;
   border: 1px solid var(--page-border);
   border-radius: 14px;
@@ -1352,8 +1379,8 @@ button {
 .shoutout-key-field {
   display: flex;
   min-width: 0;
-  min-height: 52px;
-  padding: 0 4px 10px;
+  min-height: 66px;
+  padding: 0 4px 12px;
   flex: 1;
   align-items: flex-end;
   gap: 14px;
@@ -1365,7 +1392,7 @@ button {
   flex: 1;
   color: color-mix(in oklch, var(--page-fg) 84%, transparent);
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.5;
   overflow-wrap: break-word;
 }
@@ -1424,6 +1451,16 @@ button {
   border-color: var(--page-accent);
   background: color-mix(in oklch, var(--page-accent-soft) 40%, transparent);
   color: var(--page-accent);
+}
+
+.shoutout-key-receipt {
+  margin: 0;
+  padding: 8px 14px;
+  border: 1px solid color-mix(in oklch, var(--page-border) 70%, transparent);
+  color: color-mix(in oklch, var(--page-muted) 85%, transparent);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.05em;
 }
 
 .shoutout-key-hint {
