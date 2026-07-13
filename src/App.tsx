@@ -868,6 +868,7 @@ function ProjectDetailView({
   });
   const shouldReduceMotion = useReducedMotion() ?? false;
   const backButtonRef = useRef<HTMLButtonElement>(null);
+  const focusTimer = useRef<number | undefined>(undefined);
   // Whether this session pushed a section entry on top of the overview entry,
   // so leaving the section can pop it instead of growing the history.
   const didPushSection = useRef(false);
@@ -889,6 +890,18 @@ function ProjectDetailView({
           window.history.back();
         } else {
           window.history.replaceState({}, "", `/projects/${project.slug}`);
+        }
+        // Land focus on the row of the section we just left once the
+        // overview rows have re-entered, so the visitor's place survives.
+        if (currentSection) {
+          window.clearTimeout(focusTimer.current);
+          focusTimer.current = window.setTimeout(() => {
+            document
+              .querySelector<HTMLElement>(
+                `.detail-paths button[data-section="${currentSection}"]`,
+              )
+              ?.focus({ preventScroll: true });
+          }, 620);
         }
         return;
       }
@@ -954,6 +967,7 @@ function ProjectDetailView({
   // the back control to keep keyboard and reader position inside the detail.
   useEffect(() => {
     backButtonRef.current?.focus({ preventScroll: true });
+    return () => window.clearTimeout(focusTimer.current);
   }, []);
 
   useEffect(() => {

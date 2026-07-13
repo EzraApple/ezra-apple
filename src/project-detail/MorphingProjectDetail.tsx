@@ -88,6 +88,7 @@ export function MorphingProjectDetail<SectionId extends string>({
             return (
             <m.button
               data-highlighted={highlightedSection === section.id}
+              data-section={section.id}
               animate={{
                 height: isExploring ? 64 : 76,
                 opacity: 1,
