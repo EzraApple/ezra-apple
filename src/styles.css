@@ -1033,6 +1033,10 @@ button {
   color: var(--page-accent);
 }
 
+.shoutout-menu-mic {
+  display: block;
+}
+
 .shoutout-desktop {
   display: flex;
   position: relative;
@@ -1131,13 +1135,13 @@ button {
   position: absolute;
   top: 50%;
   right: 8px;
-  width: 58px;
+  width: 46px;
   transition: transform 130ms ease-in-out;
 }
 
 .shoutout-crab img {
   display: block;
-  width: 58px;
+  width: 46px;
   transform: translateY(-50%);
   image-rendering: pixelated;
 }

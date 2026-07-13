@@ -186,7 +186,24 @@ export function ShoutOutScene() {
             <span>View</span>
             <span>Window</span>
             <span className="shoutout-menu-right">
-              {recording ? "● rec" : "Mon 9:41"}
+              {recording ? (
+                <svg
+                  className="shoutout-menu-mic"
+                  fill="none"
+                  height="12"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.4"
+                  viewBox="0 0 16 16"
+                  width="12"
+                >
+                  <rect height="7" rx="2" width="4" x="6" y="1.5" />
+                  <path d="M3.5 7.5a4.5 4.5 0 0 0 9 0M8 12v2.5" />
+                </svg>
+              ) : (
+                "Mon 9:41"
+              )}
             </span>
           </div>
           <div className="shoutout-desktop">
