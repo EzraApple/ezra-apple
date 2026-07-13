@@ -23,6 +23,7 @@ const BOOM_OUTRO_FRAME_MS = 46;
 const PAUSE_RANGE_MS: [number, number] = [520, 880];
 const TYPE_MS = 40;
 const MAX_OFFSET = 132;
+const WALK_SPEED_PX_S = 30;
 
 type Overlay = "crab" | "classic";
 type Tone = "standard" | "casual" | "formal";
@@ -66,6 +67,7 @@ export function ShoutOutScene() {
   const shouldReduceMotion = useReducedMotion() ?? false;
   const [frame, setFrame] = useState(IDLE_FRAMES[0]);
   const [offset, setOffset] = useState(0);
+  const [walkMs, setWalkMs] = useState(0);
   const [typed, setTyped] = useState("");
   const [recording, setRecording] = useState(false);
   const [overlay, setOverlay] = useState<Overlay>("crab");
@@ -100,19 +102,35 @@ export function ShoutOutScene() {
 
       while (!cancelled.current) {
         if (overlayRef.current === "crab") {
-          // A burst of strides along the display edge.
-          const steps = 8 + Math.floor(Math.random() * 7);
-          for (let step = 0; step < steps; step += 1) {
+          // Glide to a destination at constant speed: one linear transition
+          // while the walk frames tick, so the motion reads as calm walking
+          // instead of per-step twitching.
+          const distance = randomBetween(55, 150);
+          if (
+            position + direction * distance > MAX_OFFSET ||
+            position + direction * distance < -MAX_OFFSET
+          ) {
+            direction *= -1;
+          }
+          const target = Math.min(
+            Math.max(position + direction * distance, -MAX_OFFSET),
+            MAX_OFFSET,
+          );
+          const duration =
+            (Math.abs(target - position) / WALK_SPEED_PX_S) * 1000;
+          setWalkMs(duration);
+          setOffset(target);
+          const frameCount = Math.max(1, Math.round(duration / IDLE_FRAME_MS));
+          for (let tick = 0; tick < frameCount; tick += 1) {
             if (cancelled.current) return;
-            position += direction * randomBetween(3.2, 5.4);
-            position = Math.min(Math.max(position, -MAX_OFFSET), MAX_OFFSET);
-            if (Math.abs(position) >= MAX_OFFSET - 2) direction *= -1;
-            setOffset(position);
             setFrame(IDLE_FRAMES[frameIndex % IDLE_FRAMES.length]);
             frameIndex += 1;
             await sleep(IDLE_FRAME_MS);
           }
-          if (Math.random() < 0.5) direction *= -1;
+          position = target;
+          setFrame(IDLE_FRAMES[0]);
+          // Mostly keep heading the same way; turn around occasionally.
+          if (Math.random() < 0.3) direction *= -1;
         } else {
           await sleep(1100);
         }
@@ -234,7 +252,10 @@ export function ShoutOutScene() {
             {overlay === "crab" ? (
               <span
                 className="shoutout-crab"
-                style={{ transform: `translateY(${offset}px)` }}
+                style={{
+                  transform: `translateY(${offset}px)`,
+                  transitionDuration: `${Math.round(walkMs)}ms`,
+                }}
               >
                 <img alt="" src={frame} />
               </span>

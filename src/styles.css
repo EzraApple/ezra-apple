@@ -1136,7 +1136,8 @@ button {
   top: 50%;
   right: 8px;
   width: 46px;
-  transition: transform 130ms ease-in-out;
+  transition-property: transform;
+  transition-timing-function: linear;
 }
 
 .shoutout-crab img {
