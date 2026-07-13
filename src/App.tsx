@@ -19,6 +19,7 @@ import {
 } from "./animated-icons";
 import { projectsQueryOptions } from "./projects-query";
 import { MorphingProjectDetail, type MorphSection } from "./project-detail/MorphingProjectDetail";
+import { ShoutOutHoldToTalk } from "./project-detail/ShoutOutHoldToTalk";
 import { ShoutOutScene } from "./project-detail/ShoutOutScene";
 
 type ThemeStyle = CSSProperties & {
@@ -1060,6 +1061,9 @@ function ProjectDetailView({
                   <div key={item}><span>{formatIndex(index)}</span><strong>{item}</strong></div>
                 ))}
               </div>
+              {activeSection === "experience" && project.slug === "shoutout" ? (
+                <ShoutOutHoldToTalk />
+              ) : null}
               <div className="detail-exits">{exits}</div>
             </article>
           );
