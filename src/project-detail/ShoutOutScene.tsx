@@ -1,26 +1,28 @@
 import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
 
-// The ShoutOut hero: the app's actual wall-crawling mascot climbing the
-// edge of a screen, occasionally raising its boom mic while dictated text
-// lands in the field — the product, acted out. Timing constants mirror
-// FloatingIndicator.swift in the ShoutOut source.
+// The ShoutOut hero: the app's current wall-crawling mascot climbing the
+// edge of a Mac display, occasionally raising its boom mic while a
+// dictated line lands in the focused window — the product, acted out.
+// Frames and timing mirror apps/macos/Sources/Views/FloatingIndicator.swift
+// on shoutout main.
 
 const IDLE_FRAMES = Array.from(
-  { length: 10 },
+  { length: 4 },
   (_, index) => `/shoutout/crab/idle-${index + 1}.png`,
 );
 const BOOM_FRAMES = Array.from(
-  { length: 5 },
+  { length: 6 },
   (_, index) => `/shoutout/crab/recording-intro-${index + 1}.png`,
 );
+const HOLD_FRAME = "/shoutout/crab/recording-hold.png";
 
-const IDLE_FRAME_MS = 95;
-const BOOM_FRAME_MS = 90;
-const STRIDE_MS = 100;
-const PAUSE_RANGE_MS: [number, number] = [420, 900];
+const IDLE_FRAME_MS = 130;
+const BOOM_INTRO_FRAME_MS = 68;
+const BOOM_OUTRO_FRAME_MS = 46;
+const PAUSE_RANGE_MS: [number, number] = [520, 880];
 const TYPE_MS = 42;
-const MAX_OFFSET = 62;
+const MAX_OFFSET = 118;
 
 const DICTATIONS = [
   "hold to talk, release to paste.",
@@ -47,7 +49,7 @@ export function ShoutOutScene() {
     }
 
     cancelled.current = false;
-    for (const src of [...IDLE_FRAMES, ...BOOM_FRAMES]) {
+    for (const src of [...IDLE_FRAMES, ...BOOM_FRAMES, HOLD_FRAME]) {
       new Image().src = src;
     }
 
@@ -62,16 +64,16 @@ export function ShoutOutScene() {
       let dictationIndex = 0;
 
       while (!cancelled.current) {
-        // A burst of strides along the screen edge.
+        // A burst of strides along the display edge.
         const steps = 8 + Math.floor(Math.random() * 7);
         for (let step = 0; step < steps; step += 1) {
           if (cancelled.current) return;
-          position += direction * randomBetween(1.5, 3);
+          position += direction * randomBetween(3.2, 5.4);
           position = Math.min(Math.max(position, -MAX_OFFSET), MAX_OFFSET);
           if (Math.abs(position) >= MAX_OFFSET - 2) direction *= -1;
-          frameIndex += 1;
           setOffset(position);
           setFrame(IDLE_FRAMES[frameIndex % IDLE_FRAMES.length]);
+          frameIndex += 1;
           await sleep(IDLE_FRAME_MS);
         }
 
@@ -87,8 +89,9 @@ export function ShoutOutScene() {
           for (const boomFrame of BOOM_FRAMES) {
             if (cancelled.current) return;
             setFrame(boomFrame);
-            await sleep(BOOM_FRAME_MS);
+            await sleep(BOOM_INTRO_FRAME_MS);
           }
+          setFrame(HOLD_FRAME);
 
           const line = DICTATIONS[dictationIndex % DICTATIONS.length];
           dictationIndex += 1;
@@ -102,7 +105,7 @@ export function ShoutOutScene() {
           for (const boomFrame of [...BOOM_FRAMES].reverse()) {
             if (cancelled.current) return;
             setFrame(boomFrame);
-            await sleep(BOOM_FRAME_MS);
+            await sleep(BOOM_OUTRO_FRAME_MS);
           }
           setRecording(false);
           setFrame(IDLE_FRAMES[0]);
@@ -120,20 +123,43 @@ export function ShoutOutScene() {
 
   return (
     <div aria-hidden="true" className="shoutout-scene">
-      <div className="shoutout-monitor">
-        <div className="shoutout-screen" data-recording={recording}>
-          <span className="shoutout-field">
-            {typed}
-            <i className="shoutout-caret" />
-          </span>
-          <span
-            className="shoutout-crab"
-            style={{ transform: `translateY(${offset}px)` }}
-          >
-            <img alt="" src={frame} />
-          </span>
+      <div className="shoutout-mac">
+        <div className="shoutout-display" data-recording={recording}>
+          <div className="shoutout-menubar">
+            <span className="shoutout-menu-apple"></span>
+            <span className="shoutout-menu-app">ShoutOut</span>
+            <span>File</span>
+            <span>Edit</span>
+            <span>View</span>
+            <span className="shoutout-menu-right">
+              {recording ? "● rec" : "9:41"}
+            </span>
+          </div>
+          <div className="shoutout-desktop">
+            <div className="shoutout-window">
+              <div className="shoutout-window-bar">
+                <i className="shoutout-light shoutout-light-close" />
+                <i className="shoutout-light shoutout-light-min" />
+                <i className="shoutout-light shoutout-light-max" />
+                <span>notes.md</span>
+              </div>
+              <div className="shoutout-window-body">
+                {typed}
+                <i className="shoutout-caret" />
+              </div>
+            </div>
+            <span
+              className="shoutout-crab"
+              style={{ transform: `translateY(${offset}px)` }}
+            >
+              <img alt="" src={frame} />
+            </span>
+          </div>
         </div>
-        <div className="shoutout-stand" />
+        <div className="shoutout-chin">
+          <i />
+        </div>
+        <div className="shoutout-foot" />
         <div className="shoutout-base" />
       </div>
     </div>

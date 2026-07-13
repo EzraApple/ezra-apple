@@ -992,7 +992,7 @@ function ProjectDetailView({
         activeSection={section}
         highlightedSection={DETAIL_PATHS[sectionCursor].id}
         hero={(
-          <div className="detail-hero">
+          <div className="detail-hero" data-project={project.slug}>
             <div>
               <p className="detail-eyebrow">
                 <span aria-hidden="true" className="project-mark">
