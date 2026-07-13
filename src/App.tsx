@@ -19,6 +19,7 @@ import {
 } from "./animated-icons";
 import { projectsQueryOptions } from "./projects-query";
 import { MorphingProjectDetail, type MorphSection } from "./project-detail/MorphingProjectDetail";
+import { ShoutOutScene } from "./project-detail/ShoutOutScene";
 
 type ThemeStyle = CSSProperties & {
   "--page-bg": string;
@@ -833,11 +834,7 @@ function ProjectCatalog({
 
 function ProjectArtifactVisual({ project }: { project: ProjectDetail }) {
   if (project.slug === "shoutout") {
-    return (
-      <div className="signal-art" aria-hidden="true">
-        {Array.from({ length: 17 }, (_, index) => <i key={index} style={{ height: `${18 + ((index * 19) % 68)}%` }} />)}
-      </div>
-    );
+    return <ShoutOutScene />;
   }
 
   return (
