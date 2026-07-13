@@ -1203,29 +1203,35 @@ button {
   background: rgb(255 255 255 / 35%);
 }
 
+/* Mirrors ClassicIndicatorView: a vertical stack of nine 3px-tall
+   capsules whose widths pulse with speech level. */
 .shoutout-capsule-bars {
   display: flex;
-  height: 30px;
+  flex-direction: column;
   align-items: center;
   gap: 3px;
 }
 
 .shoutout-capsule-bars i {
-  width: 3px;
+  height: 3px;
   border-radius: 2px;
-  background: rgb(255 255 255 / 85%);
-  animation: shoutout-capsule-bar 0.9s ease-in-out infinite;
+  background: rgb(255 255 255 / 84%);
+  animation: shoutout-capsule-bar 0.86s ease-in-out infinite;
 }
 
-.shoutout-capsule-bars i:nth-child(1) { animation-delay: 0s; }
-.shoutout-capsule-bars i:nth-child(2) { animation-delay: 0.15s; }
-.shoutout-capsule-bars i:nth-child(3) { animation-delay: 0.3s; }
-.shoutout-capsule-bars i:nth-child(4) { animation-delay: 0.1s; }
-.shoutout-capsule-bars i:nth-child(5) { animation-delay: 0.22s; }
+.shoutout-capsule-bars i:nth-child(1) { width: 4px; animation-delay: 0.05s; }
+.shoutout-capsule-bars i:nth-child(2) { width: 8px; animation-delay: 0.31s; }
+.shoutout-capsule-bars i:nth-child(3) { width: 6px; animation-delay: 0.12s; }
+.shoutout-capsule-bars i:nth-child(4) { width: 10px; animation-delay: 0.44s; }
+.shoutout-capsule-bars i:nth-child(5) { width: 7px; animation-delay: 0.2s; }
+.shoutout-capsule-bars i:nth-child(6) { width: 9px; animation-delay: 0.37s; }
+.shoutout-capsule-bars i:nth-child(7) { width: 4px; animation-delay: 0.08s; }
+.shoutout-capsule-bars i:nth-child(8) { width: 8px; animation-delay: 0.27s; }
+.shoutout-capsule-bars i:nth-child(9) { width: 5px; animation-delay: 0.16s; }
 
 @keyframes shoutout-capsule-bar {
-  0%, 100% { height: 6px; }
-  50% { height: 24px; }
+  0%, 100% { transform: scaleX(1); }
+  50% { transform: scaleX(1.9); }
 }
 
 .shoutout-controls {

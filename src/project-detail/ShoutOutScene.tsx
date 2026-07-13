@@ -225,11 +225,9 @@ export function ShoutOutScene() {
               <span className="shoutout-capsule" data-recording={recording}>
                 {recording ? (
                   <span className="shoutout-capsule-bars">
-                    <i />
-                    <i />
-                    <i />
-                    <i />
-                    <i />
+                    {Array.from({ length: 9 }, (_, index) => (
+                      <i key={index} />
+                    ))}
                   </span>
                 ) : (
                   <i className="shoutout-capsule-dot" />
