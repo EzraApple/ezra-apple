@@ -1325,9 +1325,9 @@ button {
 
 .shoutout-key-row {
   display: flex;
-  width: min(660px, 100%);
+  width: min(860px, 100%);
   align-items: center;
-  gap: 28px;
+  gap: 32px;
 }
 
 .shoutout-keycap {
@@ -1379,8 +1379,8 @@ button {
 .shoutout-key-field {
   display: flex;
   min-width: 0;
-  min-height: 66px;
-  padding: 0 4px 12px;
+  min-height: 92px;
+  padding: 0 6px 14px;
   flex: 1;
   align-items: flex-end;
   gap: 14px;
@@ -1392,8 +1392,8 @@ button {
   flex: 1;
   color: color-mix(in oklch, var(--page-fg) 84%, transparent);
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-  font-size: 15px;
-  line-height: 1.5;
+  font-size: 18px;
+  line-height: 1.55;
   overflow-wrap: break-word;
 }
 
@@ -1656,10 +1656,12 @@ button {
 }
 
 .detail-section {
+  display: flex;
   height: 100%;
   min-height: 0;
-  padding: clamp(28px, 5vh, 52px) max(24px, 6vw) 20px;
+  padding: clamp(28px, 5vh, 52px) max(24px, 6vw) 24px;
   flex: 1 1 auto;
+  flex-direction: column;
   overflow: hidden;
 }
 
@@ -1729,7 +1731,8 @@ button {
   line-height: 1.45;
 }
 
-.detail-exits { display: flex; margin-top: 28px; justify-content: flex-end; gap: 26px; }
+/* Exits anchor to the section's bottom-left. */
+.detail-exits { display: flex; margin-top: auto; padding-top: 26px; justify-content: flex-start; gap: 26px; }
 .detail-exits a { padding-bottom: 5px; border-bottom: 1px solid var(--page-accent); font-size: 13px; }
 
 @media (max-width: 900px) {
