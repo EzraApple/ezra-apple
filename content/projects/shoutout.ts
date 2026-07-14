@@ -43,8 +43,8 @@ export const shoutout = defineProject({
   depth: {
     what: {
       headline: "The subscription ran out.",
-      body: "My Wispr Flow sub lapsed, and I realized there is no world in which I cannot just make my own. Thirty days later: local, signed, notarized, and updating itself.",
-      highlights: ["Replaced a lapsed subscription", "Crab from day one", "Signed build in a month"],
+      body: "My Wispr Flow sub lapsed, and I realized there is no world in which I cannot just make my own. It worked within the week; everything since has been tweaking.",
+      highlights: ["Replaced a lapsed subscription", "Crab from day one", "Working in a week"],
     },
     experience: {
       headline: "Press, speak, and stay in flow.",
