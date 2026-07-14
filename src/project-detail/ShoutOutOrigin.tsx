@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {
   CRAB_COATS,
-  crabFrame,
+  crabUpright,
   loadCoat,
   saveCoat,
   type CrabCoat,
@@ -34,7 +34,7 @@ export function ShoutOutOrigin() {
         <img
           alt=""
           className="shoutout-coat-preview"
-          src={crabFrame(coat, "idle-1")}
+          src={crabUpright(coat)}
         />
         <p className="shoutout-coat-note">
           the wall crab ships in 21 coats · pick yours and it follows you
@@ -49,7 +49,7 @@ export function ShoutOutOrigin() {
               onClick={() => pick(option)}
               type="button"
             >
-              <img alt="" src={crabFrame(option, "idle-1")} />
+              <img alt="" src={crabUpright(option)} />
             </button>
           ))}
         </div>

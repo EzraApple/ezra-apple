@@ -22,6 +22,11 @@ export function crabFrame(coat: CrabCoat, name: string): string {
     : `/shoutout/crab/${coat}/${name}.png`;
 }
 
+// The upright (non-wall) pose, for places the crab stands rather than clings.
+export function crabUpright(coat: CrabCoat): string {
+  return `/shoutout/crab/upright/${coat}.png`;
+}
+
 export function loadCoat(): CrabCoat {
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY);
