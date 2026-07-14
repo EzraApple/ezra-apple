@@ -1731,8 +1731,8 @@ button {
   line-height: 1.45;
 }
 
-/* Exits anchor to the section's bottom-left. */
-.detail-exits { display: flex; margin-top: auto; padding-top: 26px; justify-content: flex-start; gap: 26px; }
+/* Exits anchor to the section's bottom-right. */
+.detail-exits { display: flex; margin-top: auto; padding-top: 26px; justify-content: flex-end; gap: 26px; }
 .detail-exits a { padding-bottom: 5px; border-bottom: 1px solid var(--page-accent); font-size: 13px; }
 
 @media (max-width: 900px) {
