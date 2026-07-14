@@ -1178,6 +1178,13 @@ export function App({
     if (!isDetailOpen) document.title = DEFAULT_TITLE;
   }, [isDetailOpen]);
 
+  // Browser chrome follows the active project's theme.
+  useEffect(() => {
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute("content", themeProject?.theme.background ?? "#0b1018");
+  });
+
   if (!activeProject) return null;
 
   const themeProject = isDetailOpen
