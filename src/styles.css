@@ -1851,6 +1851,9 @@ button {
 
   .intro {
     min-height: 154px;
+    /* The base rule caps intro at 140px for the detail-open collapse;
+       uncapped here so the taller stacked layout never clips. */
+    max-height: none;
     padding: 0 0 24px;
     grid-template-columns: 1fr;
     gap: 24px;
