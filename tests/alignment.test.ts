@@ -1,5 +1,4 @@
 import { spawn, execSync, type ChildProcess } from "node:child_process";
-import { existsSync } from "node:fs";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { profile } from "../content/profile";
 import {
@@ -63,9 +62,9 @@ async function mcpTool(name: string, args: Record<string, unknown> = {}) {
 }
 
 beforeAll(async () => {
-  if (!existsSync("dist")) {
-    execSync("npm run build", { stdio: "inherit" });
-  }
+  // Always rebuild: testing a stale dist against fresh content modules
+  // produces false mismatches (and could mask real ones).
+  execSync("npm run build", { stdio: "inherit" });
   server = spawn(
     process.execPath,
     [
