@@ -146,6 +146,9 @@ button {
   min-height: 0;
   flex-direction: column;
   justify-content: space-between;
+  /* space-between collapses on shorter columns; keep a floor between the
+     identity label and the social icons. */
+  gap: 14px;
 }
 
 .intro-label {
@@ -1857,6 +1860,7 @@ button {
     min-height: 0;
     flex-direction: row;
     align-items: flex-start;
+    gap: 22px;
   }
 
   .intro-label {
