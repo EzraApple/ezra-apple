@@ -1,5 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
+import {
+  COAT_EVENT,
+  crabFrame,
+  loadCoat,
+  type CrabCoat,
+} from "./shoutout-crab";
 
 // The ShoutOut hero is a pseudo-demo: the app's wall-crawling mascot (or
 // its classic capsule indicator) dictates into a Mac, and the visitor can
@@ -7,15 +13,12 @@ import { useReducedMotion } from "motion/react";
 // timing, overlay styles, and tone semantics mirror shoutout main
 // (FloatingIndicator.swift, LanguagePassStyle).
 
-const IDLE_FRAMES = Array.from(
-  { length: 4 },
-  (_, index) => `/shoutout/crab/idle-${index + 1}.png`,
-);
+const IDLE_FRAMES = Array.from({ length: 4 }, (_, index) => `idle-${index + 1}`);
 const BOOM_FRAMES = Array.from(
   { length: 6 },
-  (_, index) => `/shoutout/crab/recording-intro-${index + 1}.png`,
+  (_, index) => `recording-intro-${index + 1}`,
 );
-const HOLD_FRAME = "/shoutout/crab/recording-hold.png";
+const HOLD_FRAME = "recording-hold";
 
 const IDLE_FRAME_MS = 130;
 const BOOM_INTRO_FRAME_MS = 68;
@@ -72,6 +75,7 @@ export function ShoutOutScene() {
   const [recording, setRecording] = useState(false);
   const [overlay, setOverlay] = useState<Overlay>("crab");
   const [tone, setTone] = useState<Tone>("standard");
+  const [coat, setCoat] = useState<CrabCoat>(loadCoat);
   const overlayRef = useRef<Overlay>("crab");
   const toneRef = useRef<Tone>("standard");
   const cancelled = useRef(false);
@@ -80,14 +84,21 @@ export function ShoutOutScene() {
   toneRef.current = tone;
 
   useEffect(() => {
+    const onCoat = (event: Event) =>
+      setCoat((event as CustomEvent<CrabCoat>).detail);
+    window.addEventListener(COAT_EVENT, onCoat);
+    return () => window.removeEventListener(COAT_EVENT, onCoat);
+  }, []);
+
+  useEffect(() => {
     if (shouldReduceMotion) {
       setTyped(DICTATIONS[0][tone]);
       return;
     }
 
     cancelled.current = false;
-    for (const src of [...IDLE_FRAMES, ...BOOM_FRAMES, HOLD_FRAME]) {
-      new Image().src = src;
+    for (const name of [...IDLE_FRAMES, ...BOOM_FRAMES, HOLD_FRAME]) {
+      new Image().src = crabFrame(coat, name);
     }
 
     const sleep = (ms: number) =>
@@ -184,7 +195,7 @@ export function ShoutOutScene() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- the loop reads
     // overlay and tone through refs; restarting it on toggle would reset the
     // scene.
-  }, [shouldReduceMotion]);
+  }, [shouldReduceMotion, coat]);
 
   useEffect(() => {
     if (shouldReduceMotion) setTyped(DICTATIONS[0][tone]);
@@ -241,7 +252,7 @@ export function ShoutOutScene() {
 
             <div className="shoutout-dock">
               <i className="shoutout-dock-tile">
-                <img alt="" src={IDLE_FRAMES[0]} />
+                <img alt="" src={crabFrame(coat, IDLE_FRAMES[0])} />
               </i>
               <i className="shoutout-dock-tile" />
               <i className="shoutout-dock-tile" />
@@ -257,7 +268,7 @@ export function ShoutOutScene() {
                   transitionDuration: `${Math.round(walkMs)}ms`,
                 }}
               >
-                <img alt="" src={frame} />
+                <img alt="" src={crabFrame(coat, frame)} />
               </span>
             ) : (
               <span className="shoutout-capsule" data-recording={recording}>

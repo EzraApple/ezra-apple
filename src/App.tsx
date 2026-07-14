@@ -20,6 +20,7 @@ import {
 import { projectsQueryOptions } from "./projects-query";
 import { MorphingProjectDetail, type MorphSection } from "./project-detail/MorphingProjectDetail";
 import { ShoutOutHoldToTalk } from "./project-detail/ShoutOutHoldToTalk";
+import { ShoutOutOrigin } from "./project-detail/ShoutOutOrigin";
 import { ShoutOutPipeline } from "./project-detail/ShoutOutPipeline";
 import { ShoutOutScene } from "./project-detail/ShoutOutScene";
 
@@ -1075,7 +1076,7 @@ function ProjectDetailView({
             <article className="detail-section">
               <h1>{narrative.headline}</h1>
               <p className="detail-section-intro">{narrative.body}</p>
-              {activeSection === "experience" && project.slug === "shoutout" ? (
+              {project.slug === "shoutout" ? (
                 <>
                   <p className="narrative-inline">
                     {narrative.highlights.map((item, index) => (
@@ -1085,7 +1086,11 @@ function ProjectDetailView({
                       </span>
                     ))}
                   </p>
-                  <ShoutOutHoldToTalk />
+                  {activeSection === "experience" ? (
+                    <ShoutOutHoldToTalk />
+                  ) : (
+                    <ShoutOutOrigin />
+                  )}
                 </>
               ) : (
                 <div className="narrative-grid">
