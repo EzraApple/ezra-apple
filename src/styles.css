@@ -1706,6 +1706,87 @@ button {
 .system-flow strong, .narrative-grid strong { font-size: 18px; font-weight: 540; }
 .narrative-grid { grid-template-columns: repeat(3, 1fr); }
 
+.shoutout-pipeline {
+  display: grid;
+  width: min(760px, 100%);
+  margin: clamp(26px, 4vh, 44px) auto 0;
+  justify-items: center;
+  gap: 10px;
+}
+
+.shoutout-pipeline svg {
+  width: 100%;
+  height: auto;
+}
+
+.sp-boundary {
+  stroke: var(--page-border);
+  stroke-width: 1;
+}
+
+.sp-tag-bg {
+  fill: var(--page-bg);
+}
+
+.sp-tag {
+  fill: color-mix(in oklch, var(--page-muted) 85%, transparent);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+}
+
+.sp-pipe {
+  stroke: color-mix(in oklch, var(--page-border) 85%, transparent);
+  stroke-width: 1;
+}
+
+.sp-bypass {
+  stroke: color-mix(in oklch, var(--page-border) 60%, transparent);
+  stroke-dasharray: 4 5;
+  stroke-width: 1;
+  transition: stroke 250ms ease;
+}
+
+.shoutout-pipeline[data-bypass="true"] .sp-bypass {
+  stroke: var(--page-accent);
+}
+
+.sp-node {
+  fill: color-mix(in oklch, var(--page-surface) 62%, transparent);
+  stroke: var(--page-border);
+  stroke-width: 1;
+}
+
+.sp-label {
+  fill: color-mix(in oklch, var(--page-fg) 82%, transparent);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 11.5px;
+}
+
+.sp-bypass-label {
+  fill: color-mix(in oklch, var(--page-muted) 60%, transparent);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  transition: fill 250ms ease;
+}
+
+.shoutout-pipeline[data-bypass="true"] .sp-bypass-label {
+  fill: var(--page-accent);
+}
+
+.sp-pulse {
+  fill: var(--page-accent);
+}
+
+.sp-caption {
+  color: color-mix(in oklch, var(--page-muted) 65%, transparent);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 .decision-list {
   display: grid;
   margin-top: clamp(24px, 4vh, 44px);

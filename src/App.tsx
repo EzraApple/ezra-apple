@@ -20,6 +20,7 @@ import {
 import { projectsQueryOptions } from "./projects-query";
 import { MorphingProjectDetail, type MorphSection } from "./project-detail/MorphingProjectDetail";
 import { ShoutOutHoldToTalk } from "./project-detail/ShoutOutHoldToTalk";
+import { ShoutOutPipeline } from "./project-detail/ShoutOutPipeline";
 import { ShoutOutScene } from "./project-detail/ShoutOutScene";
 
 type ThemeStyle = CSSProperties & {
@@ -1033,11 +1034,15 @@ function ProjectDetailView({
               <article className="detail-section">
                 <h1>{system.headline}</h1>
                 <p className="detail-section-intro">{system.body}</p>
-                <div className="system-flow">
-                  {system.flow.map((step, index) => (
-                    <div key={step}><span>{formatIndex(index)}</span><strong>{step}</strong></div>
-                  ))}
-                </div>
+                {project.slug === "shoutout" ? (
+                  <ShoutOutPipeline />
+                ) : (
+                  <div className="system-flow">
+                    {system.flow.map((step, index) => (
+                      <div key={step}><span>{formatIndex(index)}</span><strong>{step}</strong></div>
+                    ))}
+                  </div>
+                )}
                 <div className="decision-list">
                   {project.depth.decisions.map((decision) => (
                     <div key={decision.title}>
