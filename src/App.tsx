@@ -23,7 +23,10 @@ import { ShoutOutHoldToTalk } from "./project-detail/ShoutOutHoldToTalk";
 import { ShoutOutOrigin } from "./project-detail/ShoutOutOrigin";
 import { ShoutOutPipeline } from "./project-detail/ShoutOutPipeline";
 import { ShoutOutScene } from "./project-detail/ShoutOutScene";
+import { SpatiumDrag } from "./project-detail/SpatiumDrag";
+import { SpatiumOriginBand } from "./project-detail/SpatiumOriginBand";
 import { SpatiumScene } from "./project-detail/SpatiumScene";
+import { SpatiumSync } from "./project-detail/SpatiumSync";
 
 type ThemeStyle = CSSProperties & {
   "--page-bg": string;
@@ -1041,6 +1044,8 @@ function ProjectDetailView({
                 <p className="detail-section-intro">{system.body}</p>
                 {project.slug === "shoutout" ? (
                   <ShoutOutPipeline />
+                ) : project.slug === "spatium" ? (
+                  <SpatiumSync />
                 ) : (
                   <div className="system-flow">
                     {system.flow.map((step, index) => (
@@ -1080,7 +1085,7 @@ function ProjectDetailView({
             <article className="detail-section">
               <h1>{narrative.headline}</h1>
               <p className="detail-section-intro">{narrative.body}</p>
-              {project.slug === "shoutout" ? (
+              {project.slug === "shoutout" || project.slug === "spatium" ? (
                 <>
                   <p className="narrative-inline">
                     {narrative.highlights.map((item, index) => (
@@ -1090,10 +1095,16 @@ function ProjectDetailView({
                       </span>
                     ))}
                   </p>
-                  {activeSection === "experience" ? (
-                    <ShoutOutHoldToTalk />
+                  {project.slug === "shoutout" ? (
+                    activeSection === "experience" ? (
+                      <ShoutOutHoldToTalk />
+                    ) : (
+                      <ShoutOutOrigin />
+                    )
+                  ) : activeSection === "experience" ? (
+                    <SpatiumDrag />
                   ) : (
-                    <ShoutOutOrigin />
+                    <SpatiumOriginBand />
                   )}
                 </>
               ) : (

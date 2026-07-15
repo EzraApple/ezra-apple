@@ -1708,6 +1708,375 @@ button {
   letter-spacing: 0.04em;
 }
 
+/* ————— Spatium product styling: the deeper the section, the more the
+   demos dress like the app itself — light blueprint paper, 2px navy
+   borders, hard offset shadows, Instrument Sans. ————— */
+
+.spatium-drag,
+.spatium-sync,
+.spatium-blueprint {
+  --spb-bg: hsl(214 70% 97%);
+  --spb-card: hsl(214 65% 99%);
+  --spb-grid: hsl(214 40% 88%);
+  --spb-border: hsl(222 22% 28%);
+  --spb-fg: hsl(222 47% 11%);
+  --spb-muted: hsl(215 18% 40%);
+  --spb-primary: hsl(220 65% 45%);
+  --spb-ring: hsl(42 96% 55%);
+}
+
+.spb-card {
+  border: 2px solid var(--spb-border);
+  border-radius: 6px;
+  background: var(--spb-card);
+  box-shadow: 3px 3px 0 var(--spb-border);
+  color: var(--spb-fg);
+}
+
+/* — Experience: the drag demo — */
+.spatium-drag {
+  display: grid;
+  width: min(760px, 100%);
+  margin: clamp(30px, 5vh, 54px) auto 0;
+  justify-items: center;
+  gap: 12px;
+}
+
+.spatium-drag-panel {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border: 2px solid var(--spb-border);
+  border-radius: 8px;
+  background: var(--spb-bg);
+  box-shadow: 4px 4px 0 var(--spb-border);
+}
+
+.spatium-drag-panel svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.spb-grid-line {
+  stroke: var(--spb-grid);
+  stroke-width: 1;
+}
+
+.spb-piece {
+  cursor: grab;
+  transition: transform 60ms linear;
+}
+
+.spb-piece rect,
+.spb-piece circle {
+  fill: var(--spb-card);
+  stroke: var(--spb-border);
+  stroke-width: 2;
+  transition: stroke 160ms ease, fill 160ms ease;
+}
+
+.spb-piece text {
+  fill: var(--spb-muted);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  pointer-events: none;
+  user-select: none;
+}
+
+.spb-piece[data-dragging="true"] {
+  cursor: grabbing;
+  transition: none;
+}
+
+.spb-piece[data-dragging="true"] rect,
+.spb-piece[data-dragging="true"] circle {
+  stroke: var(--spb-primary);
+  fill: hsl(214 80% 95%);
+}
+
+.spb-piece[data-snapped="true"] rect,
+.spb-piece[data-snapped="true"] circle {
+  stroke: var(--spb-ring);
+}
+
+.spb-piece[data-snapped="true"] {
+  transition: transform 120ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+.spb-you {
+  display: inline-flex;
+  position: absolute;
+  bottom: 10px;
+  left: 12px;
+  align-items: center;
+  gap: 6px;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.spatium-drag-log {
+  margin: 0;
+  color: color-mix(in oklch, var(--page-muted) 75%, transparent);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+}
+
+/* — System: the sync diagram — */
+.spatium-sync {
+  display: grid;
+  width: min(860px, 100%);
+  margin: clamp(28px, 5vh, 52px) auto 0;
+  justify-items: center;
+  gap: 16px;
+}
+
+.spatium-sync-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0;
+}
+
+.spatium-sync-node {
+  display: grid;
+  min-width: 118px;
+  padding: 14px 16px;
+  justify-items: center;
+  gap: 4px;
+}
+
+.spatium-sync-node strong {
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.spatium-sync-node small {
+  color: var(--spb-muted);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 8.5px;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+.spatium-sync-node.is-room {
+  min-width: 168px;
+  background: hsl(214 80% 95%);
+}
+
+.spatium-sync-pipe {
+  display: block;
+  position: relative;
+  height: 2px;
+  flex: 1;
+  background: color-mix(in oklch, var(--page-border) 80%, transparent);
+}
+
+.spatium-sync-pipe i {
+  position: absolute;
+  top: -2.5px;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--page-accent);
+  animation: spatium-sync-dot 1.8s linear infinite;
+}
+
+.spatium-sync-pipe i[data-flow="left"] {
+  animation-direction: reverse;
+}
+
+@keyframes spatium-sync-dot {
+  from { left: 0; opacity: 0; }
+  12% { opacity: 1; }
+  88% { opacity: 1; }
+  to { left: calc(100% - 7px); opacity: 0; }
+}
+
+.spatium-sync-label {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: color-mix(in oklch, var(--page-muted) 70%, transparent);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 8.5px;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.spatium-sync-label.is-under {
+  top: auto;
+  bottom: -22px;
+}
+
+.spatium-sync-caption {
+  color: color-mix(in oklch, var(--page-muted) 65%, transparent);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* — Origin: fully inside the blueprint — */
+.spatium-blueprint {
+  display: grid;
+  width: 100%;
+  margin-top: clamp(30px, 5vh, 56px);
+  padding: clamp(22px, 3vw, 40px);
+  grid-template-columns: minmax(260px, 0.9fr) minmax(300px, 1.1fr);
+  gap: clamp(24px, 4vw, 56px);
+  border: 2px solid var(--spb-border);
+  border-radius: 10px;
+  background:
+    linear-gradient(var(--spb-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--spb-grid) 1px, transparent 1px),
+    var(--spb-bg);
+  background-size: 24px 24px, 24px 24px, auto;
+  box-shadow: 5px 5px 0 var(--spb-border);
+  color: var(--spb-fg);
+  font-family: "Instrument Sans Variable", "Geist Variable", sans-serif;
+}
+
+.spatium-blueprint-cards {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+}
+
+.spatium-room-card,
+.spatium-picker-card {
+  padding: 14px 16px;
+}
+
+.spatium-room-card header,
+.spatium-picker-card header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.spatium-room-card strong,
+.spatium-picker-card strong {
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.spatium-room-card header span {
+  color: var(--spb-muted);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.spatium-room-avatars {
+  display: flex;
+  margin-top: 10px;
+  gap: 6px;
+}
+
+.spatium-room-avatars i {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--spb-border);
+  border-radius: 50%;
+}
+
+.spatium-room-card p,
+.spatium-picker-card p {
+  margin: 10px 0 0;
+  color: var(--spb-muted);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.spatium-color-row {
+  display: flex;
+  margin-top: 12px;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.spatium-color-row button {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--spb-border);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 100ms ease, box-shadow 100ms ease;
+}
+
+.spatium-color-row button:hover,
+.spatium-color-row button:focus-visible {
+  transform: translateY(-1px);
+}
+
+.spatium-color-row button[data-active="true"] {
+  box-shadow: 0 0 0 3px var(--spb-ring);
+}
+
+.spatium-log {
+  margin: 0;
+  padding: 0;
+  border-left: 2px solid var(--spb-border);
+  list-style: none;
+}
+
+.spatium-log li {
+  display: flex;
+  position: relative;
+  padding: 9px 0 9px 22px;
+  align-items: baseline;
+  gap: 14px;
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+
+.spatium-log li::before {
+  position: absolute;
+  top: 50%;
+  left: -5px;
+  width: 8px;
+  height: 8px;
+  transform: translateY(-50%);
+  border: 2px solid var(--spb-border);
+  border-radius: 50%;
+  background: var(--spb-card);
+  content: "";
+}
+
+.spatium-log li:last-child::before {
+  background: var(--spb-ring);
+}
+
+.spatium-log li span {
+  flex: 0 0 56px;
+  color: var(--spb-primary);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.spatium-blueprint-footer {
+  grid-column: 1 / -1;
+  margin: 4px 0 0;
+  color: var(--spb-muted);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
 .spatium-caption {
   margin: 0;
   color: color-mix(in oklch, var(--page-muted) 65%, transparent);
@@ -2430,6 +2799,7 @@ button {
   .shoutout-capsule-bars i,
   .shoutout-key-level i,
   .spatium-ripple,
+  .spatium-sync-pipe i,
   .signal-art,
   .detail-paths small {
     display: none;

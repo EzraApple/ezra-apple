@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
+import {
+  CURSOR_COLOR_EVENT,
+  loadCursorColor,
+  ROOMMATE_COLOR,
+} from "./spatium-cursor";
 
 // The Spatium hero: two cursors sharing one floor plan, dragging furniture
 // that snaps to the grid on release — the product's multiplayer moment on
@@ -41,12 +46,17 @@ type Actor = {
   color: string;
 };
 
-// First two joiners get the palette's first two colors, like the party
-// server's round-robin assignment.
-const ACTORS: Actor[] = [
-  { name: "ezra", color: "#ef4444" },
-  { name: "roommate", color: "#f97316" },
-];
+// Your chosen cursor color leads; the roommate keeps the palette's second
+// slot (or falls back to the first if you took orange).
+function buildActors(myColor: string): Actor[] {
+  return [
+    { name: "ezra", color: myColor },
+    {
+      name: "roommate",
+      color: myColor === ROOMMATE_COLOR ? "#ef4444" : ROOMMATE_COLOR,
+    },
+  ];
+}
 
 const randomBetween = (min: number, max: number) =>
   min + Math.random() * (max - min);
@@ -63,7 +73,18 @@ export function SpatiumScene() {
   const [dragging, setDragging] = useState<string | null>(null);
   const [snapped, setSnapped] = useState<string | null>(null);
   const [ripple, setRipple] = useState<{ x: number; y: number; color: string; key: number } | null>(null);
+  const [myColor, setMyColor] = useState(loadCursorColor);
   const cancelled = useRef(false);
+  const actors = buildActors(myColor);
+  const actorsRef = useRef(actors);
+  actorsRef.current = actors;
+
+  useEffect(() => {
+    const onColor = (event: Event) =>
+      setMyColor((event as CustomEvent<string>).detail);
+    window.addEventListener(CURSOR_COLOR_EVENT, onColor);
+    return () => window.removeEventListener(CURSOR_COLOR_EVENT, onColor);
+  }, []);
 
   useEffect(() => {
     if (shouldReduceMotion) return;
@@ -131,7 +152,7 @@ export function SpatiumScene() {
         setRipple({
           x: grabX,
           y: grabY,
-          color: ACTORS[actorIndex].color,
+          color: actorsRef.current[actorIndex].color,
           key: Date.now(),
         });
         setDragging(piece.id);
@@ -187,7 +208,7 @@ export function SpatiumScene() {
     <div aria-hidden="true" className="spatium-scene">
       <div className="spatium-frame">
         <div className="spatium-presence">
-          {ACTORS.map((actor) => (
+          {actors.map((actor) => (
             <span key={actor.name}>
               <i style={{ background: actor.color }} />
               {actor.name}
@@ -254,7 +275,7 @@ export function SpatiumScene() {
           ) : null}
 
           {/* cursors */}
-          {ACTORS.map((actor, index) => (
+          {actors.map((actor, index) => (
             <g
               className="spatium-cursor"
               key={actor.name}
