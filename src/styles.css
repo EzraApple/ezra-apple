@@ -1586,6 +1586,137 @@ button {
   text-transform: uppercase;
 }
 
+.spatium-scene {
+  display: grid;
+  width: 100%;
+  justify-items: center;
+  gap: 12px;
+}
+
+.spatium-frame {
+  position: relative;
+  width: min(700px, 100%);
+}
+
+.spatium-frame svg {
+  width: 100%;
+  height: auto;
+}
+
+.spatium-presence {
+  display: flex;
+  position: absolute;
+  top: -6px;
+  right: 0;
+  gap: 14px;
+}
+
+.spatium-presence span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: color-mix(in oklch, var(--page-muted) 80%, transparent);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.spatium-presence i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.spatium-grid-line {
+  stroke: color-mix(in oklch, var(--page-border) 26%, transparent);
+  stroke-width: 1;
+}
+
+.spatium-wall {
+  stroke: var(--page-border);
+  stroke-width: 1.5;
+}
+
+.spatium-room-label {
+  fill: color-mix(in oklch, var(--page-muted) 55%, transparent);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+.spatium-piece {
+  transition: transform 90ms linear;
+}
+
+.spatium-piece rect,
+.spatium-piece circle {
+  fill: color-mix(in oklch, var(--page-surface) 62%, transparent);
+  stroke: color-mix(in oklch, var(--page-fg) 45%, transparent);
+  stroke-width: 1.2;
+  transition: stroke 200ms ease, fill 200ms ease;
+}
+
+.spatium-piece text {
+  fill: color-mix(in oklch, var(--page-muted) 85%, transparent);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+}
+
+.spatium-piece[data-dragging="true"] rect,
+.spatium-piece[data-dragging="true"] circle {
+  stroke: var(--page-accent);
+  fill: color-mix(in oklch, var(--page-accent-soft) 40%, transparent);
+}
+
+.spatium-piece[data-snapped="true"] rect,
+.spatium-piece[data-snapped="true"] circle {
+  stroke: var(--page-accent);
+}
+
+.spatium-piece[data-snapped="true"] {
+  transition: transform 120ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+.spatium-ripple {
+  fill: none;
+  stroke-width: 1.5;
+  animation: spatium-ripple 500ms ease-out forwards;
+}
+
+@keyframes spatium-ripple {
+  from {
+    r: 4;
+    opacity: 0.9;
+  }
+
+  to {
+    r: 22;
+    opacity: 0;
+  }
+}
+
+.spatium-cursor {
+  transition: transform 90ms linear;
+}
+
+.spatium-cursor-name {
+  fill: #fff;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+
+.spatium-caption {
+  margin: 0;
+  color: color-mix(in oklch, var(--page-muted) 65%, transparent);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 .shoutout-chin {
   display: grid;
   width: min(720px, 100%);
@@ -1617,18 +1748,21 @@ button {
   background: color-mix(in oklch, var(--page-surface) 60%, transparent);
 }
 
-/* The ShoutOut hero scene owns most of the page width; the title scales
-   down so the one-word name never breaks. */
-.detail-hero[data-project="shoutout"] {
+/* Bespoke hero scenes own most of the page width; titles scale down so
+   one-word names never break. */
+.detail-hero[data-project="shoutout"],
+.detail-hero[data-project="spatium"] {
   grid-template-columns: minmax(240px, 0.4fr) minmax(0, 1.6fr);
   gap: clamp(28px, 3vw, 56px);
 }
 
-.detail-hero[data-project="shoutout"] h1 {
+.detail-hero[data-project="shoutout"] h1,
+.detail-hero[data-project="spatium"] h1 {
   font-size: clamp(32px, 3.4vw, 56px);
 }
 
-.detail-hero[data-project="shoutout"] .detail-summary {
+.detail-hero[data-project="shoutout"] .detail-summary,
+.detail-hero[data-project="spatium"] .detail-summary {
   margin-top: 20px;
   font-size: clamp(15px, 1.25vw, 18px);
 }
@@ -2295,6 +2429,7 @@ button {
   .shoutout-caret,
   .shoutout-capsule-bars i,
   .shoutout-key-level i,
+  .spatium-ripple,
   .signal-art,
   .detail-paths small {
     display: none;

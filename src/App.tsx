@@ -23,6 +23,7 @@ import { ShoutOutHoldToTalk } from "./project-detail/ShoutOutHoldToTalk";
 import { ShoutOutOrigin } from "./project-detail/ShoutOutOrigin";
 import { ShoutOutPipeline } from "./project-detail/ShoutOutPipeline";
 import { ShoutOutScene } from "./project-detail/ShoutOutScene";
+import { SpatiumScene } from "./project-detail/SpatiumScene";
 
 type ThemeStyle = CSSProperties & {
   "--page-bg": string;
@@ -838,6 +839,9 @@ function ProjectCatalog({
 function ProjectArtifactVisual({ project }: { project: ProjectDetail }) {
   if (project.slug === "shoutout") {
     return <ShoutOutScene />;
+  }
+  if (project.slug === "spatium") {
+    return <SpatiumScene />;
   }
 
   return (
