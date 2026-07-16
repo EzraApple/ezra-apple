@@ -1319,16 +1319,36 @@ button {
   font-style: normal;
 }
 
+/* ShoutOut's own UI is a pixelBox system (see ShoutOutHomeView.swift):
+   square-cornered panels, 2px ink strokes, hard offset shadows, mono-caps
+   chips on light paper. The deeper sections wear it here, with every color
+   derived from the page's active theme instead of the app's literal palette. */
+.shoutout-key-demo,
+.shoutout-pipeline,
+.shoutout-origin {
+  --sob-paper: color-mix(in oklch, var(--page-accent) 26%, oklch(0.95 0.006 250));
+  --sob-panel: color-mix(in oklch, var(--page-accent) 7%, oklch(0.99 0.003 250));
+  --sob-tint: color-mix(in oklch, var(--page-accent) 45%, oklch(0.97 0.005 250));
+  --sob-ink: color-mix(in oklch, var(--page-accent) 16%, oklch(0.19 0.025 258));
+  --sob-muted: color-mix(in oklch, var(--page-accent) 28%, oklch(0.44 0.015 255));
+  --sob-deep: color-mix(in oklch, var(--page-accent) 60%, oklch(0.05 0.04 250));
+}
+
 .shoutout-key-demo {
   display: grid;
-  margin-top: clamp(44px, 8vh, 84px);
+  width: min(860px, 100%);
+  margin: clamp(44px, 8vh, 84px) auto 0;
+  padding: clamp(22px, 3.4vw, 36px) clamp(18px, 3vw, 34px) 18px;
   justify-items: center;
   gap: 18px;
+  border: 2px solid var(--sob-ink);
+  background: var(--sob-paper);
+  box-shadow: 6px 6px 0 var(--sob-ink);
 }
 
 .shoutout-key-row {
   display: flex;
-  width: min(860px, 100%);
+  width: 100%;
   align-items: center;
   gap: 32px;
 }
@@ -1340,34 +1360,28 @@ button {
   height: 104px;
   flex: 0 0 104px;
   place-items: center;
-  border: 1px solid var(--page-border);
-  border-radius: 14px;
-  background:
-    linear-gradient(
-      color-mix(in oklch, var(--page-surface) 88%, transparent),
-      color-mix(in oklch, var(--page-bg) 72%, transparent)
-    );
-  box-shadow: 0 5px 0 color-mix(in oklch, var(--page-border) 70%, transparent);
-  color: var(--page-muted);
+  border: 2px solid var(--sob-ink);
+  background: var(--sob-panel);
+  box-shadow: 4px 4px 0 var(--sob-ink);
+  color: var(--sob-muted);
   cursor: pointer;
   touch-action: none;
   transition:
     transform 90ms ease,
     box-shadow 90ms ease,
-    border-color 130ms ease,
     color 130ms ease;
   user-select: none;
 }
 
 .shoutout-keycap[data-pressed="true"] {
-  transform: translateY(4px);
-  border-color: var(--page-accent);
-  box-shadow: 0 1px 0 color-mix(in oklch, var(--page-border) 70%, transparent);
-  color: var(--page-accent);
+  transform: translate(3px, 3px);
+  background: var(--sob-tint);
+  box-shadow: 1px 1px 0 var(--sob-ink);
+  color: var(--sob-deep);
 }
 
 .shoutout-keycap:focus-visible {
-  outline: 1px solid var(--page-accent);
+  outline: 2px solid var(--sob-deep);
   outline-offset: 3px;
 }
 
@@ -1377,27 +1391,33 @@ button {
   right: 11px;
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 10px;
+  font-weight: 700;
 }
 
 .shoutout-key-field {
   display: flex;
   min-width: 0;
-  min-height: 92px;
-  padding: 0 6px 14px;
+  min-height: 104px;
+  padding: 14px 16px;
   flex: 1;
   align-items: flex-end;
   gap: 14px;
-  border-bottom: 1px solid var(--page-border);
+  border: 2px solid var(--sob-ink);
+  background: var(--sob-panel);
 }
 
 .shoutout-key-text {
   min-width: 0;
   flex: 1;
-  color: color-mix(in oklch, var(--page-fg) 84%, transparent);
+  color: var(--sob-ink);
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 18px;
   line-height: 1.55;
   overflow-wrap: break-word;
+}
+
+.shoutout-key-demo .shoutout-caret {
+  background: var(--sob-deep);
 }
 
 .shoutout-key-level {
@@ -1411,7 +1431,7 @@ button {
   width: 3px;
   height: 6px;
   border-radius: 2px;
-  background: var(--page-accent);
+  background: var(--sob-deep);
   animation: shoutout-key-level 0.7s ease-in-out infinite;
 }
 
@@ -1437,40 +1457,47 @@ button {
   width: 30px;
   height: 30px;
   place-items: center;
-  border: 1px solid var(--page-border);
-  border-radius: 50%;
-  background: transparent;
-  color: var(--page-muted);
+  border: 2px solid var(--sob-ink);
+  background: var(--sob-panel);
+  box-shadow: 2px 2px 0 var(--sob-ink);
+  color: var(--sob-ink);
   cursor: pointer;
   font-size: 12px;
   transition:
-    border-color 130ms ease,
-    color 130ms ease,
+    transform 90ms ease,
+    box-shadow 90ms ease,
     background-color 130ms ease;
 }
 
 .shoutout-key-actions button:hover,
 .shoutout-key-actions button:focus-visible {
-  border-color: var(--page-accent);
-  background: color-mix(in oklch, var(--page-accent-soft) 40%, transparent);
-  color: var(--page-accent);
+  background: var(--sob-tint);
+}
+
+.shoutout-key-actions button:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
 }
 
 .shoutout-key-receipt {
   margin: 0;
-  padding: 8px 14px;
-  border: 1px solid color-mix(in oklch, var(--page-border) 70%, transparent);
-  color: color-mix(in oklch, var(--page-muted) 85%, transparent);
+  padding: 7px 13px;
+  border: 2px solid var(--sob-ink);
+  background: var(--sob-panel);
+  box-shadow: 2px 2px 0 var(--sob-deep);
+  color: var(--sob-ink);
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 10px;
+  font-weight: 600;
   letter-spacing: 0.05em;
 }
 
 .shoutout-key-hint {
   margin: 0;
-  color: color-mix(in oklch, var(--page-muted) 65%, transparent);
+  color: var(--sob-muted);
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 9px;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -1478,15 +1505,24 @@ button {
 .shoutout-origin {
   display: grid;
   margin-top: clamp(34px, 6vh, 64px);
+  padding: clamp(22px, 3vw, 40px);
   grid-template-columns: minmax(280px, 1fr) minmax(300px, 1.1fr);
   align-items: center;
-  gap: clamp(36px, 6vw, 90px);
+  gap: clamp(30px, 5vw, 80px);
+  border: 2px solid var(--sob-ink);
+  background: var(--sob-paper);
+  box-shadow: 6px 6px 0 var(--sob-ink);
+  color: var(--sob-ink);
 }
 
 .shoutout-coats {
   display: grid;
+  padding: 20px 18px;
   justify-items: center;
   gap: 16px;
+  border: 2px solid var(--sob-ink);
+  background: var(--sob-panel);
+  box-shadow: 4px 4px 0 var(--sob-ink);
 }
 
 .shoutout-coat-preview {
@@ -1496,9 +1532,10 @@ button {
 
 .shoutout-coat-note {
   margin: 0;
-  color: color-mix(in oklch, var(--page-muted) 70%, transparent);
+  color: var(--sob-muted);
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 9px;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-align: center;
   text-transform: uppercase;
@@ -1516,27 +1553,29 @@ button {
   width: 44px;
   height: 44px;
   place-items: center;
-  border: 1px solid var(--page-border);
-  background: color-mix(in oklch, var(--page-surface) 45%, transparent);
+  border: 2px solid var(--sob-ink);
+  background: var(--sob-paper);
   cursor: pointer;
   transition:
-    border-color 130ms ease,
     background-color 130ms ease,
+    box-shadow 100ms ease,
     transform 100ms ease;
 }
 
 .shoutout-coat-row button:hover,
 .shoutout-coat-row button:focus-visible {
-  border-color: var(--page-accent);
+  transform: translate(-1px, -1px);
+  box-shadow: 2px 2px 0 var(--sob-ink);
 }
 
 .shoutout-coat-row button:active {
-  transform: scale(0.95);
+  transform: translate(1px, 1px);
+  box-shadow: none;
 }
 
 .shoutout-coat-row button[data-active="true"] {
-  border-color: var(--page-accent);
-  background: color-mix(in oklch, var(--page-accent-soft) 45%, transparent);
+  background: var(--sob-tint);
+  box-shadow: 2px 2px 0 var(--sob-deep);
 }
 
 .shoutout-coat-row img {
@@ -1548,7 +1587,7 @@ button {
   margin: 0;
   padding: 0;
   list-style: none;
-  border-left: 1px solid var(--page-border);
+  border-left: 2px solid var(--sob-ink);
 }
 
 .shoutout-ladder li {
@@ -1557,31 +1596,33 @@ button {
   padding: 11px 0 11px 26px;
   align-items: baseline;
   gap: 16px;
-  color: color-mix(in oklch, var(--page-fg) 82%, transparent);
+  color: var(--sob-ink);
   font-size: 14px;
 }
 
 .shoutout-ladder li::before {
   position: absolute;
   top: 50%;
-  left: -3.5px;
-  width: 6px;
-  height: 6px;
+  left: -4.5px;
+  width: 7px;
+  height: 7px;
   transform: translateY(-50%);
+  border: 2px solid var(--sob-ink);
   border-radius: 50%;
-  background: color-mix(in oklch, var(--page-muted) 45%, transparent);
+  background: var(--sob-panel);
   content: "";
 }
 
 .shoutout-ladder li:last-child::before {
-  background: var(--page-accent);
+  background: var(--sob-deep);
 }
 
 .shoutout-ladder li span {
   flex: 0 0 52px;
-  color: var(--page-accent);
+  color: var(--sob-deep);
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 10px;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -1712,17 +1753,21 @@ button {
    demos dress like the app itself — light blueprint paper, 2px navy
    borders, hard offset shadows, Instrument Sans. ————— */
 
+/* Spatium's blueprint tokens keep the app's structure (light paper, dark
+   ink, 2px borders, hard shadows) but derive every color from the page's
+   active theme so the surfaces follow the site's scroll-linked palette. */
 .spatium-drag,
 .spatium-sync,
 .spatium-blueprint {
-  --spb-bg: hsl(214 70% 97%);
-  --spb-card: hsl(214 65% 99%);
-  --spb-grid: hsl(214 40% 88%);
-  --spb-border: hsl(222 22% 28%);
-  --spb-fg: hsl(222 47% 11%);
-  --spb-muted: hsl(215 18% 40%);
-  --spb-primary: hsl(220 65% 45%);
-  --spb-ring: hsl(42 96% 55%);
+  --spb-bg: color-mix(in oklch, var(--page-accent) 11%, oklch(0.98 0.003 220));
+  --spb-card: color-mix(in oklch, var(--page-accent) 4%, oklch(0.99 0.002 220));
+  --spb-grid: color-mix(in oklch, var(--page-accent) 24%, oklch(0.94 0.005 220));
+  --spb-border: color-mix(in oklch, var(--page-accent) 16%, oklch(0.2 0.02 230));
+  --spb-fg: color-mix(in oklch, var(--page-accent) 12%, oklch(0.17 0.015 230));
+  --spb-muted: color-mix(in oklch, var(--page-accent) 24%, oklch(0.44 0.012 225));
+  --spb-primary: color-mix(in oklch, var(--page-accent) 55%, oklch(0.2 0.05 225));
+  --spb-tint: color-mix(in oklch, var(--page-accent) 16%, oklch(0.985 0.002 220));
+  --spb-ring: var(--page-accent);
 }
 
 .spb-card {
@@ -1793,7 +1838,7 @@ button {
 .spb-piece[data-dragging="true"] rect,
 .spb-piece[data-dragging="true"] circle {
   stroke: var(--spb-primary);
-  fill: hsl(214 80% 95%);
+  fill: var(--spb-tint);
 }
 
 .spb-piece[data-snapped="true"] rect,
@@ -1866,7 +1911,7 @@ button {
 
 .spatium-sync-node.is-room {
   min-width: 168px;
-  background: hsl(214 80% 95%);
+  background: var(--spb-tint);
 }
 
 .spatium-sync-pipe {
@@ -2336,52 +2381,63 @@ button {
   height: auto;
 }
 
+.sp-shadow {
+  fill: var(--sob-ink);
+}
+
 .sp-boundary {
-  stroke: var(--page-border);
-  stroke-width: 1;
+  fill: var(--sob-paper);
+  stroke: var(--sob-ink);
+  stroke-width: 2;
 }
 
 .sp-tag-bg {
-  fill: var(--page-bg);
+  fill: var(--sob-ink);
 }
 
 .sp-tag {
-  fill: color-mix(in oklch, var(--page-muted) 85%, transparent);
+  fill: var(--sob-paper);
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 9px;
+  font-weight: 700;
   letter-spacing: 0.14em;
 }
 
 .sp-pipe {
-  stroke: color-mix(in oklch, var(--page-border) 85%, transparent);
-  stroke-width: 1;
+  stroke: color-mix(in oklch, var(--sob-ink) 55%, transparent);
+  stroke-width: 1.5;
 }
 
 .sp-bypass {
-  stroke: color-mix(in oklch, var(--page-border) 60%, transparent);
+  stroke: color-mix(in oklch, var(--sob-muted) 65%, transparent);
   stroke-dasharray: 4 5;
-  stroke-width: 1;
+  stroke-width: 1.5;
   transition: stroke 250ms ease;
 }
 
 .shoutout-pipeline[data-bypass="true"] .sp-bypass {
-  stroke: var(--page-accent);
+  stroke: var(--sob-deep);
+}
+
+.sp-node-shadow {
+  fill: var(--sob-ink);
 }
 
 .sp-node {
-  fill: color-mix(in oklch, var(--page-surface) 62%, transparent);
-  stroke: var(--page-border);
-  stroke-width: 1;
+  fill: var(--sob-panel);
+  stroke: var(--sob-ink);
+  stroke-width: 2;
 }
 
 .sp-label {
-  fill: color-mix(in oklch, var(--page-fg) 82%, transparent);
+  fill: var(--sob-ink);
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 11.5px;
+  font-weight: 600;
 }
 
 .sp-bypass-label {
-  fill: color-mix(in oklch, var(--page-muted) 60%, transparent);
+  fill: var(--sob-muted);
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 9.5px;
   letter-spacing: 0.04em;
@@ -2389,11 +2445,13 @@ button {
 }
 
 .shoutout-pipeline[data-bypass="true"] .sp-bypass-label {
-  fill: var(--page-accent);
+  fill: var(--sob-deep);
 }
 
 .sp-pulse {
-  fill: var(--page-accent);
+  fill: var(--sob-deep);
+  stroke: var(--sob-panel);
+  stroke-width: 1.5;
 }
 
 .sp-caption {
@@ -2561,97 +2619,23 @@ button {
   .detail-shell { padding-top: 12px; }
   .detail-hero { min-height: 0; padding: 28px 18px; grid-template-columns: 1fr; gap: 20px; }
   .detail-hero h1, .detail-section h1 { font-size: clamp(54px, 17vw, 78px); }
-  .shoutout-scene {
-  display: grid;
-  justify-content: center;
-  align-content: center;
-}
 
-.shoutout-monitor {
-  display: grid;
-  justify-items: center;
-}
-
-.shoutout-screen {
-  display: flex;
-  position: relative;
-  width: min(400px, 38vw);
-  height: 230px;
-  padding: 26px 64px 26px 24px;
-  align-items: center;
-  border: 1px solid var(--page-border);
-  background:
-    linear-gradient(
-      color-mix(in oklch, var(--page-surface) 55%, transparent),
-      color-mix(in oklch, var(--page-bg) 70%, transparent)
-    );
-  transition: border-color 200ms ease;
-}
-
-.shoutout-screen[data-recording="true"] {
-  border-color: color-mix(in oklch, var(--page-accent) 45%, var(--page-border));
-}
-
-.shoutout-field {
-  min-width: 0;
-  border-bottom: 1px solid color-mix(in oklch, var(--page-border) 80%, transparent);
-  padding-bottom: 6px;
-  color: var(--page-muted);
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-  font-size: 12px;
-  letter-spacing: 0.02em;
-  line-height: 1.5;
-  overflow-wrap: break-word;
-  flex: 1;
-}
-
-.shoutout-caret {
-  display: inline-block;
-  width: 6px;
-  height: 13px;
-  margin-left: 3px;
-  background: var(--page-accent);
-  animation: shoutout-caret-blink 1.1s steps(1) infinite;
-  vertical-align: -2px;
-}
-
-@keyframes shoutout-caret-blink {
-  50% {
-    opacity: 0;
+  .shoutout-key-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
   }
-}
 
-.shoutout-crab {
-  display: block;
-  position: absolute;
-  top: 50%;
-  right: 7px;
-  width: 44px;
-}
+  .shoutout-keycap {
+    margin-inline: auto;
+  }
 
-.shoutout-crab img {
-  display: block;
-  position: absolute;
-  right: 0;
-  bottom: -26px;
-  width: 44px;
-  image-rendering: pixelated;
-}
+  .shoutout-origin,
+  .spatium-blueprint {
+    grid-template-columns: 1fr;
+  }
 
-.shoutout-stand {
-  width: 34px;
-  height: 26px;
-  border-right: 1px solid var(--page-border);
-  border-left: 1px solid var(--page-border);
-  background: color-mix(in oklch, var(--page-surface) 40%, transparent);
-}
-
-.shoutout-base {
-  width: 120px;
-  border-top: 1px solid var(--page-border);
-}
-
-.signal-art { display: none; }
+  .signal-art { display: none; }
   .detail-paths button { grid-template-columns: 38px 1fr auto; }
   .detail-paths small { display: none; }
   .detail-section { padding: 70px 0 0; }
@@ -2698,100 +2682,9 @@ button {
     font-size: clamp(17px, 1.7vw, 22px);
   }
 
-  .shoutout-scene {
-  display: grid;
-  justify-content: center;
-  align-content: center;
-}
-
-.shoutout-monitor {
-  display: grid;
-  justify-items: center;
-}
-
-.shoutout-screen {
-  display: flex;
-  position: relative;
-  width: min(400px, 38vw);
-  height: 230px;
-  padding: 26px 64px 26px 24px;
-  align-items: center;
-  border: 1px solid var(--page-border);
-  background:
-    linear-gradient(
-      color-mix(in oklch, var(--page-surface) 55%, transparent),
-      color-mix(in oklch, var(--page-bg) 70%, transparent)
-    );
-  transition: border-color 200ms ease;
-}
-
-.shoutout-screen[data-recording="true"] {
-  border-color: color-mix(in oklch, var(--page-accent) 45%, var(--page-border));
-}
-
-.shoutout-field {
-  min-width: 0;
-  border-bottom: 1px solid color-mix(in oklch, var(--page-border) 80%, transparent);
-  padding-bottom: 6px;
-  color: var(--page-muted);
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-  font-size: 12px;
-  letter-spacing: 0.02em;
-  line-height: 1.5;
-  overflow-wrap: break-word;
-  flex: 1;
-}
-
-.shoutout-caret {
-  display: inline-block;
-  width: 6px;
-  height: 13px;
-  margin-left: 3px;
-  background: var(--page-accent);
-  animation: shoutout-caret-blink 1.1s steps(1) infinite;
-  vertical-align: -2px;
-}
-
-@keyframes shoutout-caret-blink {
-  50% {
-    opacity: 0;
-  }
-}
-
-.shoutout-crab {
-  display: block;
-  position: absolute;
-  top: 50%;
-  right: 7px;
-  width: 44px;
-}
-
-.shoutout-crab img {
-  display: block;
-  position: absolute;
-  right: 0;
-  bottom: -26px;
-  width: 44px;
-  image-rendering: pixelated;
-}
-
-.shoutout-stand {
-  width: 34px;
-  height: 26px;
-  border-right: 1px solid var(--page-border);
-  border-left: 1px solid var(--page-border);
-  background: color-mix(in oklch, var(--page-surface) 40%, transparent);
-}
-
-.shoutout-base {
-  width: 120px;
-  border-top: 1px solid var(--page-border);
-}
-
-.signal-art {
+  .signal-art {
     height: 150px;
   }
-
 }
 
 @media (max-height: 620px) {

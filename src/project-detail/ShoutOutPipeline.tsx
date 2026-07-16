@@ -50,10 +50,11 @@ export function ShoutOutPipeline() {
   return (
     <figure aria-hidden="true" className="shoutout-pipeline" data-bypass={bypassing}>
       <svg fill="none" viewBox="0 0 700 232" xmlns="http://www.w3.org/2000/svg">
-        {/* the boundary: everything happens inside this box */}
-        <rect className="sp-boundary" height="196" rx="14" width="676" x="12" y="18" />
-        <rect className="sp-tag-bg" height="14" width="66" x="30" y="11" />
-        <text className="sp-tag" x="36" y="22">THIS MAC</text>
+        {/* the boundary: everything happens inside this pixel box */}
+        <rect className="sp-shadow" height="196" width="676" x="17" y="23" />
+        <rect className="sp-boundary" height="196" width="676" x="12" y="18" />
+        <rect className="sp-tag-bg" height="15" width="70" x="30" y="10" />
+        <text className="sp-tag" x="37" y="21">THIS MAC</text>
 
         {/* main pipe */}
         <path className="sp-pipe" d="M 34 150 H 668" />
@@ -68,7 +69,8 @@ export function ShoutOutPipeline() {
           { x: 560, label: "paste" },
         ].map((node) => (
           <g key={node.label}>
-            <rect className="sp-node" height="42" rx="8" width="108" x={node.x - 26} y="129" />
+            <rect className="sp-node-shadow" height="42" width="108" x={node.x - 23} y="132" />
+            <rect className="sp-node" height="42" width="108" x={node.x - 26} y="129" />
             <text className="sp-label" textAnchor="middle" x={node.x + 28} y="154.5">
               {node.label}
             </text>
