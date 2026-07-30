@@ -2911,8 +2911,8 @@ button {
   overflow: visible;
   touch-action: pan-y;
 }
-.cosmic-field[data-interactive="true"][data-mode="3d"] { cursor: grab; touch-action: none; }
-.cosmic-field[data-interactive="true"][data-mode="3d"]:active { cursor: grabbing; }
+.cosmic-field[data-interactive="true"] { cursor: grab; touch-action: none; user-select: none; }
+.cosmic-field[data-interactive="true"]:active { cursor: grabbing; }
 .cosmic-grid { fill: none; stroke: color-mix(in oklch, var(--page-border) 62%, transparent); stroke-width: 0.7; }
 .cosmic-grid-2d line:nth-child(3),
 .cosmic-grid-2d line:nth-child(8) { stroke: color-mix(in oklch, var(--cosmic-accent) 38%, transparent); }
@@ -3159,6 +3159,12 @@ button {
 }
 
 .cosmic-game-panel[data-compact="true"] .cosmic-panel-controls { display: none; }
+.cosmic-game-panel[data-compact="true"] .cosmic-panel-header strong {
+  max-width: 108px;
+  font-size: 13px;
+  line-height: 1.15;
+  white-space: normal;
+}
 .cosmic-game-panel[data-compact="true"] .cosmic-spectrum > div { height: 24px; }
 .cosmic-game-panel[data-compact="true"] .cosmic-guess-list { min-height: 56px; }
 .cosmic-game-panel[data-compact="true"] .cosmic-guess-form > p { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

@@ -110,31 +110,73 @@ function SemanticField({
 }) {
   const [mode] = useSceneMode();
   const [yaw, setYaw] = useState(-0.52);
-  const drag = useRef<{ pointerId: number; x: number; yaw: number } | null>(null);
+  const [pitch, setPitch] = useState(-0.18);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const drag = useRef<{
+    panX: number;
+    panY: number;
+    pitch: number;
+    pointerId: number;
+    x: number;
+    y: number;
+    yaw: number;
+  } | null>(null);
 
-  useEffect(() => setYaw(-0.52), [focusNonce]);
+  useEffect(() => {
+    setYaw(-0.52);
+    setPitch(-0.18);
+    setPan({ x: 0, y: 0 });
+  }, [focusNonce]);
+
+  const center = mode === "2d"
+    ? { x: 260 + pan.x, y: 140 + pan.y }
+    : { x: 260, y: 140 };
 
   const project = (point: { x: number; y: number; z: number }) => {
     if (mode === "2d") {
-      return { depth: 0, x: 260 + point.x * 208, y: 140 + point.y * 132 };
+      return {
+        depth: 0,
+        x: center.x + point.x * 208,
+        y: center.y + point.y * 132,
+      };
     }
     const rotatedX = point.x * Math.cos(yaw) - point.z * Math.sin(yaw);
-    const depth = point.x * Math.sin(yaw) + point.z * Math.cos(yaw);
+    const yawDepth = point.x * Math.sin(yaw) + point.z * Math.cos(yaw);
+    const rotatedY = point.y * Math.cos(pitch) - yawDepth * Math.sin(pitch);
+    const depth = point.y * Math.sin(pitch) + yawDepth * Math.cos(pitch);
     return {
       depth,
       x: 260 + rotatedX * 196,
-      y: 140 + point.y * 118 - depth * 46,
+      y: 140 + rotatedY * 118 - depth * 38,
     };
   };
 
   const onPointerDown = (event: PointerEvent<SVGSVGElement>) => {
-    if (!interactive || mode !== "3d") return;
+    if (!interactive) return;
     event.currentTarget.setPointerCapture(event.pointerId);
-    drag.current = { pointerId: event.pointerId, x: event.clientX, yaw };
+    drag.current = {
+      panX: pan.x,
+      panY: pan.y,
+      pitch,
+      pointerId: event.pointerId,
+      x: event.clientX,
+      y: event.clientY,
+      yaw,
+    };
   };
   const onPointerMove = (event: PointerEvent<SVGSVGElement>) => {
     if (!drag.current || drag.current.pointerId !== event.pointerId) return;
-    setYaw(drag.current.yaw + (event.clientX - drag.current.x) / 170);
+    const deltaX = event.clientX - drag.current.x;
+    const deltaY = event.clientY - drag.current.y;
+    if (mode === "3d") {
+      setYaw(drag.current.yaw + deltaX / 170);
+      setPitch(Math.max(-0.78, Math.min(0.78, drag.current.pitch + deltaY / 190)));
+      return;
+    }
+    setPan({
+      x: Math.max(-150, Math.min(150, drag.current.panX + deltaX)),
+      y: Math.max(-90, Math.min(90, drag.current.panY + deltaY)),
+    });
   };
   const endDrag = (event: PointerEvent<SVGSVGElement>) => {
     if (drag.current?.pointerId === event.pointerId) drag.current = null;
@@ -142,8 +184,8 @@ function SemanticField({
 
   return (
     <svg
-      aria-label={labelled ? "Semantic map around the hidden word" : undefined}
-      aria-hidden={labelled ? undefined : true}
+      aria-label={labelled || interactive ? "Draggable semantic map around the hidden word" : undefined}
+      aria-hidden={labelled || interactive ? undefined : true}
       className="cosmic-field"
       data-interactive={interactive}
       data-mode={mode}
@@ -151,11 +193,11 @@ function SemanticField({
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={endDrag}
-      role={labelled ? "img" : undefined}
+      role={labelled || interactive ? "img" : undefined}
       viewBox="0 0 520 280"
     >
       {mode === "2d" ? (
-        <g className="cosmic-grid cosmic-grid-2d">
+        <g className="cosmic-grid cosmic-grid-2d" transform={`translate(${pan.x} ${pan.y})`}>
           {[-160, -80, 0, 80, 160].map((offset) => (
             <line key={`v-${offset}`} x1={260 + offset} x2={260 + offset} y1="34" y2="246" />
           ))}
@@ -184,8 +226,8 @@ function SemanticField({
           );
         })}
       </g>
-      <circle className="cosmic-target" cx="260" cy="140" r="10" />
-      <circle className="cosmic-target-ring" cx="260" cy="140" r="34" />
+      <circle className="cosmic-target" cx={center.x} cy={center.y} r="10" />
+      <circle className="cosmic-target-ring" cx={center.x} cy={center.y} r="34" />
       {guesses.map((guess) => {
         const projected = project(guess);
         const isSelected = selectedWord === guess.word;
@@ -196,7 +238,7 @@ function SemanticField({
             data-temperature={temperatureFor(guess.similarity)}
             key={guess.word}
           >
-            <line x1="260" x2={projected.x} y1="140" y2={projected.y} />
+            <line x1={center.x} x2={projected.x} y1={center.y} y2={projected.y} />
             <circle
               cx={projected.x}
               cy={projected.y}
@@ -212,10 +254,12 @@ function SemanticField({
       })}
       <text className="cosmic-mode-note" x="18" y="264">
         {mode === "3d" && interactive
-          ? "drag to orbit x · y · z"
+          ? "drag to orbit · horizontal + vertical"
           : mode === "3d"
             ? "perspective x · y · z"
-            : "flat x · y projection"}
+            : interactive
+              ? "drag to pan · flat x · y"
+              : "flat x · y projection"}
       </text>
     </svg>
   );
@@ -331,6 +375,7 @@ export function CosmicHotPotatoScene() {
   const shouldReduceMotion = useReducedMotion() ?? false;
   const [guessCount, setGuessCount] = useState(shouldReduceMotion ? 4 : 2);
   const [mode] = useSceneMode();
+  const [focusNonce, setFocusNonce] = useState(0);
 
   useEffect(() => {
     if (shouldReduceMotion) {
@@ -347,10 +392,19 @@ export function CosmicHotPotatoScene() {
   return (
     <div className="cosmic-scene cosmic-game-shell" data-mode={mode}>
       <div className="cosmic-game-map">
-        <SemanticField guesses={GUESS_POCKET.slice(0, guessCount)} />
+        <SemanticField
+          focusNonce={focusNonce}
+          guesses={GUESS_POCKET.slice(0, guessCount)}
+          interactive
+        />
         <span className="cosmic-map-math">Map math · 50D → UMAP → 3D</span>
       </div>
-      <CosmicGamePanel compact guesses={GUESS_POCKET.slice(0, guessCount)} />
+      <CosmicGamePanel
+        compact
+        guesses={GUESS_POCKET.slice(0, guessCount)}
+        onCenter={() => setFocusNonce((current) => current + 1)}
+        onReset={() => setGuessCount(shouldReduceMotion ? 4 : 0)}
+      />
     </div>
   );
 }
