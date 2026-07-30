@@ -22,9 +22,37 @@ const MODE_KEY = "ezra-apple:cosmic-mode";
 const MODE_EVENT = "ezra-apple:cosmic-mode-change";
 const TARGET = "music";
 
-// Similarities and positions come from Cosmic Hot Potato's normalized GloVe
-// 50d dataset and its deterministic UMAP projection.
-const GUESS_POCKET: Guess[] = [
+type SourcePosition = {
+  rank: number;
+  x: number;
+  y: number;
+  z: number;
+};
+
+const WORD_COUNT = 317_000;
+
+// Mirrors Cosmic Hot Potato's answer-relative public-puzzle transform.
+function spiralPosition({ rank, x, y, z }: SourcePosition) {
+  if (rank === 0) return { x: 0, y: 0, z: 0 };
+  const rankDistance = rank / (WORD_COUNT - 1);
+  const radius = 0.035 + Math.pow(rankDistance, 0.55) * 0.88;
+  const baseAngle = Math.atan2(y, x);
+  const angle = baseAngle + radius * Math.PI * 3.35 + z * 0.95;
+  const armWave = Math.sin(angle * 3 - radius * 9 + z * 4);
+  const armRadius = radius * (1 + armWave * 0.08);
+  const depthWave = Math.sin(angle * 2 + radius * 7) * 0.16 * (1 - rankDistance);
+
+  return {
+    x: Math.cos(angle) * armRadius,
+    y: Math.sin(angle) * armRadius,
+    z: Math.max(-1, Math.min(1, z * 0.46 + depthWave)),
+  };
+}
+
+// Similarities and source positions come from Cosmic Hot Potato's normalized
+// GloVe dataset and deterministic UMAP projection. The public game then bends
+// those positions around the answer with spiralPosition.
+const SOURCE_GUESS_POCKET = [
   { word: "song", rank: 14, similarity: 0.7985, x: -0.066, y: -0.002, z: -0.462 },
   { word: "concert", rank: 18, similarity: 0.7768, x: -0.074, y: -0.052, z: -0.438 },
   { word: "artist", rank: 20, similarity: 0.7755, x: -0.077, y: -0.021, z: -0.422 },
@@ -39,12 +67,47 @@ const GUESS_POCKET: Guess[] = [
   { word: "potato", rank: 15860, similarity: 0.1068, x: 0.2, y: 0.579, z: -0.38 },
 ];
 
-const FIELD_POINTS = Array.from({ length: 54 }, (_, index) => ({
-  x: ((((index * 83) % 101) - 50) / 50) * 0.92,
-  y: ((((index * 47) % 97) - 48) / 48) * 0.72,
-  z: ((((index * 61) % 89) - 44) / 44) * 0.78,
-  r: index % 11 === 0 ? 2 : 1.15,
+const GUESS_POCKET: Guess[] = SOURCE_GUESS_POCKET.map((guess) => ({
+  ...guess,
+  ...spiralPosition(guess),
 }));
+
+const CLUSTER_ANGLES = [-2.72, -1.34, -0.16, 1.08, 2.28];
+const CLUSTER_DEPTHS = [-0.34, 0.18, -0.08, 0.38, -0.22];
+const unitNoise = (seed: number) => {
+  const value = Math.sin(seed * 12.9898) * 43758.5453;
+  return value - Math.floor(value);
+};
+
+// A legible sample of the game's 30k-point field: uneven UMAP neighborhoods
+// become dense pockets along the same rank-driven spiral used by the product.
+const FIELD_POINTS = Array.from({ length: 108 }, (_, index) => {
+  const cluster = index % CLUSTER_ANGLES.length;
+  const clusterProgress = Math.floor(index / CLUSTER_ANGLES.length);
+  const sourceAngle =
+    CLUSTER_ANGLES[cluster] +
+    (unitNoise(index + 19) - 0.5) * (0.28 + cluster * 0.035);
+  const sourceRadius = 0.12 + unitNoise(index + 47) * 0.34;
+  const sourceZ =
+    CLUSTER_DEPTHS[cluster] + (unitNoise(index + 83) - 0.5) * 0.24;
+  const rankProgress = (clusterProgress + 1) / 22;
+  const rank = Math.round(
+    24 +
+      Math.pow(rankProgress, 1.72) * 72_000 +
+      cluster * 620 +
+      unitNoise(index + 113) * 940,
+  );
+
+  return {
+    ...spiralPosition({
+      rank,
+      x: Math.cos(sourceAngle) * sourceRadius,
+      y: Math.sin(sourceAngle) * sourceRadius,
+      z: sourceZ,
+    }),
+    r: 0.82 + unitNoise(index + 151) * 1.18,
+  };
+});
 
 function loadMode(): SceneMode {
   if (typeof window === "undefined") return "3d";
