@@ -2604,7 +2604,7 @@ button {
 .lh-terminal {
   display: flex;
   width: 100%;
-  min-height: 330px;
+  min-height: 280px;
   padding: 14px;
   flex-direction: column;
   border: 1px solid color-mix(in oklch, var(--page-border) 82%, transparent);
@@ -3475,9 +3475,34 @@ button {
   }
 
   .detail-hero[data-project="leharness"] .lh-transcript p:not(:last-child),
-  .detail-hero[data-project="leharness"] .lh-accent-picker,
-  .detail-hero[data-project="skills-init"] .skills-tree {
+  .detail-hero[data-project="leharness"] .lh-accent-picker {
     display: none;
+  }
+
+  .detail-hero[data-project="skills-init"] .skills-tree {
+    padding: 7px 12px 9px;
+    font-size: 8px;
+  }
+
+  .detail-hero[data-project="skills-init"] .skills-leaf {
+    display: none;
+  }
+
+  .detail-hero[data-project="skills-init"] :is(
+    .skills-root,
+    .skills-tool-links > div
+  ) {
+    min-height: 19px;
+    grid-template-columns: 16px minmax(0, 1fr) auto;
+  }
+
+  .detail-hero[data-project="skills-init"] .skills-tool-links {
+    margin-top: 4px;
+    padding-top: 4px;
+  }
+
+  .detail-hero[data-project="skills-init"] .skills-tool-links > div {
+    padding-left: 8px;
   }
 
   .detail-hero[data-project="cosmic-hot-potato"] .cosmic-field {

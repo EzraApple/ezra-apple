@@ -83,7 +83,7 @@ export function LeHarnessScene() {
   const shouldReduceMotion = useReducedMotion() ?? false;
   const [accent] = useTerminalAccent();
   const [visibleLines, setVisibleLines] = useState(
-    shouldReduceMotion ? SESSION_LINES.length : 1,
+    shouldReduceMotion ? SESSION_LINES.length : 3,
   );
 
   useEffect(() => {
@@ -93,9 +93,9 @@ export function LeHarnessScene() {
     }
     const timer = window.setInterval(() => {
       setVisibleLines((current) =>
-        current >= SESSION_LINES.length ? 1 : current + 1,
+        Math.min(current + 1, SESSION_LINES.length),
       );
-    }, 900);
+    }, 650);
     return () => window.clearInterval(timer);
   }, [shouldReduceMotion]);
 
