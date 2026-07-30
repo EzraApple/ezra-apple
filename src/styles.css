@@ -2804,48 +2804,88 @@ button {
 .cosmic-experience,
 .cosmic-system,
 .cosmic-origin {
-  --cosmic-accent: color-mix(in oklch, var(--page-accent) 68%, oklch(0.8 0.12 195));
-  --cosmic-hot: color-mix(in oklch, var(--page-accent) 58%, oklch(0.86 0.15 80));
-  --cosmic-panel: color-mix(in oklch, var(--page-surface) 82%, #08090b);
+  --cosmic-accent: color-mix(in oklch, var(--page-accent) 18%, oklch(0.83 0.13 170));
+  --cosmic-cold: color-mix(in oklch, var(--page-accent) 14%, oklch(0.62 0.23 263));
+  --cosmic-tepid: color-mix(in oklch, var(--page-accent) 14%, oklch(0.72 0.16 242));
+  --cosmic-warm: color-mix(in oklch, var(--page-accent) 12%, oklch(0.69 0.2 20));
+  --cosmic-hot: color-mix(in oklch, var(--page-accent) 8%, oklch(0.84 0.16 80));
+  --cosmic-very-hot: color-mix(in oklch, var(--page-accent) 5%, oklch(0.94 0.11 96));
+  --cosmic-panel: color-mix(in oklch, var(--page-surface) 38%, oklch(0.17 0.018 245));
   font-family: "SFMono-Regular", Consolas, monospace;
 }
-.cosmic-scene {
+
+.cosmic-game-shell {
+  display: grid;
+  position: relative;
   width: 100%;
-  border: 1px solid var(--page-border);
+  min-height: 360px;
+  overflow: hidden;
+  grid-template-columns: minmax(0, 1fr) minmax(270px, 37%);
+  border: 1px solid color-mix(in oklch, var(--page-border) 72%, transparent);
   background:
-    linear-gradient(145deg, color-mix(in oklch, var(--page-bg) 88%, #08090b), color-mix(in oklch, var(--page-surface) 82%, #10111b));
+    linear-gradient(145deg, color-mix(in oklch, var(--page-bg) 88%, #08090b), color-mix(in oklch, var(--page-surface) 54%, #10111b));
   box-shadow: 0 22px 60px color-mix(in oklch, #000 34%, transparent);
 }
-.cosmic-scene > header,
-.cosmic-scene > footer,
-.cosmic-projection > header,
-.cosmic-console > header {
-  display: flex;
-  min-height: 38px;
-  padding: 0 12px;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid var(--page-border);
-  color: var(--page-muted);
-  font-size: 9px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+
+.cosmic-game-shell::before {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(color-mix(in oklch, var(--page-fg) 3.5%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklch, var(--page-fg) 2.8%, transparent) 1px, transparent 1px);
+  background-size: 54px 54px;
+  content: "";
+  mask-image: linear-gradient(90deg, #000, transparent 74%);
+  pointer-events: none;
 }
-.cosmic-scene > footer { border-top: 1px solid var(--page-border); border-bottom: 0; }
+
+.cosmic-game-map {
+  display: grid;
+  position: relative;
+  min-width: 0;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 58% 50%, color-mix(in oklch, var(--cosmic-cold) 15%, transparent), transparent 34%),
+    radial-gradient(circle at 45% 48%, color-mix(in oklch, var(--cosmic-accent) 8%, transparent), transparent 50%);
+}
+
+.cosmic-game-map .cosmic-field { height: 100%; min-height: 330px; }
+.cosmic-map-math {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in oklch, var(--cosmic-accent) 28%, transparent);
+  border-radius: 7px;
+  background: color-mix(in oklch, var(--page-bg) 78%, transparent);
+  color: var(--page-fg);
+  font-size: 8px;
+  font-weight: 700;
+  box-shadow: 0 12px 30px color-mix(in oklch, #000 24%, transparent);
+  backdrop-filter: blur(12px);
+}
+
 .cosmic-mode-toggle {
-  display: inline-flex;
-  border: 1px solid var(--page-border);
+  display: inline-grid;
+  height: 30px;
+  padding: 2px;
+  grid-template-columns: repeat(2, 30px);
+  border: 1px solid color-mix(in oklch, var(--page-fg) 12%, transparent);
+  border-radius: 8px;
+  background: color-mix(in oklch, var(--page-fg) 4%, transparent);
 }
 .cosmic-mode-toggle button {
   position: relative;
-  min-height: 28px;
-  padding: 0 9px;
+  min-height: 24px;
+  padding: 0;
   border: 0;
-  border-right: 1px solid var(--page-border);
+  border-radius: 6px;
   background: transparent;
   color: var(--page-muted);
   cursor: pointer;
-  font: 9px "SFMono-Regular", Consolas, monospace;
+  font: 800 9px "SFMono-Regular", Consolas, monospace;
+  transition: background-color 140ms ease, color 140ms ease, transform 140ms ease;
 }
 .cosmic-mode-toggle button::before,
 .decyphr-language-picker button::before,
@@ -2858,8 +2898,12 @@ button {
   transform: translate(-50%, -50%);
   content: "";
 }
-.cosmic-mode-toggle button:last-child { border-right: 0; }
-.cosmic-mode-toggle button[aria-pressed="true"] { background: var(--cosmic-accent); color: var(--page-bg); }
+.cosmic-mode-toggle button[aria-pressed="true"] {
+  background: var(--cosmic-accent);
+  box-shadow: 0 0 0 1px color-mix(in oklch, var(--page-fg) 18%, transparent);
+  color: color-mix(in oklch, var(--page-bg) 88%, #03110d);
+}
+.cosmic-mode-toggle button:active { transform: translateY(1px); }
 .cosmic-field {
   display: block;
   width: 100%;
@@ -2873,11 +2917,20 @@ button {
 .cosmic-grid-2d line:nth-child(3),
 .cosmic-grid-2d line:nth-child(8) { stroke: color-mix(in oklch, var(--cosmic-accent) 38%, transparent); }
 .cosmic-grid-3d { stroke-dasharray: 3 7; }
-.cosmic-cloud { fill: color-mix(in oklch, var(--page-muted) 32%, transparent); }
+.cosmic-cloud { fill: var(--cosmic-cold); }
 .cosmic-target { fill: var(--cosmic-hot); }
-.cosmic-target-ring { fill: none; stroke: var(--cosmic-hot); stroke-dasharray: 3 6; opacity: 0.5; }
-.cosmic-guess-point line { stroke: color-mix(in oklch, var(--cosmic-accent) 35%, transparent); }
-.cosmic-guess-point circle { fill: var(--cosmic-accent); }
+.cosmic-target-ring {
+  fill: none;
+  stroke: color-mix(in oklch, var(--cosmic-hot) 58%, transparent);
+  stroke-width: 1.5;
+  opacity: 0.62;
+}
+.cosmic-guess-point line { stroke: color-mix(in oklch, var(--page-fg) 12%, transparent); }
+.cosmic-guess-point circle { fill: var(--cosmic-cold); }
+.cosmic-guess-point[data-temperature="tepid"] circle { fill: var(--cosmic-tepid); }
+.cosmic-guess-point[data-temperature="warm"] circle { fill: var(--cosmic-warm); }
+.cosmic-guess-point[data-temperature="hot"] circle { fill: var(--cosmic-hot); }
+.cosmic-guess-point[data-temperature="very-hot"] circle { fill: var(--cosmic-very-hot); }
 .cosmic-guess-point text { fill: var(--page-fg); font-size: 9px; }
 .cosmic-guess-point[data-selected="true"] circle {
   fill: var(--cosmic-hot);
@@ -2892,64 +2945,263 @@ button {
 }
 
 .cosmic-experience {
-  display: grid;
   width: min(1050px, 100%);
-  min-height: 300px;
+  min-height: 490px;
   margin: clamp(22px, 4vh, 40px) auto 0;
-  grid-template-columns: minmax(0, 1.35fr) minmax(270px, 0.65fr);
-  border: 1px solid var(--page-border);
-  background: var(--cosmic-panel);
+  grid-template-columns: minmax(0, 1fr) minmax(330px, 34%);
 }
-.cosmic-map-panel { position: relative; min-width: 0; border-right: 1px solid var(--page-border); }
-.cosmic-map-panel .cosmic-mode-toggle { position: absolute; top: 10px; right: 10px; }
-.cosmic-console { display: flex; min-width: 0; flex-direction: column; }
-.cosmic-console ol { min-height: 100px; margin: 0; padding: 8px 12px; flex: 1; list-style: none; }
-.cosmic-console li {
-  display: grid;
-  min-height: 30px;
-  grid-template-columns: 28px 1fr auto;
-  align-items: center;
-  border-bottom: 1px solid color-mix(in oklch, var(--page-border) 62%, transparent);
-  font-size: 10px;
-}
-.cosmic-console li span { color: var(--page-muted); }
-.cosmic-console li i { color: var(--cosmic-accent); font-style: normal; }
-.cosmic-console .cosmic-empty {
+
+.cosmic-game-panel {
   display: flex;
-  min-height: 100%;
+  position: relative;
+  z-index: 2;
+  min-width: 0;
   flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 8px;
-  border-bottom: 0;
-}
-.cosmic-console .cosmic-empty strong {
+  border-left: 1px solid color-mix(in oklch, var(--page-fg) 12%, transparent);
+  background:
+    linear-gradient(180deg, color-mix(in oklch, var(--cosmic-panel) 96%, transparent), color-mix(in oklch, var(--page-bg) 88%, transparent));
+  box-shadow: -18px 0 60px color-mix(in oklch, #000 24%, transparent);
   color: var(--page-fg);
-  font-size: 11px;
-  font-weight: 500;
+  backdrop-filter: blur(16px);
 }
-.cosmic-console .cosmic-empty span {
-  color: var(--cosmic-accent);
+
+.cosmic-game-panel::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  background: linear-gradient(90deg, var(--cosmic-accent), var(--cosmic-very-hot), var(--cosmic-hot), var(--cosmic-warm));
+  content: "";
+}
+
+.cosmic-panel-header {
+  display: flex;
+  padding: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid color-mix(in oklch, var(--page-fg) 10%, transparent);
+}
+.cosmic-panel-header > div:first-child { display: grid; gap: 2px; min-width: 0; }
+.cosmic-panel-header span { color: var(--cosmic-accent); font-size: 8px; font-weight: 700; }
+.cosmic-panel-header strong {
+  font-family: "Geist Variable", Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1;
+  white-space: nowrap;
+}
+.cosmic-panel-header small { color: var(--page-muted); font-size: 8px; }
+.cosmic-panel-actions { display: flex; align-items: center; gap: 5px; }
+.cosmic-panel-actions > button {
+  width: 30px;
+  height: 30px;
+  border: 1px solid color-mix(in oklch, var(--page-fg) 12%, transparent);
+  border-radius: 8px;
+  background: color-mix(in oklch, var(--page-fg) 4.5%, transparent);
+  color: var(--page-fg);
+  cursor: pointer;
+}
+.cosmic-panel-actions > button:disabled { color: color-mix(in oklch, var(--page-muted) 35%, transparent); cursor: default; }
+.cosmic-panel-actions > button:not(:disabled):active { transform: translateY(1px); }
+
+.cosmic-day-band {
+  display: grid;
+  min-height: 53px;
+  padding: 7px 12px;
+  grid-template-columns: 24px 1fr 24px;
+  align-items: center;
+  gap: 7px;
+  border-bottom: 1px solid color-mix(in oklch, var(--page-fg) 10%, transparent);
+  background: linear-gradient(90deg, color-mix(in oklch, var(--cosmic-accent) 8%, transparent), transparent 68%);
+}
+.cosmic-day-band > span {
+  display: grid;
+  width: 24px;
+  height: 26px;
+  place-items: center;
+  border: 1px solid color-mix(in oklch, var(--page-fg) 10%, transparent);
+  border-radius: 6px;
+  color: var(--page-muted);
+}
+.cosmic-day-band div { display: grid; gap: 1px; }
+.cosmic-day-band small { color: var(--cosmic-accent); font-size: 7px; font-weight: 800; text-transform: uppercase; }
+.cosmic-day-band strong { font-size: 10px; }
+.cosmic-day-band i { color: var(--page-muted); font-size: 7px; font-style: normal; }
+
+.cosmic-metrics {
+  display: grid;
+  padding: 8px 10px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  border-bottom: 1px solid color-mix(in oklch, var(--page-fg) 10%, transparent);
+}
+.cosmic-metrics div {
+  display: grid;
+  min-width: 0;
+  padding: 6px;
+  gap: 2px;
+  border: 1px solid color-mix(in oklch, var(--page-fg) 8%, transparent);
+  border-radius: 6px;
+  background: color-mix(in oklch, var(--page-fg) 3.5%, transparent);
+}
+.cosmic-metrics strong { font-size: 12px; }
+.cosmic-metrics span { color: var(--page-muted); font-size: 6px; text-transform: uppercase; }
+
+.cosmic-panel-controls {
+  display: flex;
+  padding: 7px 10px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.cosmic-panel-controls > div { display: grid; gap: 1px; }
+.cosmic-panel-controls span { color: var(--page-muted); font-size: 7px; }
+.cosmic-panel-controls small { color: var(--cosmic-accent); font-size: 6px; }
+.cosmic-panel-controls button {
+  min-height: 25px;
+  padding: 0 7px;
+  border: 1px solid color-mix(in oklch, var(--page-fg) 10%, transparent);
+  border-radius: 6px;
+  background: color-mix(in oklch, var(--page-fg) 4%, transparent);
+  color: var(--page-fg);
+  cursor: pointer;
+  font: 7px "SFMono-Regular", Consolas, monospace;
+}
+
+.cosmic-spectrum { padding: 8px 10px; border-block: 1px solid color-mix(in oklch, var(--page-fg) 8%, transparent); }
+.cosmic-spectrum header,
+.cosmic-spectrum footer { display: flex; align-items: center; justify-content: space-between; color: var(--page-muted); font-size: 6px; text-transform: uppercase; }
+.cosmic-spectrum > div {
+  display: grid;
+  height: 34px;
+  margin: 5px 0;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: end;
+  gap: 3px;
+}
+.cosmic-spectrum i { height: var(--bar-height); min-height: 4px; background: var(--cosmic-cold); opacity: 0.34; }
+.cosmic-spectrum i[data-temperature="tepid"] { background: var(--cosmic-tepid); }
+.cosmic-spectrum i[data-temperature="warm"] { background: var(--cosmic-warm); }
+.cosmic-spectrum i[data-temperature="hot"] { background: var(--cosmic-hot); }
+.cosmic-spectrum i[data-temperature="very-hot"] { background: var(--cosmic-very-hot); }
+
+.cosmic-guess-list {
+  min-height: 74px;
+  margin: 0;
+  padding: 6px 10px;
+  flex: 1;
+  overflow: auto;
+  list-style: none;
+}
+.cosmic-guess-list li {
+  display: grid;
+  min-height: 28px;
+  padding: 0 7px;
+  grid-template-columns: 1fr 48px 52px;
+  align-items: center;
+  border-left: 2px solid var(--cosmic-cold);
+  border-bottom: 1px solid color-mix(in oklch, var(--page-fg) 7%, transparent);
+  background: color-mix(in oklch, var(--cosmic-cold) 4%, transparent);
+  font-size: 8px;
+}
+.cosmic-guess-list li[data-temperature="tepid"] { border-left-color: var(--cosmic-tepid); }
+.cosmic-guess-list li[data-temperature="warm"] { border-left-color: var(--cosmic-warm); }
+.cosmic-guess-list li[data-temperature="hot"] { border-left-color: var(--cosmic-hot); }
+.cosmic-guess-list li[data-temperature="very-hot"] { border-left-color: var(--cosmic-very-hot); }
+.cosmic-guess-list li[data-latest="true"] { background: color-mix(in oklch, var(--cosmic-accent) 8%, transparent); }
+.cosmic-guess-list li strong,
+.cosmic-guess-list li i { color: var(--page-muted); font-size: 7px; font-style: normal; font-weight: 500; text-align: right; }
+.cosmic-panel-empty {
+  display: flex !important;
+  min-height: 68px !important;
+  padding: 12px !important;
+  flex-direction: column;
+  align-items: flex-start !important;
+  justify-content: center;
+  gap: 5px;
+  border-left: 0 !important;
+}
+.cosmic-panel-empty span { color: var(--page-muted); font-size: 7px; }
+
+.cosmic-guess-form {
+  padding: 7px 10px 10px;
+  border-top: 1px solid color-mix(in oklch, var(--page-fg) 10%, transparent);
+}
+.cosmic-guess-form > p {
+  min-height: 13px;
+  margin: 0 0 5px;
+  color: var(--page-muted);
+  font-size: 7px;
+}
+.cosmic-guess-form > div { display: grid; min-height: 34px; grid-template-columns: 1fr auto; }
+.cosmic-guess-form input {
+  min-width: 0;
+  padding: 0 9px;
+  border: 1px solid color-mix(in oklch, var(--page-fg) 13%, transparent);
+  border-radius: 7px 0 0 7px;
+  outline: 0;
+  background: color-mix(in oklch, var(--page-fg) 4%, transparent);
+  color: var(--page-fg);
   font-size: 9px;
 }
-.cosmic-console > p { min-height: 30px; margin: 0; padding: 8px 12px; color: var(--page-muted); font-size: 9px; }
-.cosmic-console form {
-  display: grid;
-  min-height: 46px;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  border-top: 1px solid var(--page-border);
-}
-.cosmic-console form label { padding-left: 12px; color: var(--cosmic-accent); font-size: 9px; }
-.cosmic-console input { min-width: 0; height: 100%; padding: 0 10px; border: 0; outline: 0; background: transparent; color: var(--page-fg); }
-.cosmic-console form button {
-  align-self: stretch;
-  padding: 0 14px;
+.cosmic-guess-form button {
+  padding: 0 10px;
   border: 0;
-  border-left: 1px solid var(--page-border);
-  background: transparent;
-  color: var(--cosmic-accent);
+  border-radius: 0 7px 7px 0;
+  background: var(--cosmic-accent);
+  color: color-mix(in oklch, var(--page-bg) 88%, #03110d);
   cursor: pointer;
+  font: 800 8px "SFMono-Regular", Consolas, monospace;
+}
+.cosmic-guess-form button:disabled {
+  background: color-mix(in oklch, var(--page-fg) 8%, transparent);
+  color: var(--page-muted);
+  cursor: default;
+}
+
+.cosmic-game-panel[data-compact="true"] .cosmic-panel-controls { display: none; }
+.cosmic-game-panel[data-compact="true"] .cosmic-spectrum > div { height: 24px; }
+.cosmic-game-panel[data-compact="true"] .cosmic-guess-list { min-height: 56px; }
+.cosmic-game-panel[data-compact="true"] .cosmic-guess-form > p { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+@media (hover: hover) and (pointer: fine) {
+  .cosmic-panel-actions > button:not(:disabled):hover,
+  .cosmic-panel-controls button:hover {
+    border-color: color-mix(in oklch, var(--page-fg) 22%, transparent);
+    background: color-mix(in oklch, var(--page-fg) 9%, transparent);
+  }
+  .cosmic-guess-list li:hover { background: color-mix(in oklch, var(--page-fg) 6%, transparent); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cosmic-game-panel {
+    animation: cosmic-panel-enter 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .cosmic-guess-list li {
+    animation: cosmic-item-enter 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+@keyframes cosmic-panel-enter {
+  from { opacity: 0; transform: translateX(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes cosmic-item-enter {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+.cosmic-projection > header {
+  display: flex;
+  min-height: 38px;
+  padding: 0 12px;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--page-border);
+  color: var(--cosmic-accent);
+  font-size: 9px;
+  text-transform: uppercase;
 }
 
 .cosmic-system {
@@ -2957,8 +3209,11 @@ button {
   width: min(1080px, 100%);
   margin: clamp(24px, 4vh, 42px) auto 0;
   grid-template-columns: 1.02fr 0.64fr 1.34fr;
-  border: 1px solid var(--page-border);
+  overflow: hidden;
+  border: 1px solid color-mix(in oklch, var(--page-fg) 12%, transparent);
+  border-radius: 8px;
   background: var(--cosmic-panel);
+  box-shadow: 0 18px 56px color-mix(in oklch, #000 28%, transparent);
 }
 .cosmic-system > div { min-width: 0; padding: 14px; border-right: 1px solid var(--page-border); }
 .cosmic-system > div:last-child { border-right: 0; }
@@ -2974,15 +3229,17 @@ button {
 .cosmic-vector-words button {
   min-height: 30px;
   padding: 0 8px;
-  border: 1px solid var(--page-border);
-  background: transparent;
+  border: 1px solid color-mix(in oklch, var(--page-fg) 10%, transparent);
+  border-radius: 6px;
+  background: color-mix(in oklch, var(--page-fg) 3.5%, transparent);
   color: var(--page-muted);
   cursor: pointer;
   font: 9px "SFMono-Regular", Consolas, monospace;
 }
 .cosmic-vector-words button[aria-pressed="true"] {
-  border-color: var(--cosmic-accent);
-  color: var(--page-fg);
+  border-color: color-mix(in oklch, var(--cosmic-accent) 55%, transparent);
+  background: color-mix(in oklch, var(--cosmic-accent) 12%, transparent);
+  color: var(--cosmic-accent);
 }
 .cosmic-vector-bars { display: grid; gap: 10px; }
 .cosmic-vector-bars > div {
@@ -2997,15 +3254,15 @@ button {
   display: block;
   width: var(--guess-size);
   height: 8px;
-  background: var(--cosmic-accent);
+  background: var(--cosmic-cold);
   font-style: normal;
   transform-origin: left;
 }
 .cosmic-vector-bars i:nth-of-type(2) {
   width: var(--target-size);
-  background: color-mix(in oklch, var(--cosmic-accent) 45%, var(--page-muted));
+  background: color-mix(in oklch, var(--cosmic-cold) 45%, var(--page-muted));
 }
-.cosmic-vector-bars > div[data-warm="true"] i { background: var(--cosmic-hot); }
+.cosmic-vector-bars > div[data-warm="true"] i { background: var(--cosmic-warm); }
 .cosmic-vector-bars small { font-size: 8px; text-align: right; }
 .cosmic-vectors > p {
   display: flex;
@@ -3016,12 +3273,12 @@ button {
   font-size: 8px;
 }
 .cosmic-vectors > p span,
-.cosmic-vectors > p i { width: 14px; height: 4px; background: var(--cosmic-accent); }
-.cosmic-vectors > p i { margin-left: 6px; background: color-mix(in oklch, var(--cosmic-accent) 45%, var(--page-muted)); }
+.cosmic-vectors > p i { width: 14px; height: 4px; background: var(--cosmic-cold); }
+.cosmic-vectors > p i { margin-left: 6px; background: color-mix(in oklch, var(--cosmic-cold) 45%, var(--page-muted)); }
 .cosmic-angle { display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .cosmic-angle svg { width: 100%; max-height: 130px; overflow: visible; }
 .cosmic-angle line,
-.cosmic-angle path { fill: none; stroke: var(--cosmic-accent); stroke-width: 2; }
+.cosmic-angle path { fill: none; stroke: var(--cosmic-cold); stroke-width: 2; }
 .cosmic-angle .cosmic-angle-target { stroke: var(--cosmic-hot); }
 .cosmic-angle circle { fill: var(--cosmic-hot); }
 .cosmic-angle text { fill: var(--page-fg); font-size: 16px; }
@@ -3036,17 +3293,32 @@ button {
   width: min(1060px, 100%);
   margin: clamp(22px, 4vh, 40px) auto 0;
   grid-template-columns: 1.2fr 0.8fr;
-  border: 1px solid var(--page-border);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklch, var(--page-fg) 12%, transparent);
+  border-radius: 8px;
   background:
-    radial-gradient(circle at 18% 24%, color-mix(in oklch, var(--cosmic-accent) 12%, transparent), transparent 36%),
+    linear-gradient(145deg, color-mix(in oklch, var(--cosmic-accent) 7%, transparent), transparent 42%),
     var(--cosmic-panel);
+  box-shadow: 0 18px 56px color-mix(in oklch, #000 28%, transparent);
+}
+.cosmic-origin::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  background: linear-gradient(90deg, var(--cosmic-accent), var(--cosmic-very-hot), var(--cosmic-hot), var(--cosmic-warm));
+  content: "";
 }
 .cosmic-origin > div { padding: clamp(22px, 4vw, 52px); }
 .cosmic-origin > div > span { color: var(--cosmic-accent); font-size: 9px; text-transform: uppercase; }
 .cosmic-origin h2 { margin: 18px 0; font: 650 clamp(28px, 4vw, 54px)/1 "Unbounded Variable", sans-serif; letter-spacing: -0.05em; }
 .cosmic-origin p { max-width: 620px; color: var(--page-muted); font-size: 13px; line-height: 1.55; }
 .cosmic-origin dl { margin: 0; padding: 20px; border-left: 1px solid var(--page-border); }
-.cosmic-origin dl div { padding: 16px 0; border-bottom: 1px solid var(--page-border); }
+.cosmic-origin dl div {
+  padding: 16px 10px;
+  border-bottom: 1px solid var(--page-border);
+  background: color-mix(in oklch, var(--page-fg) 2.5%, transparent);
+}
 .cosmic-origin dt { color: var(--cosmic-hot); font-size: 9px; text-transform: uppercase; }
 .cosmic-origin dd { margin: 6px 0 0; font-size: 11px; }
 
@@ -3752,7 +4024,6 @@ button {
 
   .lh-system,
   .lh-origin,
-  .cosmic-experience,
   .cosmic-system,
   .cosmic-origin,
   .decyphr-experience,
@@ -3764,7 +4035,6 @@ button {
   }
 
   .lh-motd,
-  .cosmic-map-panel,
   .decyphr-source,
   .decyphr-origin-copy,
   .skills-command-builder,
@@ -3774,6 +4044,7 @@ button {
   }
 
   .cosmic-experience {
+    grid-template-columns: 1fr;
     min-height: 0;
   }
 
@@ -3781,18 +4052,69 @@ button {
     min-height: 170px;
   }
 
-  .cosmic-experience .cosmic-console {
-    min-height: 220px;
-    order: -1;
-    border-bottom: 1px solid var(--page-border);
+  .cosmic-experience .cosmic-game-map { min-height: 250px; }
+  .cosmic-experience .cosmic-game-map .cosmic-field { min-height: 250px; }
+  .cosmic-experience .cosmic-game-panel {
+    min-height: 410px;
+    border-top: 1px solid color-mix(in oklch, var(--page-fg) 12%, transparent);
+    border-left: 0;
   }
 
-  .cosmic-experience .cosmic-console ol {
-    min-height: 70px;
+  .detail-hero[data-project="cosmic-hot-potato"] .cosmic-game-shell {
+    min-height: 190px;
+    grid-template-columns: minmax(0, 1fr) minmax(150px, 45%);
   }
-
-  .cosmic-experience .cosmic-map-panel {
-    border-bottom: 0;
+  .detail-hero[data-project="cosmic-hot-potato"] .cosmic-game-map .cosmic-field {
+    min-height: 190px;
+    height: 190px;
+  }
+  .detail-hero[data-project="cosmic-hot-potato"] .cosmic-map-math,
+  .detail-hero[data-project="cosmic-hot-potato"] .cosmic-day-band,
+  .detail-hero[data-project="cosmic-hot-potato"] .cosmic-spectrum,
+  .detail-hero[data-project="cosmic-hot-potato"] .cosmic-guess-list,
+  .detail-hero[data-project="cosmic-hot-potato"] .cosmic-panel-actions > button {
+    display: none;
+  }
+  .detail-hero[data-project="cosmic-hot-potato"] .cosmic-panel-header {
+    padding: 8px;
+  }
+  .detail-hero[data-project="cosmic-hot-potato"] .cosmic-panel-header strong {
+    max-width: 92px;
+    font-size: 11px;
+    white-space: normal;
+  }
+  .detail-hero[data-project="cosmic-hot-potato"] .cosmic-panel-header small,
+  .detail-hero[data-project="cosmic-hot-potato"] .cosmic-panel-header span {
+    font-size: 6px;
+  }
+  .detail-hero[data-project="cosmic-hot-potato"] .cosmic-metrics {
+    padding: 6px;
+    grid-template-columns: 1fr;
+    gap: 3px;
+  }
+  .detail-hero[data-project="cosmic-hot-potato"] .cosmic-metrics div {
+    display: flex;
+    padding: 4px 5px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .detail-hero[data-project="cosmic-hot-potato"] .cosmic-guess-form {
+    padding: 6px;
+  }
+  .detail-hero[data-project="cosmic-hot-potato"] .cosmic-guess-form > p {
+    display: none;
+  }
+  .detail-hero[data-project="cosmic-hot-potato"] .cosmic-guess-form input {
+    display: none;
+  }
+  .detail-hero[data-project="cosmic-hot-potato"] .cosmic-guess-form > div {
+    display: block;
+    min-height: 28px;
+  }
+  .detail-hero[data-project="cosmic-hot-potato"] .cosmic-guess-form button {
+    width: 100%;
+    height: 28px;
+    border-radius: 6px;
   }
 
   .cosmic-vector-pocket,
@@ -3914,7 +4236,6 @@ button {
     margin-top: 20px;
   }
 
-  .detail-section[data-project="cosmic-hot-potato"] .cosmic-mode-toggle button,
   .detail-section[data-project="decyphr"] .decyphr-language-picker button,
   .detail-section[data-project="skills-init"] .skills-mode-toggle button {
     min-height: 36px;
@@ -4004,6 +4325,17 @@ button {
 
   .project-content {
     animation: none;
+  }
+
+  .cosmic-game-panel,
+  .cosmic-guess-list li {
+    animation: none;
+  }
+
+  .cosmic-mode-toggle button,
+  .cosmic-panel-actions > button,
+  .cosmic-panel-controls button {
+    transition: none;
   }
 
   .decyphr-workflow-node[data-active="true"] circle {

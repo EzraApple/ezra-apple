@@ -10,6 +10,7 @@ import {
 
 type SceneMode = "2d" | "3d";
 type Guess = {
+  rank: number;
   similarity: number;
   word: string;
   x: number;
@@ -24,18 +25,18 @@ const TARGET = "music";
 // Similarities and positions come from Cosmic Hot Potato's normalized GloVe
 // 50d dataset and its deterministic UMAP projection.
 const GUESS_POCKET: Guess[] = [
-  { word: "song", similarity: 0.7985, x: -0.066, y: -0.002, z: -0.462 },
-  { word: "concert", similarity: 0.7768, x: -0.074, y: -0.052, z: -0.438 },
-  { word: "artist", similarity: 0.7755, x: -0.077, y: -0.021, z: -0.422 },
-  { word: "sound", similarity: 0.7472, x: -0.124, y: 0.038, z: -0.465 },
-  { word: "piano", similarity: 0.7451, x: -0.059, y: -0.047, z: -0.531 },
-  { word: "video", similarity: 0.6985, x: -0.045, y: 0.058, z: -0.307 },
-  { word: "language", similarity: 0.6007, x: -0.164, y: -0.017, z: -0.239 },
-  { word: "game", similarity: 0.4584, x: 0.161, y: 0.096, z: 0.315 },
-  { word: "city", similarity: 0.4159, x: 0.194, y: 0.182, z: -0.108 },
-  { word: "planet", similarity: 0.259, x: 0.233, y: 0.255, z: -0.059 },
-  { word: "river", similarity: 0.2708, x: 0.251, y: 0.348, z: -0.168 },
-  { word: "potato", similarity: 0.1068, x: 0.2, y: 0.579, z: -0.38 },
+  { word: "song", rank: 14, similarity: 0.7985, x: -0.066, y: -0.002, z: -0.462 },
+  { word: "concert", rank: 18, similarity: 0.7768, x: -0.074, y: -0.052, z: -0.438 },
+  { word: "artist", rank: 20, similarity: 0.7755, x: -0.077, y: -0.021, z: -0.422 },
+  { word: "sound", rank: 38, similarity: 0.7472, x: -0.124, y: 0.038, z: -0.465 },
+  { word: "piano", rank: 40, similarity: 0.7451, x: -0.059, y: -0.047, z: -0.531 },
+  { word: "video", rank: 85, similarity: 0.6985, x: -0.045, y: 0.058, z: -0.307 },
+  { word: "language", rank: 281, similarity: 0.6007, x: -0.164, y: -0.017, z: -0.239 },
+  { word: "game", rank: 1434, similarity: 0.4584, x: 0.161, y: 0.096, z: 0.315 },
+  { word: "city", rank: 2117, similarity: 0.4159, x: 0.194, y: 0.182, z: -0.108 },
+  { word: "planet", rank: 7009, similarity: 0.259, x: 0.233, y: 0.255, z: -0.059 },
+  { word: "river", rank: 6543, similarity: 0.2708, x: 0.251, y: 0.348, z: -0.168 },
+  { word: "potato", rank: 15860, similarity: 0.1068, x: 0.2, y: 0.579, z: -0.38 },
 ];
 
 const FIELD_POINTS = Array.from({ length: 54 }, (_, index) => ({
@@ -86,20 +87,32 @@ function ModeToggle() {
   );
 }
 
+function temperatureFor(similarity: number) {
+  if (similarity >= 0.77) return "very-hot";
+  if (similarity >= 0.68) return "hot";
+  if (similarity >= 0.45) return "warm";
+  if (similarity >= 0.25) return "tepid";
+  return "cold";
+}
+
 function SemanticField({
   guesses = GUESS_POCKET.slice(0, 4),
   interactive = false,
   labelled = false,
+  focusNonce = 0,
   selectedWord,
 }: {
   guesses?: Guess[];
   interactive?: boolean;
   labelled?: boolean;
+  focusNonce?: number;
   selectedWord?: string;
 }) {
   const [mode] = useSceneMode();
   const [yaw, setYaw] = useState(-0.52);
   const drag = useRef<{ pointerId: number; x: number; yaw: number } | null>(null);
+
+  useEffect(() => setYaw(-0.52), [focusNonce]);
 
   const project = (point: { x: number; y: number; z: number }) => {
     if (mode === "2d") {
@@ -177,7 +190,12 @@ function SemanticField({
         const projected = project(guess);
         const isSelected = selectedWord === guess.word;
         return (
-          <g className="cosmic-guess-point" data-selected={isSelected} key={guess.word}>
+          <g
+            className="cosmic-guess-point"
+            data-selected={isSelected}
+            data-temperature={temperatureFor(guess.similarity)}
+            key={guess.word}
+          >
             <line x1="260" x2={projected.x} y1="140" y2={projected.y} />
             <circle
               cx={projected.x}
@@ -203,6 +221,112 @@ function SemanticField({
   );
 }
 
+function CosmicGamePanel({
+  compact = false,
+  guesses,
+  input = "",
+  message = "Try a broad noun, place, or idea.",
+  onCenter,
+  onInput,
+  onReset,
+  onSubmit,
+}: {
+  compact?: boolean;
+  guesses: Guess[];
+  input?: string;
+  message?: string;
+  onCenter?: () => void;
+  onInput?: (value: string) => void;
+  onReset?: () => void;
+  onSubmit?: (event: FormEvent) => void;
+}) {
+  const [chronological, setChronological] = useState(true);
+  const best = [...guesses].sort((a, b) => a.rank - b.rank)[0];
+  const ordered = chronological
+    ? guesses
+    : [...guesses].sort((a, b) => b.similarity - a.similarity);
+  const buckets = ["cold", "tepid", "warm", "hot", "very-hot"].map((temperature) =>
+    guesses.filter((guess) => temperatureFor(guess.similarity) === temperature).length,
+  );
+  const maxBucket = Math.max(1, ...buckets);
+
+  return (
+    <aside className="cosmic-game-panel" data-compact={compact}>
+      <header className="cosmic-panel-header">
+        <div>
+          <span>Semantic vector field</span>
+          <strong>Cosmic Hot Potato</strong>
+          <small>30,000-word map</small>
+        </div>
+        <div className="cosmic-panel-actions">
+          <ModeToggle />
+          <button aria-label="Center view" disabled={!onCenter} onClick={onCenter} type="button">⌖</button>
+          <button aria-label="Reset puzzle progress" disabled={!onReset} onClick={onReset} type="button">↻</button>
+        </div>
+      </header>
+      <div className="cosmic-day-band">
+        <span>‹</span>
+        <div><small>Today</small><strong>Portfolio puzzle</strong><i>target hidden</i></div>
+        <span>›</span>
+      </div>
+      <div className="cosmic-metrics">
+        <div><strong>{guesses.length}</strong><span>guesses</span></div>
+        <div><strong>{best ? `#${best.rank}` : "--"}</strong><span>best rank</span></div>
+        <div><strong>{best ? best.similarity.toFixed(3) : "--"}</strong><span>similarity</span></div>
+      </div>
+      <div className="cosmic-panel-controls">
+        <div><span>12-word demo pocket</span><small>vectors ready</small></div>
+        <button onClick={() => setChronological((current) => !current)} type="button">
+          ⇅ {chronological ? "Timeline" : "Closest"}
+        </button>
+      </div>
+      <div className="cosmic-spectrum">
+        <header><span>guess spectrum</span><span>{guesses.length} sampled</span></header>
+        <div>
+          {buckets.map((count, index) => (
+            <i
+              data-temperature={["cold", "tepid", "warm", "hot", "very-hot"][index]}
+              key={index}
+              style={{ "--bar-height": `${Math.max(12, (count / maxBucket) * 100)}%` } as CSSProperties}
+            />
+          ))}
+        </div>
+        <footer><span>cold</span><span>target</span></footer>
+      </div>
+      <ol className="cosmic-guess-list">
+        {ordered.length === 0 ? (
+          <li className="cosmic-panel-empty"><strong>No guesses yet</strong><span>Try song, piano, city, or potato.</span></li>
+        ) : (
+          ordered.slice(compact ? -3 : -5).map((guess, index) => (
+            <li
+              data-latest={index === ordered.slice(compact ? -3 : -5).length - 1}
+              data-temperature={temperatureFor(guess.similarity)}
+              key={guess.word}
+            >
+              <span>{guess.word}</span>
+              <strong>#{guess.rank}</strong>
+              <i>{guess.similarity.toFixed(4)}</i>
+            </li>
+          ))
+        )}
+      </ol>
+      <form className="cosmic-guess-form" onSubmit={onSubmit ?? ((event) => event.preventDefault())}>
+        <p aria-live="polite">{message}</p>
+        <div>
+          <input
+            autoComplete="off"
+            disabled={!onInput}
+            onChange={(event) => onInput?.(event.target.value)}
+            placeholder="Enter a word"
+            value={input}
+          />
+          <button disabled={!onSubmit || !input.trim()} type="submit">Guess ↗</button>
+        </div>
+      </form>
+    </aside>
+  );
+}
+
 export function CosmicHotPotatoScene() {
   const shouldReduceMotion = useReducedMotion() ?? false;
   const [guessCount, setGuessCount] = useState(shouldReduceMotion ? 4 : 2);
@@ -221,16 +345,12 @@ export function CosmicHotPotatoScene() {
   }, [shouldReduceMotion]);
 
   return (
-    <div className="cosmic-scene" data-mode={mode}>
-      <header>
-        <span>semantic field / daily</span>
-        <ModeToggle />
-      </header>
-      <SemanticField guesses={GUESS_POCKET.slice(0, guessCount)} />
-      <footer>
-        <span>target · hidden</span>
-        <span>{guessCount} {guessCount === 1 ? "guess" : "guesses"} plotted</span>
-      </footer>
+    <div className="cosmic-scene cosmic-game-shell" data-mode={mode}>
+      <div className="cosmic-game-map">
+        <SemanticField guesses={GUESS_POCKET.slice(0, guessCount)} />
+        <span className="cosmic-map-math">Map math · 50D → UMAP → 3D</span>
+      </div>
+      <CosmicGamePanel compact guesses={GUESS_POCKET.slice(0, guessCount)} />
     </div>
   );
 }
@@ -239,6 +359,7 @@ export function CosmicHotPotatoExperience() {
   const [input, setInput] = useState("");
   const [guesses, setGuesses] = useState<Guess[]>([]);
   const [message, setMessage] = useState("Try song, piano, city, or potato.");
+  const [focusNonce, setFocusNonce] = useState(0);
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
@@ -264,45 +385,23 @@ export function CosmicHotPotatoExperience() {
   };
 
   return (
-    <div className="cosmic-experience">
-      <div className="cosmic-map-panel">
-        <SemanticField guesses={guesses} interactive labelled />
-        <ModeToggle />
+    <div className="cosmic-experience cosmic-game-shell">
+      <div className="cosmic-game-map">
+        <SemanticField focusNonce={focusNonce} guesses={guesses} interactive labelled />
+        <span className="cosmic-map-math">drag to orbit · scroll to inspect depth</span>
       </div>
-      <div className="cosmic-console">
-        <header>
-          <span>puzzle / meaning</span>
-          <strong>{guesses.length}</strong>
-        </header>
-        <ol>
-          {guesses.length === 0 ? (
-            <li className="cosmic-empty">
-              <strong>make your first jump</strong>
-              <span>song · piano · city · potato</span>
-            </li>
-          ) : (
-            [...guesses].reverse().map((guess, index) => (
-              <li key={guess.word}>
-                <span>{String(guesses.length - index).padStart(2, "0")}</span>
-                <strong>{guess.word}</strong>
-                <i>{guess.similarity.toFixed(4)}</i>
-              </li>
-            ))
-          )}
-        </ol>
-        <p aria-live="polite">{message}</p>
-        <form onSubmit={submit}>
-          <label htmlFor="cosmic-guess">guess</label>
-          <input
-            autoComplete="off"
-            id="cosmic-guess"
-            onChange={(event) => setInput(event.target.value)}
-            placeholder="semantic jump"
-            value={input}
-          />
-          <button disabled={!input.trim()} type="submit">plot</button>
-        </form>
-      </div>
+      <CosmicGamePanel
+        guesses={guesses}
+        input={input}
+        message={message}
+        onCenter={() => setFocusNonce((current) => current + 1)}
+        onInput={setInput}
+        onReset={() => {
+          setGuesses([]);
+          setMessage("Puzzle reset. Try a broad noun, place, or idea.");
+        }}
+        onSubmit={submit}
+      />
     </div>
   );
 }
