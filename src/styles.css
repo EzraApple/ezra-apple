@@ -2931,7 +2931,6 @@ button {
 .cosmic-guess-point[data-temperature="warm"] circle { fill: var(--cosmic-warm); }
 .cosmic-guess-point[data-temperature="hot"] circle { fill: var(--cosmic-hot); }
 .cosmic-guess-point[data-temperature="very-hot"] circle { fill: var(--cosmic-very-hot); }
-.cosmic-guess-point text { fill: var(--page-fg); font-size: 9px; }
 .cosmic-guess-point[data-selected="true"] circle {
   fill: var(--cosmic-hot);
   stroke: var(--page-fg);

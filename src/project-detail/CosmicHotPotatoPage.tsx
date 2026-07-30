@@ -298,22 +298,21 @@ function SemanticField({
         const isSelected = selectedWord === guess.word;
         return (
           <g
+            aria-label={labelled ? `${guess.word}, ${Math.round(guess.similarity * 100)} percent similar` : undefined}
             className="cosmic-guess-point"
             data-selected={isSelected}
             data-temperature={temperatureFor(guess.similarity)}
             key={guess.word}
           >
+            {labelled ? (
+              <title>{`${guess.word} · ${(guess.similarity * 100).toFixed(0)}`}</title>
+            ) : null}
             <line x1={center.x} x2={projected.x} y1={center.y} y2={projected.y} />
             <circle
               cx={projected.x}
               cy={projected.y}
               r={(isSelected ? 7 : 4) + guess.similarity * 3}
             />
-            {labelled ? (
-              <text x={projected.x + 10} y={projected.y - 8}>
-                {guess.word} · {(guess.similarity * 100).toFixed(0)}
-              </text>
-            ) : null}
           </g>
         );
       })}
