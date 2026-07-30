@@ -48,7 +48,7 @@ export const leHarness = defineProject({
   },
   depth: {
     what: {
-      headline: "A harness built as a study of the machinery underneath agents.",
+      headline: "A harness built to expose the machinery beneath agents.",
       body: "LeHarness keeps the core loop explicit while growing durable sessions, tools, background work, subagents, artifacts, skills, and MCP support around it.",
       highlights: ["Interactive CLI", "Multiple model providers", "Persistent local sessions"],
     },

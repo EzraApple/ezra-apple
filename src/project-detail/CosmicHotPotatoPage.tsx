@@ -1,5 +1,12 @@
 import { useReducedMotion } from "motion/react";
-import { useEffect, useState, type FormEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type FormEvent,
+  type PointerEvent,
+} from "react";
 
 type SceneMode = "2d" | "3d";
 type Guess = {
@@ -14,8 +21,8 @@ const MODE_KEY = "ezra-apple:cosmic-mode";
 const MODE_EVENT = "ezra-apple:cosmic-mode-change";
 const TARGET = "music";
 
-// These similarities and source positions are calculated directly from the
-// normalized GloVe 50d vectors in Cosmic Hot Potato's generated dataset.
+// Similarities and positions come from Cosmic Hot Potato's normalized GloVe
+// 50d dataset and its deterministic UMAP projection.
 const GUESS_POCKET: Guess[] = [
   { word: "song", similarity: 0.7985, x: -0.066, y: -0.002, z: -0.462 },
   { word: "concert", similarity: 0.7768, x: -0.074, y: -0.052, z: -0.438 },
@@ -31,10 +38,11 @@ const GUESS_POCKET: Guess[] = [
   { word: "potato", similarity: 0.1068, x: 0.2, y: 0.579, z: -0.38 },
 ];
 
-const FIELD_POINTS = Array.from({ length: 42 }, (_, index) => ({
-  x: 40 + ((index * 83) % 430),
-  y: 24 + ((index * 47) % 230),
-  r: index % 9 === 0 ? 2 : 1,
+const FIELD_POINTS = Array.from({ length: 54 }, (_, index) => ({
+  x: ((((index * 83) % 101) - 50) / 50) * 0.92,
+  y: ((((index * 47) % 97) - 48) / 48) * 0.72,
+  z: ((((index * 61) % 89) - 44) / 44) * 0.78,
+  r: index % 11 === 0 ? 2 : 1.15,
 }));
 
 function loadMode(): SceneMode {
@@ -80,43 +88,117 @@ function ModeToggle() {
 
 function SemanticField({
   guesses = GUESS_POCKET.slice(0, 4),
+  interactive = false,
   labelled = false,
+  selectedWord,
 }: {
   guesses?: Guess[];
+  interactive?: boolean;
   labelled?: boolean;
+  selectedWord?: string;
 }) {
   const [mode] = useSceneMode();
+  const [yaw, setYaw] = useState(-0.52);
+  const drag = useRef<{ pointerId: number; x: number; yaw: number } | null>(null);
+
+  const project = (point: { x: number; y: number; z: number }) => {
+    if (mode === "2d") {
+      return { depth: 0, x: 260 + point.x * 208, y: 140 + point.y * 132 };
+    }
+    const rotatedX = point.x * Math.cos(yaw) - point.z * Math.sin(yaw);
+    const depth = point.x * Math.sin(yaw) + point.z * Math.cos(yaw);
+    return {
+      depth,
+      x: 260 + rotatedX * 196,
+      y: 140 + point.y * 118 - depth * 46,
+    };
+  };
+
+  const onPointerDown = (event: PointerEvent<SVGSVGElement>) => {
+    if (!interactive || mode !== "3d") return;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    drag.current = { pointerId: event.pointerId, x: event.clientX, yaw };
+  };
+  const onPointerMove = (event: PointerEvent<SVGSVGElement>) => {
+    if (!drag.current || drag.current.pointerId !== event.pointerId) return;
+    setYaw(drag.current.yaw + (event.clientX - drag.current.x) / 170);
+  };
+  const endDrag = (event: PointerEvent<SVGSVGElement>) => {
+    if (drag.current?.pointerId === event.pointerId) drag.current = null;
+  };
 
   return (
     <svg
       aria-label={labelled ? "Semantic map around the hidden word" : undefined}
       aria-hidden={labelled ? undefined : true}
       className="cosmic-field"
+      data-interactive={interactive}
       data-mode={mode}
+      onPointerCancel={endDrag}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={endDrag}
       role={labelled ? "img" : undefined}
       viewBox="0 0 520 280"
     >
+      {mode === "2d" ? (
+        <g className="cosmic-grid cosmic-grid-2d">
+          {[-160, -80, 0, 80, 160].map((offset) => (
+            <line key={`v-${offset}`} x1={260 + offset} x2={260 + offset} y1="34" y2="246" />
+          ))}
+          {[-80, -40, 0, 40, 80].map((offset) => (
+            <line key={`h-${offset}`} x1="56" x2="464" y1={140 + offset} y2={140 + offset} />
+          ))}
+        </g>
+      ) : (
+        <g className="cosmic-grid cosmic-grid-3d">
+          <path d="M260 140 L54 224 M260 140 L466 224 M260 140 L260 30" />
+          <ellipse cx="260" cy="163" rx="86" ry="28" />
+          <ellipse cx="260" cy="179" rx="154" ry="49" />
+        </g>
+      )}
       <g className="cosmic-cloud">
-        {FIELD_POINTS.map((point, index) => (
-          <circle cx={point.x} cy={point.y} key={index} r={point.r} />
-        ))}
+        {FIELD_POINTS.map((point, index) => {
+          const projected = project(point);
+          return (
+            <circle
+              cx={projected.x}
+              cy={projected.y}
+              key={index}
+              opacity={mode === "3d" ? 0.22 + (projected.depth + 1) * 0.18 : 0.32}
+              r={point.r * (mode === "3d" ? 1.1 + projected.depth * 0.34 : 1)}
+            />
+          );
+        })}
       </g>
       <circle className="cosmic-target" cx="260" cy="140" r="10" />
       <circle className="cosmic-target-ring" cx="260" cy="140" r="34" />
       {guesses.map((guess) => {
-        const distance = (1 - guess.similarity) * 210;
-        const angle = Math.atan2(guess.y, guess.x);
-        const depthOffset = mode === "3d" ? guess.z * 46 : 0;
-        const x = 260 + Math.cos(angle) * distance + depthOffset;
-        const y = 140 + Math.sin(angle) * distance * (mode === "3d" ? 0.56 : 0.82);
+        const projected = project(guess);
+        const isSelected = selectedWord === guess.word;
         return (
-          <g className="cosmic-guess-point" key={guess.word}>
-            <line x1="260" x2={x} y1="140" y2={y} />
-            <circle cx={x} cy={y} r={4 + guess.similarity * 3} />
-            {labelled ? <text x={x + 9} y={y + 4}>{guess.word}</text> : null}
+          <g className="cosmic-guess-point" data-selected={isSelected} key={guess.word}>
+            <line x1="260" x2={projected.x} y1="140" y2={projected.y} />
+            <circle
+              cx={projected.x}
+              cy={projected.y}
+              r={(isSelected ? 7 : 4) + guess.similarity * 3}
+            />
+            {labelled ? (
+              <text x={projected.x + 10} y={projected.y - 8}>
+                {guess.word} · {(guess.similarity * 100).toFixed(0)}
+              </text>
+            ) : null}
           </g>
         );
       })}
+      <text className="cosmic-mode-note" x="18" y="264">
+        {mode === "3d" && interactive
+          ? "drag to orbit x · y · z"
+          : mode === "3d"
+            ? "perspective x · y · z"
+            : "flat x · y projection"}
+      </text>
     </svg>
   );
 }
@@ -184,7 +266,7 @@ export function CosmicHotPotatoExperience() {
   return (
     <div className="cosmic-experience">
       <div className="cosmic-map-panel">
-        <SemanticField guesses={guesses} labelled />
+        <SemanticField guesses={guesses} interactive labelled />
         <ModeToggle />
       </div>
       <div className="cosmic-console">
@@ -227,32 +309,74 @@ export function CosmicHotPotatoExperience() {
 
 export function CosmicHotPotatoSystem() {
   const [mode] = useSceneMode();
-  const vectorA = [0.31, -0.12, 0.48, 0.08, "…", 0.27];
-  const vectorB = [0.28, -0.09, 0.42, 0.14, "…", 0.19];
+  const [selectedWord, setSelectedWord] = useState("song");
+  const selected = GUESS_POCKET.find((guess) => guess.word === selectedWord) ?? GUESS_POCKET[0];
+  const dimensions = [
+    { label: "d07", guess: selected.x, target: -0.08 },
+    { label: "d18", guess: selected.y, target: -0.01 },
+    { label: "d31", guess: selected.z, target: -0.49 },
+    { label: "rest", guess: selected.similarity, target: 1 },
+  ];
+  const angle = Math.acos(selected.similarity);
+  const endpoint = {
+    x: 34 + Math.cos(angle) * 145,
+    y: 126 - Math.sin(angle) * 96,
+  };
+  const arcEnd = {
+    x: 34 + Math.cos(angle) * 42,
+    y: 126 - Math.sin(angle) * 42,
+  };
 
   return (
     <div className="cosmic-system" data-mode={mode}>
       <div className="cosmic-vectors">
-        <header>50d normalized vectors</header>
-        <div><span>guess</span>{vectorA.map((value, index) => <i key={index}>{value}</i>)}</div>
-        <div><span>target</span>{vectorB.map((value, index) => <i key={index}>{value}</i>)}</div>
+        <header><span>50d vector sample</span><strong>{selected.word}</strong></header>
+        <div className="cosmic-vector-words">
+          {GUESS_POCKET.slice(0, 4).map((guess) => (
+            <button
+              aria-pressed={selected.word === guess.word}
+              key={guess.word}
+              onClick={() => setSelectedWord(guess.word)}
+              type="button"
+            >
+              {guess.word}
+            </button>
+          ))}
+        </div>
+        <div className="cosmic-vector-bars">
+          {dimensions.map((dimension, index) => (
+            <div data-warm={index === 3} key={dimension.label}>
+              <span>{dimension.label}</span>
+              <i style={{ "--guess-size": `${Math.max(8, Math.abs(dimension.guess) * 100)}%` } as CSSProperties} />
+              <i style={{ "--target-size": `${Math.max(8, Math.abs(dimension.target) * 100)}%` } as CSSProperties} />
+              <small>{dimension.guess.toFixed(2)}</small>
+            </div>
+          ))}
+        </div>
+        <p><span /> guess vector <i /> hidden target</p>
       </div>
       <div className="cosmic-angle">
-        <svg aria-label="Angle between guess and target vectors" role="img" viewBox="0 0 240 160">
-          <line x1="28" x2="190" y1="132" y2="38" />
-          <line x1="28" x2="212" y1="132" y2="112" />
-          <path d="M76 104 A58 58 0 0 1 88 125" />
-          <circle cx="28" cy="132" r="4" />
-          <text x="92" y="102">cos θ</text>
+        <svg aria-label="Angle between guess and target vectors" role="img" viewBox="0 0 220 160">
+          <line className="cosmic-angle-target" x1="34" x2="196" y1="126" y2="126" />
+          <line x1="34" x2={endpoint.x} y1="126" y2={endpoint.y} />
+          <path d={`M76 126 A42 42 0 0 0 ${arcEnd.x} ${arcEnd.y}`} />
+          <circle cx="34" cy="126" r="4" />
+          <text x="72" y="108">θ</text>
         </svg>
-        <strong>score every guess locally</strong>
+        <strong>cos θ = {selected.similarity.toFixed(4)}</strong>
+        <span>scored locally</span>
       </div>
       <div className="cosmic-projection">
         <header>
           <span>UMAP projection</span>
           <ModeToggle />
         </header>
-        <SemanticField guesses={GUESS_POCKET.slice(0, 5)} />
+        <SemanticField
+          guesses={GUESS_POCKET.slice(0, 5)}
+          interactive
+          labelled
+          selectedWord={selected.word}
+        />
         <p>30,000 points in-browser · 317,000+ words score server-side</p>
       </div>
     </div>
@@ -260,9 +384,8 @@ export function CosmicHotPotatoSystem() {
 }
 
 export function CosmicHotPotatoOrigin() {
-  const [mode] = useSceneMode();
   return (
-    <div className="cosmic-origin" data-mode={mode}>
+    <div className="cosmic-origin">
       <div>
         <span>why a map?</span>
         <h2>Similarity should feel like a place, not another number.</h2>
@@ -271,7 +394,6 @@ export function CosmicHotPotatoOrigin() {
           itself playable: guesses orbit a hidden answer and meaning acquires
           direction, depth, and temperature.
         </p>
-        <ModeToggle />
       </div>
       <dl>
         <div><dt>jun 11</dt><dd>date-scoped daily puzzles shipped</dd></div>

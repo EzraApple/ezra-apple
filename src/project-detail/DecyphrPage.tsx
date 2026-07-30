@@ -17,13 +17,9 @@ const LANGUAGES: {
   { id: "Arabic", lang: "ar", dir: "rtl", text: "يمكن لفيديو واحد أن يصل إلى أكثر من جمهور." },
 ];
 
-const PIPELINE = [
-  "upload",
-  "dub",
-  "retrieve audio",
-  "lip-sync",
-  "deliver",
-] as const;
+type WorkflowNode = "web" | "source" | "dub" | "poll" | "retrieve" | "lip-sync" | "deliver";
+const WORKFLOW: WorkflowNode[] = ["web", "source", "dub", "poll", "retrieve", "lip-sync", "deliver"];
+const RETRY_WORKFLOW: WorkflowNode[] = ["web", "source", "dub", "poll", "dub", "poll", "retrieve", "lip-sync", "deliver"];
 
 function loadLanguage(): Language {
   if (typeof window === "undefined") return "Spanish";
@@ -206,46 +202,94 @@ export function DecyphrExperience() {
 
 export function DecyphrSystem() {
   const shouldReduceMotion = useReducedMotion() ?? false;
-  const [activeStep, setActiveStep] = useState<number>(PIPELINE.length);
+  const [sequence, setSequence] = useState<WorkflowNode[]>(WORKFLOW);
+  const [activeStep, setActiveStep] = useState<number>(WORKFLOW.length - 1);
   const timer = useRef<number | undefined>(undefined);
 
   useEffect(() => () => window.clearInterval(timer.current), []);
 
-  const replay = () => {
+  const replay = (withRetry = false) => {
+    const nextSequence = withRetry ? RETRY_WORKFLOW : WORKFLOW;
     window.clearInterval(timer.current);
+    setSequence(nextSequence);
     if (shouldReduceMotion) {
-      setActiveStep(PIPELINE.length);
+      setActiveStep(nextSequence.length - 1);
       return;
     }
     setActiveStep(0);
     let step = 0;
     timer.current = window.setInterval(() => {
-      step = Math.min(step + 1, PIPELINE.length);
+      step = Math.min(step + 1, nextSequence.length - 1);
       setActiveStep(step);
-      if (step >= PIPELINE.length) window.clearInterval(timer.current);
-    }, 380);
+      if (step >= nextSequence.length - 1) window.clearInterval(timer.current);
+    }, 430);
   };
+
+  const activeNode = sequence[activeStep];
+  const completed = new Set(sequence.slice(0, activeStep));
+  const retrying = sequence === RETRY_WORKFLOW && activeStep >= 4 && activeStep <= 5;
+  const nodes: { id: WorkflowNode; label: string; detail: string; x: number; y: number; width: number }[] = [
+    { id: "web", label: "WEB APP", detail: "upload + status", x: 18, y: 116, width: 140 },
+    { id: "source", label: "S3 SOURCE", detail: "durable media", x: 190, y: 116, width: 120 },
+    { id: "dub", label: "DUB", detail: "Lambda", x: 352, y: 96, width: 104 },
+    { id: "poll", label: "POLL", detail: "wait + retry", x: 480, y: 96, width: 104 },
+    { id: "retrieve", label: "RETRIEVE", detail: "translated audio", x: 608, y: 96, width: 112 },
+    { id: "lip-sync", label: "LIP-SYNC", detail: "Lambda", x: 480, y: 194, width: 104 },
+    { id: "deliver", label: "RESULT", detail: "S3 + web state", x: 824, y: 116, width: 148 },
+  ];
 
   return (
     <div className="decyphr-system">
       <header>
-        <span>one upload · one durable job</span>
-        <button onClick={replay} type="button">replay workflow</button>
-      </header>
-      <div className="decyphr-boundary">
-        <span>product</span>
-        <div className="decyphr-pipeline">
-          {PIPELINE.map((step, index) => (
-            <div data-active={index <= activeStep} key={step}>
-              <i>{String(index + 1).padStart(2, "0")}</i>
-              <strong>{step}</strong>
-            </div>
-          ))}
+        <span>one upload · one durable state machine</span>
+        <div className="decyphr-workflow-actions">
+          <button onClick={() => replay(false)} type="button">run clean</button>
+          <button onClick={() => replay(true)} type="button">simulate retry</button>
         </div>
-        <p>
-          Web state stayed visible while AWS Step Functions owned the
-          long-running media work, retries, retrieval, and failure updates.
+      </header>
+      <div className="decyphr-workflow-canvas">
+        <svg aria-label="Decyphr durable video localization workflow" role="img" viewBox="0 0 990 320">
+          <defs>
+            <marker id="decyphr-arrow" markerHeight="6" markerWidth="7" orient="auto" refX="6" refY="3">
+              <path d="M0 0 L7 3 L0 6 Z" />
+            </marker>
+          </defs>
+          <rect className="decyphr-machine-boundary" height="258" width="414" x="330" y="28" />
+          <text className="decyphr-machine-label" x="352" y="55">AWS STEP FUNCTIONS · DURABLE JOB</text>
+          <g className="decyphr-workflow-paths">
+            <path d="M158 151 H190" />
+            <path d="M310 151 H352" />
+            <path d="M456 131 H480" />
+            <path d="M584 131 H608" />
+            <path d="M664 166 V216 H584" />
+            <path d="M584 229 C700 229 714 151 824 151" />
+            <path className="decyphr-retry-path" data-active={retrying} d="M532 96 C532 64 404 64 404 96" />
+            <path className="decyphr-status-path" d="M898 186 V292 H88 V186" />
+          </g>
+          <text className="decyphr-status-label" x="412" y="307">status events return to the product</text>
+          {nodes.map((node) => (
+            <g
+              className="decyphr-workflow-node"
+              data-active={activeNode === node.id}
+              data-complete={completed.has(node.id)}
+              key={node.id}
+              transform={`translate(${node.x} ${node.y})`}
+            >
+              <rect height="70" width={node.width} />
+              <circle cx="16" cy="17" r="4" />
+              <text className="decyphr-node-label" x="16" y="39">{node.label}</text>
+              <text className="decyphr-node-detail" x="16" y="56">{node.detail}</text>
+            </g>
+          ))}
+        </svg>
+      </div>
+      <div className="decyphr-workflow-caption">
+        <p aria-live="polite">
+          {retrying
+            ? "The job is still the same job: Step Functions waits, retries dubbing, and keeps web status current."
+            : `${activeNode} · ${activeStep === sequence.length - 1 ? "workflow complete" : "state persisted"}`}
         </p>
+        <span>product state</span><i /> <span>durable media work</span><b />
       </div>
     </div>
   );

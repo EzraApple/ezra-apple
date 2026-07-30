@@ -2599,22 +2599,6 @@ button {
   font-family: "JetBrains Mono Variable", "SFMono-Regular", Consolas, monospace;
 }
 
-.lh-terminal[data-accent="cyan"],
-.lh-system[data-accent="cyan"],
-.lh-origin[data-accent="cyan"] {
-  --lh-accent: color-mix(in oklch, var(--page-accent) 45%, oklch(0.79 0.13 205));
-}
-.lh-terminal[data-accent="green"],
-.lh-system[data-accent="green"],
-.lh-origin[data-accent="green"] {
-  --lh-accent: color-mix(in oklch, var(--page-accent) 38%, oklch(0.78 0.17 145));
-}
-.lh-terminal[data-accent="violet"],
-.lh-system[data-accent="violet"],
-.lh-origin[data-accent="violet"] {
-  --lh-accent: color-mix(in oklch, var(--page-accent) 42%, oklch(0.72 0.18 305));
-}
-
 .lh-terminal {
   display: flex;
   width: 100%;
@@ -2798,17 +2782,6 @@ button {
   font: 700 clamp(12px, 1.5vw, 18px)/1.45 "JetBrains Mono Variable", monospace;
 }
 .lh-motd p { max-width: 600px; color: var(--page-muted); font-size: 13px; line-height: 1.55; }
-.lh-accent-picker { display: flex; margin-top: 22px; gap: 8px; flex-wrap: wrap; }
-.lh-accent-picker button {
-  min-height: 34px;
-  padding: 0 11px;
-  border: 1px solid var(--page-border);
-  background: transparent;
-  color: var(--page-muted);
-  cursor: pointer;
-  font: 9px "JetBrains Mono Variable", monospace;
-}
-.lh-accent-picker button[aria-pressed="true"] { border-color: var(--lh-accent); color: var(--lh-accent); }
 .lh-history { margin: 0; padding: 20px; list-style: none; }
 .lh-history li {
   display: grid;
@@ -2819,6 +2792,12 @@ button {
   font-size: 11px;
 }
 .lh-history span { color: var(--lh-accent); font-size: 9px; }
+
+.detail-section[data-project="leharness"][data-section="origin"] h1 {
+  max-width: 1040px;
+  font-size: clamp(42px, 5.1vw, 68px);
+  line-height: 0.96;
+}
 
 /* Cosmic Hot Potato — mono console around an explorable vector field. */
 .cosmic-scene,
@@ -2881,14 +2860,36 @@ button {
 }
 .cosmic-mode-toggle button:last-child { border-right: 0; }
 .cosmic-mode-toggle button[aria-pressed="true"] { background: var(--cosmic-accent); color: var(--page-bg); }
-.cosmic-field { display: block; width: 100%; height: min(35vh, 300px); overflow: visible; }
+.cosmic-field {
+  display: block;
+  width: 100%;
+  height: min(35vh, 300px);
+  overflow: visible;
+  touch-action: pan-y;
+}
+.cosmic-field[data-interactive="true"][data-mode="3d"] { cursor: grab; touch-action: none; }
+.cosmic-field[data-interactive="true"][data-mode="3d"]:active { cursor: grabbing; }
+.cosmic-grid { fill: none; stroke: color-mix(in oklch, var(--page-border) 62%, transparent); stroke-width: 0.7; }
+.cosmic-grid-2d line:nth-child(3),
+.cosmic-grid-2d line:nth-child(8) { stroke: color-mix(in oklch, var(--cosmic-accent) 38%, transparent); }
+.cosmic-grid-3d { stroke-dasharray: 3 7; }
 .cosmic-cloud { fill: color-mix(in oklch, var(--page-muted) 32%, transparent); }
 .cosmic-target { fill: var(--cosmic-hot); }
 .cosmic-target-ring { fill: none; stroke: var(--cosmic-hot); stroke-dasharray: 3 6; opacity: 0.5; }
 .cosmic-guess-point line { stroke: color-mix(in oklch, var(--cosmic-accent) 35%, transparent); }
 .cosmic-guess-point circle { fill: var(--cosmic-accent); }
 .cosmic-guess-point text { fill: var(--page-fg); font-size: 9px; }
-.cosmic-field[data-mode="3d"] .cosmic-cloud { transform: skewX(-6deg) scaleY(0.82); transform-origin: center; }
+.cosmic-guess-point[data-selected="true"] circle {
+  fill: var(--cosmic-hot);
+  stroke: var(--page-fg);
+  stroke-width: 1.5;
+}
+.cosmic-mode-note {
+  fill: var(--page-muted);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
 
 .cosmic-experience {
   display: grid;
@@ -2955,7 +2956,7 @@ button {
   display: grid;
   width: min(1080px, 100%);
   margin: clamp(24px, 4vh, 42px) auto 0;
-  grid-template-columns: 1fr 0.7fr 1.3fr;
+  grid-template-columns: 1.02fr 0.64fr 1.34fr;
   border: 1px solid var(--page-border);
   background: var(--cosmic-panel);
 }
@@ -2963,22 +2964,70 @@ button {
 .cosmic-system > div:last-child { border-right: 0; }
 .cosmic-vectors header,
 .cosmic-projection header { color: var(--cosmic-accent); font-size: 10px; text-transform: uppercase; }
-.cosmic-vectors > div {
-  display: grid;
-  margin-top: 12px;
-  grid-template-columns: 46px repeat(6, 1fr);
-  color: var(--page-muted);
-  font-size: 9px;
+.cosmic-vectors header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-.cosmic-vectors i { font-style: normal; }
+.cosmic-vectors header strong { color: var(--page-fg); font-weight: 500; }
+.cosmic-vector-words { display: flex; margin: 14px 0 18px; gap: 5px; flex-wrap: wrap; }
+.cosmic-vector-words button {
+  min-height: 30px;
+  padding: 0 8px;
+  border: 1px solid var(--page-border);
+  background: transparent;
+  color: var(--page-muted);
+  cursor: pointer;
+  font: 9px "SFMono-Regular", Consolas, monospace;
+}
+.cosmic-vector-words button[aria-pressed="true"] {
+  border-color: var(--cosmic-accent);
+  color: var(--page-fg);
+}
+.cosmic-vector-bars { display: grid; gap: 10px; }
+.cosmic-vector-bars > div {
+  display: grid;
+  grid-template-columns: 30px minmax(30px, 1fr) minmax(30px, 1fr) 34px;
+  align-items: center;
+  gap: 7px;
+  color: var(--page-muted);
+  font-size: 8px;
+}
+.cosmic-vector-bars i {
+  display: block;
+  width: var(--guess-size);
+  height: 8px;
+  background: var(--cosmic-accent);
+  font-style: normal;
+  transform-origin: left;
+}
+.cosmic-vector-bars i:nth-of-type(2) {
+  width: var(--target-size);
+  background: color-mix(in oklch, var(--cosmic-accent) 45%, var(--page-muted));
+}
+.cosmic-vector-bars > div[data-warm="true"] i { background: var(--cosmic-hot); }
+.cosmic-vector-bars small { font-size: 8px; text-align: right; }
+.cosmic-vectors > p {
+  display: flex;
+  margin: 18px 0 0;
+  align-items: center;
+  gap: 6px;
+  color: var(--page-muted);
+  font-size: 8px;
+}
+.cosmic-vectors > p span,
+.cosmic-vectors > p i { width: 14px; height: 4px; background: var(--cosmic-accent); }
+.cosmic-vectors > p i { margin-left: 6px; background: color-mix(in oklch, var(--cosmic-accent) 45%, var(--page-muted)); }
 .cosmic-angle { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.cosmic-angle svg { width: 100%; max-height: 140px; }
+.cosmic-angle svg { width: 100%; max-height: 130px; overflow: visible; }
 .cosmic-angle line,
 .cosmic-angle path { fill: none; stroke: var(--cosmic-accent); stroke-width: 2; }
+.cosmic-angle .cosmic-angle-target { stroke: var(--cosmic-hot); }
 .cosmic-angle circle { fill: var(--cosmic-hot); }
-.cosmic-angle text { fill: var(--page-fg); font-size: 14px; }
-.cosmic-angle strong { font-size: 10px; font-weight: 500; color: var(--page-muted); }
-.cosmic-projection .cosmic-field { height: 150px; }
+.cosmic-angle text { fill: var(--page-fg); font-size: 16px; }
+.cosmic-angle strong { color: var(--page-fg); font-size: 10px; font-weight: 500; }
+.cosmic-angle > span { margin-top: 5px; color: var(--page-muted); font-size: 8px; text-transform: uppercase; }
+.cosmic-projection .cosmic-field { height: 210px; }
 .cosmic-projection header { align-items: center; }
 .cosmic-projection p { margin: 0; color: var(--page-muted); font-size: 9px; line-height: 1.35; }
 
@@ -3145,23 +3194,109 @@ button {
   text-transform: uppercase;
 }
 .decyphr-system > header button { min-height: 30px; padding: 0 12px; }
-.decyphr-boundary { padding: 16px; }
-.decyphr-boundary > span { color: var(--dec-accent); font: 9px "SFMono-Regular", Consolas, monospace; text-transform: uppercase; }
-.decyphr-pipeline { display: grid; margin-top: 12px; grid-template-columns: repeat(5, 1fr); border-top: 1px solid var(--dec-ink); border-left: 1px solid var(--dec-ink); }
-.decyphr-pipeline > div {
-  display: flex;
-  min-height: 84px;
-  padding: 10px;
-  flex-direction: column;
-  justify-content: space-between;
-  border-right: 1px solid var(--dec-ink);
-  border-bottom: 1px solid var(--dec-ink);
-  color: var(--dec-muted);
+.decyphr-workflow-actions { display: flex; gap: 6px; }
+.decyphr-workflow-actions button:first-child {
+  background: transparent;
+  color: var(--dec-accent);
 }
-.decyphr-pipeline > div[data-active="true"] { background: color-mix(in oklch, var(--dec-accent) 10%, transparent); color: var(--dec-ink); }
-.decyphr-pipeline i { color: var(--dec-accent); font: 8px "SFMono-Regular", Consolas, monospace; font-style: normal; }
-.decyphr-pipeline strong { font-size: 11px; }
-.decyphr-boundary > p { max-width: 760px; margin: 14px 0 0; color: var(--dec-muted); font-size: 11px; line-height: 1.45; }
+.decyphr-workflow-canvas {
+  padding: 8px 16px 0;
+  overflow-x: auto;
+  border-bottom: 1px solid color-mix(in oklch, var(--dec-ink) 24%, transparent);
+}
+.decyphr-workflow-canvas svg {
+  display: block;
+  width: 100%;
+  min-width: 720px;
+  height: auto;
+}
+.decyphr-machine-boundary {
+  fill: color-mix(in oklch, var(--dec-accent) 5%, transparent);
+  stroke: color-mix(in oklch, var(--dec-ink) 56%, transparent);
+  stroke-dasharray: 4 5;
+}
+.decyphr-machine-label,
+.decyphr-status-label,
+.decyphr-node-detail {
+  fill: var(--dec-muted);
+  font: 9px "SFMono-Regular", Consolas, monospace;
+  letter-spacing: 0.04em;
+}
+.decyphr-workflow-paths path {
+  fill: none;
+  marker-end: url("#decyphr-arrow");
+  stroke: color-mix(in oklch, var(--dec-ink) 55%, transparent);
+  stroke-width: 1.5;
+}
+.decyphr-workflow-paths .decyphr-retry-path {
+  stroke: var(--dec-accent);
+  stroke-dasharray: 4 4;
+  opacity: 0.22;
+}
+.decyphr-workflow-paths .decyphr-retry-path[data-active="true"] {
+  opacity: 1;
+  stroke-width: 2.5;
+}
+.decyphr-workflow-paths .decyphr-status-path {
+  marker-end: none;
+  stroke: var(--dec-accent);
+  stroke-dasharray: 3 5;
+}
+.decyphr-workflow-node rect {
+  fill: var(--dec-paper);
+  stroke: var(--dec-ink);
+}
+.decyphr-workflow-node circle { fill: color-mix(in oklch, var(--dec-ink) 20%, transparent); }
+.decyphr-node-label {
+  fill: var(--dec-ink);
+  font: 650 11px "Geist Variable", Arial, sans-serif;
+}
+.decyphr-workflow-node[data-complete="true"] rect {
+  fill: color-mix(in oklch, var(--dec-accent) 8%, var(--dec-paper));
+}
+.decyphr-workflow-node[data-complete="true"] circle { fill: var(--dec-accent); }
+.decyphr-workflow-node[data-active="true"] rect {
+  fill: var(--dec-ink);
+  stroke: var(--dec-accent);
+  stroke-width: 2.5;
+}
+.decyphr-workflow-node[data-active="true"] :is(.decyphr-node-label, .decyphr-node-detail) {
+  fill: var(--dec-paper);
+}
+.decyphr-workflow-node[data-active="true"] circle {
+  fill: var(--dec-accent);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: decyphr-workflow-pulse 900ms ease-in-out infinite alternate;
+}
+.decyphr-workflow-caption {
+  display: flex;
+  min-height: 52px;
+  padding: 10px 16px;
+  align-items: center;
+  gap: 8px;
+  color: var(--dec-muted);
+  font: 8px "SFMono-Regular", Consolas, monospace;
+  text-transform: uppercase;
+}
+.decyphr-workflow-caption p {
+  margin: 0 auto 0 0;
+  color: var(--dec-muted);
+  font: 10px/1.4 "Geist Variable", Arial, sans-serif;
+  text-transform: none;
+}
+.decyphr-workflow-caption i,
+.decyphr-workflow-caption b {
+  width: 16px;
+  height: 4px;
+  background: var(--dec-ink);
+}
+.decyphr-workflow-caption b { background: var(--dec-accent); }
+
+@keyframes decyphr-workflow-pulse {
+  from { transform: scale(0.75); opacity: 0.5; }
+  to { transform: scale(1.3); opacity: 1; }
+}
 
 .decyphr-origin {
   display: grid;
@@ -3638,11 +3773,6 @@ button {
     border-bottom: 1px solid var(--page-border);
   }
 
-  .cosmic-system,
-  .decyphr-pipeline {
-    overflow-x: auto;
-  }
-
   .cosmic-experience {
     min-height: 0;
   }
@@ -3670,9 +3800,39 @@ button {
     min-height: 210px;
   }
 
-  .decyphr-pipeline {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    overflow-x: visible;
+  .cosmic-system > div {
+    border-right: 0;
+    border-bottom: 1px solid var(--page-border);
+  }
+
+  .cosmic-system > div:last-child { border-bottom: 0; }
+
+  .decyphr-system > header {
+    padding: 10px 12px;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .decyphr-workflow-actions {
+    width: 100%;
+  }
+
+  .decyphr-workflow-actions button {
+    flex: 1;
+  }
+
+  .decyphr-workflow-caption {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .decyphr-workflow-caption p {
+    width: 100%;
+  }
+
+  .detail-section[data-project="leharness"][data-section="origin"] h1 {
+    font-size: clamp(36px, 11vw, 48px);
   }
 
   .skills-system {
@@ -3843,6 +4003,10 @@ button {
   }
 
   .project-content {
+    animation: none;
+  }
+
+  .decyphr-workflow-node[data-active="true"] circle {
     animation: none;
   }
 

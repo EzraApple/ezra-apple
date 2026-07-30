@@ -1,15 +1,10 @@
 import { useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 
-type TerminalAccent = "amber" | "cyan" | "green" | "violet";
 type TerminalLine = {
   kind: "assistant" | "meta" | "tool" | "user";
   text: string;
 };
-
-const ACCENT_KEY = "ezra-apple:leharness-accent";
-const ACCENT_EVENT = "ezra-apple:leharness-accent-change";
-const ACCENTS: TerminalAccent[] = ["amber", "cyan", "green", "violet"];
 
 const SESSION_LINES: TerminalLine[] = [
   { kind: "user", text: "summarize this repo" },
@@ -37,30 +32,61 @@ const MILESTONES = [
   { date: "jun 10", label: "stable prompt input" },
 ] as const;
 
-function loadAccent(): TerminalAccent {
-  if (typeof window === "undefined") return "amber";
-  const saved = window.localStorage.getItem(ACCENT_KEY);
-  return ACCENTS.includes(saved as TerminalAccent)
-    ? (saved as TerminalAccent)
-    : "amber";
-}
+function responseFor(prompt: string): TerminalLine[] {
+  const normalized = prompt.toLowerCase();
 
-function saveAccent(accent: TerminalAccent) {
-  window.localStorage.setItem(ACCENT_KEY, accent);
-  window.dispatchEvent(new CustomEvent(ACCENT_EVENT, { detail: accent }));
-}
-
-function useTerminalAccent() {
-  const [accent, setAccent] = useState<TerminalAccent>(loadAccent);
-
-  useEffect(() => {
-    const onAccent = (event: Event) =>
-      setAccent((event as CustomEvent<TerminalAccent>).detail);
-    window.addEventListener(ACCENT_EVENT, onAccent);
-    return () => window.removeEventListener(ACCENT_EVENT, onAccent);
-  }, []);
-
-  return [accent, saveAccent] as const;
+  if (normalized === "/help") {
+    return [
+      { kind: "meta", text: "commands · /model /effort /mcp /help" },
+      { kind: "assistant", text: "Slash commands change the session; plain text runs a model turn." },
+    ];
+  }
+  if (normalized === "/model") {
+    return [{ kind: "meta", text: "provider · openai · alternates: deepseek, ollama" }];
+  }
+  if (normalized === "/effort") {
+    return [{ kind: "meta", text: "reasoning effort · high" }];
+  }
+  if (normalized === "/mcp") {
+    return [
+      { kind: "tool", text: "Load .leharness/mcp.json · completed" },
+      { kind: "meta", text: "MCP tools join the same registry as local tools." },
+    ];
+  }
+  if (/event|loop|runtime/.test(normalized)) {
+    return [
+      { kind: "tool", text: "Read session event log · 12 events" },
+      { kind: "assistant", text: "The parent loop stays small: project events, build context, call the model, execute tools, append the result." },
+    ];
+  }
+  if (/background|subagent|task/.test(normalized)) {
+    return [
+      { kind: "tool", text: "Inspect task projection · 2 durable handles" },
+      { kind: "assistant", text: "Long work returns a handle. Completion becomes an event that can wake the parent session later." },
+    ];
+  }
+  if (/compact|context|session/.test(normalized)) {
+    return [
+      { kind: "tool", text: "Project session from events · completed" },
+      { kind: "assistant", text: "Compaction can replace active context without replacing history; the append-only log remains canonical." },
+    ];
+  }
+  if (/tool|mcp/.test(normalized)) {
+    return [
+      { kind: "tool", text: "Inspect tool registry · bash, read, write, MCP" },
+      { kind: "assistant", text: "Tool calls and results enter the same event stream, so the transcript can always explain what ran." },
+    ];
+  }
+  if (/repo|architect|summar/.test(normalized)) {
+    return [
+      { kind: "tool", text: "List packages · harness, mcp, cli, tui" },
+      { kind: "assistant", text: "A channel-agnostic harness kernel sits below thin CLI and TUI products; sessions, tasks, and artifacts live on disk." },
+    ];
+  }
+  return [
+    { kind: "tool", text: "Read project boundary · completed" },
+    { kind: "assistant", text: "I’d trace the relevant events and tools first, then return the result with the evidence that produced it." },
+  ];
 }
 
 function TerminalLineView({ line }: { line: TerminalLine }) {
@@ -81,7 +107,6 @@ function TerminalLineView({ line }: { line: TerminalLine }) {
 
 export function LeHarnessScene() {
   const shouldReduceMotion = useReducedMotion() ?? false;
-  const [accent] = useTerminalAccent();
   const [visibleLines, setVisibleLines] = useState(
     shouldReduceMotion ? SESSION_LINES.length : 3,
   );
@@ -100,7 +125,7 @@ export function LeHarnessScene() {
   }, [shouldReduceMotion]);
 
   return (
-    <div className="lh-terminal lh-terminal-hero" data-accent={accent}>
+    <div className="lh-terminal lh-terminal-hero" data-accent="amber">
       <header>
         <span>lh · main</span>
         <span className="lh-status">openai · high</span>
@@ -119,7 +144,6 @@ export function LeHarnessScene() {
 }
 
 export function LeHarnessExperience() {
-  const [accent] = useTerminalAccent();
   const [input, setInput] = useState("");
   const [lines, setLines] = useState<TerminalLine[]>([
     { kind: "meta", text: "lh · session ready" },
@@ -138,31 +162,22 @@ export function LeHarnessExperience() {
     setInput("");
     setRunning(true);
     timer.current = window.setTimeout(() => {
-      setLines((current) => [
-        ...current,
-        { kind: "tool", text: "Read project context · completed" },
-        {
-          kind: "assistant",
-          text: `I’d start “${prompt.slice(0, 42)}${prompt.length > 42 ? "…" : ""}” by making the loop and its evidence explicit.`,
-        },
-      ]);
+      setLines((current) => [...current, ...responseFor(prompt)]);
       setRunning(false);
-    }, 650);
+    }, 420);
   };
 
   const chooseCommand = (command: string) => {
-    const message = {
-      "/model": "model switched · openai/gpt-5",
-      "/effort": "reasoning effort · high",
-      "/mcp": "MCP servers · project configuration loaded",
-      "/help": "commands · /model /effort /mcp /compact",
-    }[command] ?? command;
-    setLines((current) => [...current, { kind: "meta", text: message }]);
+    setLines((current) => [
+      ...current,
+      { kind: "user", text: command },
+      ...responseFor(command),
+    ]);
     setInput("");
   };
 
   return (
-    <div className="lh-terminal lh-experience" data-accent={accent}>
+    <div className="lh-terminal lh-experience" data-accent="amber">
       <header>
         <span>interactive session</span>
         <span>{running ? "running" : "ready"}</span>
@@ -207,7 +222,6 @@ export function LeHarnessExperience() {
 
 export function LeHarnessSystem() {
   const shouldReduceMotion = useReducedMotion() ?? false;
-  const [accent] = useTerminalAccent();
   const [eventCount, setEventCount] = useState<number>(EVENTS.length);
   const timer = useRef<number | undefined>(undefined);
 
@@ -229,7 +243,7 @@ export function LeHarnessSystem() {
   };
 
   return (
-    <div className="lh-system" data-accent={accent}>
+    <div className="lh-system" data-accent="amber">
       <div className="lh-loop">
         <span>one small loop</span>
         {["invocation", "project session", "model step", "execute tools"].map((step, index) => (
@@ -259,34 +273,18 @@ export function LeHarnessSystem() {
 }
 
 export function LeHarnessOrigin() {
-  const [accent, setAccent] = useTerminalAccent();
-
   return (
-    <div className="lh-origin" data-accent={accent}>
+    <div className="lh-origin" data-accent="amber">
       <div className="lh-motd">
         <span>leharness / motd</span>
         <pre aria-label="LeHarness wordmark">{`╭─ lh ─────────────────╮
-│ the machinery, open │
+│ keep the loop visible │
 ╰─────────────────────╯`}</pre>
         <p>
           I wanted to understand harness engineering by building the loop,
           event log, tools, background work, subagents, and compaction myself.
           The name came from a dream in Paris.
         </p>
-        <div aria-label="Terminal accent" className="lh-accent-picker" role="group">
-          {ACCENTS.map((option) => (
-            <button
-              aria-label={`${option} terminal accent`}
-              aria-pressed={accent === option}
-              data-accent={option}
-              key={option}
-              onClick={() => setAccent(option)}
-              type="button"
-            >
-              {option}
-            </button>
-          ))}
-        </div>
       </div>
       <ol className="lh-history">
         {MILESTONES.map((milestone) => (
