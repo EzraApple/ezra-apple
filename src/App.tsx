@@ -18,11 +18,35 @@ import {
   type AnimatedIconHandle,
 } from "./animated-icons";
 import { projectsQueryOptions } from "./projects-query";
+import {
+  CosmicHotPotatoExperience,
+  CosmicHotPotatoOrigin,
+  CosmicHotPotatoScene,
+  CosmicHotPotatoSystem,
+} from "./project-detail/CosmicHotPotatoPage";
+import {
+  DecyphrExperience,
+  DecyphrOrigin,
+  DecyphrScene,
+  DecyphrSystem,
+} from "./project-detail/DecyphrPage";
+import {
+  LeHarnessExperience,
+  LeHarnessOrigin,
+  LeHarnessScene,
+  LeHarnessSystem,
+} from "./project-detail/LeHarnessPage";
 import { MorphingProjectDetail, type MorphSection } from "./project-detail/MorphingProjectDetail";
 import { ShoutOutHoldToTalk } from "./project-detail/ShoutOutHoldToTalk";
 import { ShoutOutOrigin } from "./project-detail/ShoutOutOrigin";
 import { ShoutOutPipeline } from "./project-detail/ShoutOutPipeline";
 import { ShoutOutScene } from "./project-detail/ShoutOutScene";
+import {
+  SkillsInitExperience,
+  SkillsInitOrigin,
+  SkillsInitScene,
+  SkillsInitSystem,
+} from "./project-detail/SkillsInitPage";
 import { SpatiumDrag } from "./project-detail/SpatiumDrag";
 import { SpatiumOriginBand } from "./project-detail/SpatiumOriginBand";
 import { SpatiumScene } from "./project-detail/SpatiumScene";
@@ -70,6 +94,14 @@ function readDetailSection(): DetailSection | null {
 }
 
 const DEFAULT_TITLE = "Ezra Apple — Software Engineer";
+const BESPOKE_PROJECTS = new Set([
+  "shoutout",
+  "spatium",
+  "leharness",
+  "cosmic-hot-potato",
+  "decyphr",
+  "skills-init",
+]);
 
 // One abstract micro-mark per project: a single-stroke glyph drawn from
 // what the thing is, sharing one grid and stroke weight so the set reads
@@ -840,24 +872,85 @@ function ProjectCatalog({
 }
 
 function ProjectArtifactVisual({ project }: { project: ProjectDetail }) {
-  if (project.slug === "shoutout") {
-    return <ShoutOutScene />;
-  }
-  if (project.slug === "spatium") {
-    return <SpatiumScene />;
-  }
-
-  return (
-    <div className="detail-artifact" aria-hidden="true">
-      <span>{project.artifact.label}</span>
-      {project.artifact.items.map((item) => (
-        <div key={`${item.label}-${item.detail}`}>
-          <strong>{item.label}</strong>
-          <small>{item.detail}</small>
+  switch (project.slug) {
+    case "shoutout":
+      return <ShoutOutScene />;
+    case "spatium":
+      return <SpatiumScene />;
+    case "leharness":
+      return <LeHarnessScene />;
+    case "cosmic-hot-potato":
+      return <CosmicHotPotatoScene />;
+    case "decyphr":
+      return <DecyphrScene />;
+    case "skills-init":
+      return <SkillsInitScene />;
+    default:
+      return (
+        <div className="detail-artifact" aria-hidden="true">
+          <span>{project.artifact.label}</span>
+          {project.artifact.items.map((item) => (
+            <div key={`${item.label}-${item.detail}`}>
+              <strong>{item.label}</strong>
+              <small>{item.detail}</small>
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
-  );
+      );
+  }
+}
+
+function ProjectSystemVisual({ project }: { project: ProjectDetail }) {
+  switch (project.slug) {
+    case "shoutout":
+      return <ShoutOutPipeline />;
+    case "spatium":
+      return <SpatiumSync />;
+    case "leharness":
+      return <LeHarnessSystem />;
+    case "cosmic-hot-potato":
+      return <CosmicHotPotatoSystem />;
+    case "decyphr":
+      return <DecyphrSystem />;
+    case "skills-init":
+      return <SkillsInitSystem />;
+    default:
+      return (
+        <div className="system-flow">
+          {project.depth.system.flow.map((step, index) => (
+            <div key={step}>
+              <span>{formatIndex(index)}</span>
+              <strong>{step}</strong>
+            </div>
+          ))}
+        </div>
+      );
+  }
+}
+
+function ProjectNarrativeVisual({
+  project,
+  section,
+}: {
+  project: ProjectDetail;
+  section: "experience" | "origin";
+}) {
+  switch (project.slug) {
+    case "shoutout":
+      return section === "experience" ? <ShoutOutHoldToTalk /> : <ShoutOutOrigin />;
+    case "spatium":
+      return section === "experience" ? <SpatiumDrag /> : <SpatiumOriginBand />;
+    case "leharness":
+      return section === "experience" ? <LeHarnessExperience /> : <LeHarnessOrigin />;
+    case "cosmic-hot-potato":
+      return section === "experience" ? <CosmicHotPotatoExperience /> : <CosmicHotPotatoOrigin />;
+    case "decyphr":
+      return section === "experience" ? <DecyphrExperience /> : <DecyphrOrigin />;
+    case "skills-init":
+      return section === "experience" ? <SkillsInitExperience /> : <SkillsInitOrigin />;
+    default:
+      return null;
+  }
 }
 
 function ProjectDetailView({
@@ -1039,20 +1132,10 @@ function ProjectDetailView({
           if (activeSection === "system") {
             const system = project.depth.system;
             return (
-              <article className="detail-section">
+              <article className="detail-section" data-project={project.slug} data-section="system">
                 <h1>{system.headline}</h1>
                 <p className="detail-section-intro">{system.body}</p>
-                {project.slug === "shoutout" ? (
-                  <ShoutOutPipeline />
-                ) : project.slug === "spatium" ? (
-                  <SpatiumSync />
-                ) : (
-                  <div className="system-flow">
-                    {system.flow.map((step, index) => (
-                      <div key={step}><span>{formatIndex(index)}</span><strong>{step}</strong></div>
-                    ))}
-                  </div>
-                )}
+                <ProjectSystemVisual project={project} />
                 <div className="decision-list">
                   {project.depth.decisions.map((decision) => (
                     <div key={decision.title}>
@@ -1082,10 +1165,10 @@ function ProjectDetailView({
                   </a>
                 ));
           return (
-            <article className="detail-section">
+            <article className="detail-section" data-project={project.slug} data-section={activeSection}>
               <h1>{narrative.headline}</h1>
               <p className="detail-section-intro">{narrative.body}</p>
-              {project.slug === "shoutout" || project.slug === "spatium" ? (
+              {BESPOKE_PROJECTS.has(project.slug) ? (
                 <>
                   <p className="narrative-inline">
                     {narrative.highlights.map((item, index) => (
@@ -1095,17 +1178,7 @@ function ProjectDetailView({
                       </span>
                     ))}
                   </p>
-                  {project.slug === "shoutout" ? (
-                    activeSection === "experience" ? (
-                      <ShoutOutHoldToTalk />
-                    ) : (
-                      <ShoutOutOrigin />
-                    )
-                  ) : activeSection === "experience" ? (
-                    <SpatiumDrag />
-                  ) : (
-                    <SpatiumOriginBand />
-                  )}
+                  <ProjectNarrativeVisual project={project} section={activeSection} />
                 </>
               ) : (
                 <div className="narrative-grid">
