@@ -14,7 +14,7 @@ export const cosmicHotPotato = defineProject({
   links: [
     {
       kind: "product",
-      label: "Play the game",
+      label: "Play it",
       href: "https://cosmic-hot-potato.vercel.app/",
     },
   ],
@@ -69,7 +69,7 @@ export const cosmicHotPotato = defineProject({
     },
     proof: [
       {
-        label: "Playable product",
+        label: "Play it",
         note: "The live daily word game and its public explanation of the map math.",
         href: "https://cosmic-hot-potato.vercel.app/",
       },
