@@ -227,6 +227,7 @@ export function DecyphrSystem() {
 
   const activeNode = sequence[activeStep];
   const completed = new Set(sequence.slice(0, activeStep));
+  const workflowComplete = activeStep === sequence.length - 1;
   const retrying = sequence === RETRY_WORKFLOW && activeStep >= 4 && activeStep <= 5;
   const nodes: { id: WorkflowNode; label: string; detail: string; x: number; y: number; width: number }[] = [
     { id: "web", label: "WEB APP", detail: "upload + status", x: 18, y: 116, width: 140 },
@@ -283,11 +284,37 @@ export function DecyphrSystem() {
           ))}
         </svg>
       </div>
+      <ol className="decyphr-mobile-workflow" aria-label="Decyphr workflow states">
+        {nodes.map((node) => (
+          <li
+            data-active={activeNode === node.id}
+            data-complete={completed.has(node.id)}
+            key={node.id}
+          >
+            <i />
+            <span>
+              <strong>{node.label}</strong>
+              <small>{node.detail}</small>
+            </span>
+            <em>
+              {activeNode === node.id
+                ? workflowComplete
+                  ? "done"
+                  : retrying
+                  ? "retrying"
+                  : "running"
+                : completed.has(node.id)
+                  ? "done"
+                  : "queued"}
+            </em>
+          </li>
+        ))}
+      </ol>
       <div className="decyphr-workflow-caption">
         <p aria-live="polite">
           {retrying
             ? "The job is still the same job: Step Functions waits, retries dubbing, and keeps web status current."
-            : `${activeNode} · ${activeStep === sequence.length - 1 ? "workflow complete" : "state persisted"}`}
+            : `${activeNode} · ${workflowComplete ? "workflow complete" : "state persisted"}`}
         </p>
         <span>product state</span><i /> <span>durable media work</span><b />
       </div>

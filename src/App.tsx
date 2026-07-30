@@ -1055,7 +1055,23 @@ function ProjectDetailView({
     const syncRoute = () => {
       didPushSection.current = false;
       const nextSection = readDetailSection();
-      setSection(nextSection);
+      setSection((previousSection) => {
+        window.clearTimeout(focusTimer.current);
+        if (previousSection && !nextSection) {
+          focusTimer.current = window.setTimeout(() => {
+            document
+              .querySelector<HTMLElement>(
+                `.detail-paths button[data-section="${previousSection}"]`,
+              )
+              ?.focus({ preventScroll: true });
+          }, 620);
+        } else if (!previousSection && nextSection) {
+          focusTimer.current = window.setTimeout(() => {
+            backButtonRef.current?.focus({ preventScroll: true });
+          }, 40);
+        }
+        return nextSection;
+      });
       if (nextSection) {
         const index = DETAIL_PATHS.findIndex((path) => path.id === nextSection);
         if (index >= 0) setSectionCursor(index);

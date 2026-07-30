@@ -12,6 +12,7 @@ type SceneMode = "2d" | "3d";
 type Guess = {
   rank: number;
   similarity: number;
+  vector: readonly [number, number, number, number];
   word: string;
   x: number;
   y: number;
@@ -30,6 +31,7 @@ type SourcePosition = {
 };
 
 const WORD_COUNT = 317_000;
+const TARGET_VECTOR = [-0.04905, -0.004064, -0.09455, -0.150631] as const;
 
 // Mirrors Cosmic Hot Potato's answer-relative public-puzzle transform.
 function spiralPosition({ rank, x, y, z }: SourcePosition) {
@@ -53,19 +55,19 @@ function spiralPosition({ rank, x, y, z }: SourcePosition) {
 // GloVe dataset and deterministic UMAP projection. The public game then bends
 // those positions around the answer with spiralPosition.
 const SOURCE_GUESS_POCKET = [
-  { word: "song", rank: 14, similarity: 0.7985, x: -0.066, y: -0.002, z: -0.462 },
-  { word: "concert", rank: 18, similarity: 0.7768, x: -0.074, y: -0.052, z: -0.438 },
-  { word: "artist", rank: 20, similarity: 0.7755, x: -0.077, y: -0.021, z: -0.422 },
-  { word: "sound", rank: 38, similarity: 0.7472, x: -0.124, y: 0.038, z: -0.465 },
-  { word: "piano", rank: 40, similarity: 0.7451, x: -0.059, y: -0.047, z: -0.531 },
-  { word: "video", rank: 85, similarity: 0.6985, x: -0.045, y: 0.058, z: -0.307 },
-  { word: "language", rank: 281, similarity: 0.6007, x: -0.164, y: -0.017, z: -0.239 },
-  { word: "game", rank: 1434, similarity: 0.4584, x: 0.161, y: 0.096, z: 0.315 },
-  { word: "city", rank: 2117, similarity: 0.4159, x: 0.194, y: 0.182, z: -0.108 },
-  { word: "planet", rank: 7009, similarity: 0.259, x: 0.233, y: 0.255, z: -0.059 },
-  { word: "river", rank: 6543, similarity: 0.2708, x: 0.251, y: 0.348, z: -0.168 },
-  { word: "potato", rank: 15860, similarity: 0.1068, x: 0.2, y: 0.579, z: -0.38 },
-];
+  { word: "song", rank: 14, similarity: 0.7985, vector: [0.037501, -0.016131, -0.151715, -0.19509], x: -0.066, y: -0.002, z: -0.462 },
+  { word: "concert", rank: 18, similarity: 0.7768, vector: [0.109725, -0.136127, 0.081776, -0.232143], x: -0.074, y: -0.052, z: -0.438 },
+  { word: "artist", rank: 20, similarity: 0.7755, vector: [-0.099458, -0.009147, -0.245328, -0.00662], x: -0.077, y: -0.021, z: -0.422 },
+  { word: "sound", rank: 38, similarity: 0.7472, vector: [-0.027245, -0.066951, -0.129272, -0.071811], x: -0.124, y: 0.038, z: -0.465 },
+  { word: "piano", rank: 40, similarity: 0.7451, vector: [0.117592, 0.016717, -0.145815, -0.068143], x: -0.059, y: -0.047, z: -0.531 },
+  { word: "video", rank: 85, similarity: 0.6985, vector: [-0.193866, -0.064918, -0.075575, -0.174791], x: -0.045, y: 0.058, z: -0.307 },
+  { word: "language", rank: 281, similarity: 0.6007, vector: [-0.170217, 0.113254, -0.171971, 0.034757], x: -0.164, y: -0.017, z: -0.239 },
+  { word: "game", rank: 1434, similarity: 0.4584, vector: [0.009276, -0.317685, 0.172208, -0.159593], x: 0.161, y: 0.096, z: 0.315 },
+  { word: "city", rank: 2117, similarity: 0.4159, vector: [0.002883, -0.154113, 0.08802, 0.04185], x: 0.194, y: 0.182, z: -0.108 },
+  { word: "planet", rank: 7009, similarity: 0.259, vector: [-0.079254, -0.287728, -0.110071, 0.059413], x: 0.233, y: 0.255, z: -0.059 },
+  { word: "river", rank: 6543, similarity: 0.2708, vector: [0.108157, -0.102755, -0.085407, 0.008535], x: 0.251, y: 0.348, z: -0.168 },
+  { word: "potato", rank: 15860, similarity: 0.1068, vector: [-0.140154, 0.004303, -0.039745, -0.182433], x: 0.2, y: 0.579, z: -0.38 },
+] as const;
 
 const GUESS_POCKET: Guess[] = SOURCE_GUESS_POCKET.map((guess) => ({
   ...guess,
@@ -505,7 +507,7 @@ export function CosmicHotPotatoExperience() {
     <div className="cosmic-experience cosmic-game-shell">
       <div className="cosmic-game-map">
         <SemanticField focusNonce={focusNonce} guesses={guesses} interactive labelled />
-        <span className="cosmic-map-math">drag to orbit · scroll to inspect depth</span>
+        <span className="cosmic-map-math">drag to orbit · switch 2D / 3D</span>
       </div>
       <CosmicGamePanel
         guesses={guesses}
@@ -528,10 +530,10 @@ export function CosmicHotPotatoSystem() {
   const [selectedWord, setSelectedWord] = useState("song");
   const selected = GUESS_POCKET.find((guess) => guess.word === selectedWord) ?? GUESS_POCKET[0];
   const dimensions = [
-    { label: "d07", guess: selected.x, target: -0.08 },
-    { label: "d18", guess: selected.y, target: -0.01 },
-    { label: "d31", guess: selected.z, target: -0.49 },
-    { label: "rest", guess: selected.similarity, target: 1 },
+    { label: "d07", guess: selected.vector[0], target: TARGET_VECTOR[0] },
+    { label: "d18", guess: selected.vector[1], target: TARGET_VECTOR[1] },
+    { label: "d31", guess: selected.vector[2], target: TARGET_VECTOR[2] },
+    { label: "d42", guess: selected.vector[3], target: TARGET_VECTOR[3] },
   ];
   const angle = Math.acos(selected.similarity);
   const endpoint = {
