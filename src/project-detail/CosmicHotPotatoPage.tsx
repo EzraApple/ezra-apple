@@ -123,7 +123,7 @@ function SemanticField({
 
 export function CosmicHotPotatoScene() {
   const shouldReduceMotion = useReducedMotion() ?? false;
-  const [guessCount, setGuessCount] = useState(shouldReduceMotion ? 4 : 1);
+  const [guessCount, setGuessCount] = useState(shouldReduceMotion ? 4 : 2);
   const [mode] = useSceneMode();
 
   useEffect(() => {
@@ -132,8 +132,8 @@ export function CosmicHotPotatoScene() {
       return;
     }
     const timer = window.setInterval(
-      () => setGuessCount((count) => (count >= 4 ? 1 : count + 1)),
-      1200,
+      () => setGuessCount((count) => Math.min(count + 1, 4)),
+      720,
     );
     return () => window.clearInterval(timer);
   }, [shouldReduceMotion]);
@@ -147,7 +147,7 @@ export function CosmicHotPotatoScene() {
       <SemanticField guesses={GUESS_POCKET.slice(0, guessCount)} />
       <footer>
         <span>target · hidden</span>
-        <span>{guessCount} guesses plotted</span>
+        <span>{guessCount} {guessCount === 1 ? "guess" : "guesses"} plotted</span>
       </footer>
     </div>
   );
@@ -193,13 +193,20 @@ export function CosmicHotPotatoExperience() {
           <strong>{guesses.length}</strong>
         </header>
         <ol>
-          {[...guesses].reverse().map((guess, index) => (
-            <li key={guess.word}>
-              <span>{String(guesses.length - index).padStart(2, "0")}</span>
-              <strong>{guess.word}</strong>
-              <i>{guess.similarity.toFixed(4)}</i>
+          {guesses.length === 0 ? (
+            <li className="cosmic-empty">
+              <strong>make your first jump</strong>
+              <span>song · piano · city · potato</span>
             </li>
-          ))}
+          ) : (
+            [...guesses].reverse().map((guess, index) => (
+              <li key={guess.word}>
+                <span>{String(guesses.length - index).padStart(2, "0")}</span>
+                <strong>{guess.word}</strong>
+                <i>{guess.similarity.toFixed(4)}</i>
+              </li>
+            ))
+          )}
         </ol>
         <p aria-live="polite">{message}</p>
         <form onSubmit={submit}>

@@ -131,7 +131,12 @@ export function SkillsInitExperience() {
             <p><strong>portable context ready.</strong></p>
           </>
         ) : (
-          <p className="skills-terminal-placeholder">run the command to see every planned write.</p>
+          <div className="skills-terminal-placeholder">
+            <p>$ {command}</p>
+            <p><i>preview</i> .agents/skills ← core</p>
+            <p><i>expose</i> 4 harness views</p>
+            <p>run to verify every planned write.</p>
+          </div>
         )}
       </div>
     </div>

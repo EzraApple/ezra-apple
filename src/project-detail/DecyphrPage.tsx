@@ -72,7 +72,11 @@ function LanguagePicker({ compact = false }: { compact?: boolean }) {
   );
 }
 
-function TranslationCard() {
+function TranslationCard({
+  state = "ready",
+}: {
+  state?: "processing" | "ready" | "source";
+}) {
   const [language] = useLanguage();
   const selected = LANGUAGES.find((option) => option.id === language) ?? LANGUAGES[0];
   return (
@@ -82,24 +86,53 @@ function TranslationCard() {
         <p>One video can speak to more than one audience.</p>
       </div>
       <i aria-hidden="true">↓</i>
-      <div className="decyphr-translated" key={selected.id}>
-        <span>Translated · {selected.id}</span>
-        <p dir={selected.dir} lang={selected.lang}>{selected.text}</p>
+      <div
+        className="decyphr-translated"
+        data-state={state}
+        key={`${selected.id}-${state}`}
+      >
+        <span>{state === "ready" ? "Translated" : "Output"} · {selected.id}</span>
+        {state === "ready" ? (
+          <p dir={selected.dir} lang={selected.lang}>{selected.text}</p>
+        ) : (
+          <p>
+            {state === "processing"
+              ? "Preserving voice, timing, and delivery…"
+              : "Choose a language, then localize the source."}
+          </p>
+        )}
       </div>
     </div>
   );
 }
 
 export function DecyphrScene() {
+  const shouldReduceMotion = useReducedMotion() ?? false;
+  const [stage, setStage] = useState(shouldReduceMotion ? 2 : 0);
+
+  useEffect(() => {
+    if (shouldReduceMotion) {
+      setStage(2);
+      return;
+    }
+    const timer = window.setInterval(
+      () => setStage((current) => Math.min(current + 1, 2)),
+      720,
+    );
+    return () => window.clearInterval(timer);
+  }, [shouldReduceMotion]);
+
   return (
     <div className="decyphr-scene">
       <header>
         <span>Product launch.mp4</span>
-        <span className="decyphr-processing"><i /> Processing</span>
+        <span className="decyphr-processing" data-ready={stage === 2}>
+          <i /> {stage === 2 ? "Ready" : stage === 1 ? "Processing" : "Queued"}
+        </span>
       </header>
       <div className="decyphr-video">
         <span className="decyphr-play">▶</span>
-        <TranslationCard />
+        <TranslationCard state={stage === 2 ? "ready" : stage === 1 ? "processing" : "source"} />
       </div>
       <LanguagePicker compact />
     </div>
@@ -114,6 +147,11 @@ export function DecyphrExperience() {
   const timer = useRef<number | undefined>(undefined);
 
   useEffect(() => () => window.clearInterval(timer.current), []);
+  useEffect(() => {
+    window.clearInterval(timer.current);
+    setActiveStep(-1);
+    setStatus("Choose a language, then localize the source.");
+  }, [language]);
 
   const run = () => {
     window.clearInterval(timer.current);
@@ -143,7 +181,9 @@ export function DecyphrExperience() {
           <span>Product launch.mp4</span>
           <i>English · 1080p</i>
         </div>
-        <TranslationCard />
+        <TranslationCard
+          state={activeStep === 3 ? "ready" : activeStep >= 0 ? "processing" : "source"}
+        />
       </div>
       <div className="decyphr-job">
         <span>Target language</span>

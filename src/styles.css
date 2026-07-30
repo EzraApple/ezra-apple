@@ -902,14 +902,28 @@ button {
 }
 
 .detail-topbar button {
+  position: relative;
   padding: 10px 0;
   border: 0;
   background: transparent;
   color: inherit;
   cursor: pointer;
 }
+.detail-topbar button::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, 44px);
+  height: 44px;
+  transform: translate(-50%, -50%);
+  content: "";
+}
 
 .detail-topbar button:hover { color: var(--page-accent); }
+.detail-topbar button:focus-visible {
+  outline: 1px solid var(--page-accent);
+  outline-offset: 3px;
+}
 
 .detail-stage {
   display: flex;
@@ -2542,7 +2556,7 @@ button {
   [data-project="decyphr"],
   [data-project="skills-init"]
 ) h1 {
-  font-size: clamp(46px, 5.4vw, 78px);
+  font-size: clamp(44px, 4.9vw, 72px);
 }
 
 .detail-section:is(
@@ -2844,6 +2858,7 @@ button {
   border: 1px solid var(--page-border);
 }
 .cosmic-mode-toggle button {
+  position: relative;
   min-height: 28px;
   padding: 0 9px;
   border: 0;
@@ -2852,6 +2867,17 @@ button {
   color: var(--page-muted);
   cursor: pointer;
   font: 9px "SFMono-Regular", Consolas, monospace;
+}
+.cosmic-mode-toggle button::before,
+.decyphr-language-picker button::before,
+.skills-mode-toggle button::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+  content: "";
 }
 .cosmic-mode-toggle button:last-child { border-right: 0; }
 .cosmic-mode-toggle button[aria-pressed="true"] { background: var(--cosmic-accent); color: var(--page-bg); }
@@ -2887,6 +2913,24 @@ button {
 }
 .cosmic-console li span { color: var(--page-muted); }
 .cosmic-console li i { color: var(--cosmic-accent); font-style: normal; }
+.cosmic-console .cosmic-empty {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 8px;
+  border-bottom: 0;
+}
+.cosmic-console .cosmic-empty strong {
+  color: var(--page-fg);
+  font-size: 11px;
+  font-weight: 500;
+}
+.cosmic-console .cosmic-empty span {
+  color: var(--cosmic-accent);
+  font-size: 9px;
+}
 .cosmic-console > p { min-height: 30px; margin: 0; padding: 8px 12px; color: var(--page-muted); font-size: 9px; }
 .cosmic-console form {
   display: grid;
@@ -2896,7 +2940,7 @@ button {
   border-top: 1px solid var(--page-border);
 }
 .cosmic-console form label { padding-left: 12px; color: var(--cosmic-accent); font-size: 9px; }
-.cosmic-console input { min-width: 0; padding: 0 10px; border: 0; outline: 0; background: transparent; color: var(--page-fg); }
+.cosmic-console input { min-width: 0; height: 100%; padding: 0 10px; border: 0; outline: 0; background: transparent; color: var(--page-fg); }
 .cosmic-console form button {
   align-self: stretch;
   padding: 0 14px;
@@ -2918,13 +2962,13 @@ button {
 .cosmic-system > div { min-width: 0; padding: 14px; border-right: 1px solid var(--page-border); }
 .cosmic-system > div:last-child { border-right: 0; }
 .cosmic-vectors header,
-.cosmic-projection header { color: var(--cosmic-accent); font-size: 9px; text-transform: uppercase; }
+.cosmic-projection header { color: var(--cosmic-accent); font-size: 10px; text-transform: uppercase; }
 .cosmic-vectors > div {
   display: grid;
   margin-top: 12px;
   grid-template-columns: 46px repeat(6, 1fr);
   color: var(--page-muted);
-  font-size: 8px;
+  font-size: 9px;
 }
 .cosmic-vectors i { font-style: normal; }
 .cosmic-angle { display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -2933,10 +2977,10 @@ button {
 .cosmic-angle path { fill: none; stroke: var(--cosmic-accent); stroke-width: 2; }
 .cosmic-angle circle { fill: var(--cosmic-hot); }
 .cosmic-angle text { fill: var(--page-fg); font-size: 14px; }
-.cosmic-angle strong { font-size: 9px; font-weight: 500; color: var(--page-muted); }
+.cosmic-angle strong { font-size: 10px; font-weight: 500; color: var(--page-muted); }
 .cosmic-projection .cosmic-field { height: 150px; }
 .cosmic-projection header { align-items: center; }
-.cosmic-projection p { margin: 0; color: var(--page-muted); font-size: 8px; }
+.cosmic-projection p { margin: 0; color: var(--page-muted); font-size: 9px; line-height: 1.35; }
 
 .cosmic-origin {
   display: grid;
@@ -2989,6 +3033,7 @@ button {
   text-transform: uppercase;
 }
 .decyphr-processing { display: inline-flex; align-items: center; gap: 7px; color: var(--dec-paper-deep); }
+.decyphr-processing[data-ready="true"] { color: var(--dec-paper); }
 .decyphr-processing i { width: 7px; height: 7px; border-radius: 50%; background: var(--dec-accent); }
 .decyphr-video {
   display: grid;
@@ -3007,9 +3052,19 @@ button {
 .decyphr-translation-card p { margin: 7px 0 0; color: var(--dec-paper); font-size: 12px; line-height: 1.35; }
 .decyphr-translation-card > i { display: block; height: 20px; color: var(--dec-accent); font-style: normal; line-height: 20px; text-align: center; }
 .decyphr-translated { will-change: transform, opacity; }
+.decyphr-translated[data-state="source"],
+.decyphr-translated[data-state="processing"] {
+  border-style: dashed;
+  background: color-mix(in oklch, var(--dec-ink) 68%, transparent);
+}
+.decyphr-translated[data-state="source"] p,
+.decyphr-translated[data-state="processing"] p {
+  color: color-mix(in oklch, var(--dec-paper) 68%, transparent);
+}
 .decyphr-language-picker { display: flex; gap: 6px; flex-wrap: wrap; }
 .decyphr-language-picker[data-compact="true"] { padding: 10px 12px; border-top: 1px solid color-mix(in oklch, var(--dec-paper) 18%, transparent); }
 .decyphr-language-picker button {
+  position: relative;
   min-height: 32px;
   padding: 0 10px;
   border: 1px solid currentColor;
@@ -3181,6 +3236,7 @@ button {
 
 .skills-mode-toggle { display: flex; gap: 6px; }
 .skills-mode-toggle button {
+  position: relative;
   min-height: 32px;
   padding: 0 10px;
   border: 1px solid var(--skills-line);
@@ -3219,7 +3275,12 @@ button {
 .skills-terminal-output p { margin: 9px 0; color: var(--page-muted); font-size: 9px; }
 .skills-terminal-output p i { color: var(--skills-accent); font-style: normal; }
 .skills-terminal-output p strong { color: var(--page-fg); }
-.skills-terminal-placeholder { padding-top: 34px; }
+.skills-terminal-placeholder { padding-top: 18px; }
+.skills-terminal-placeholder p:first-child {
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--skills-line);
+  color: var(--page-fg);
+}
 
 .skills-system {
   display: grid;
@@ -3470,13 +3531,32 @@ button {
   }
 
   .detail-hero[data-project="leharness"] .lh-terminal {
-    min-height: 104px;
-    height: 104px;
+    min-height: 154px;
+    height: 154px;
   }
 
-  .detail-hero[data-project="leharness"] .lh-transcript p:not(:last-child),
   .detail-hero[data-project="leharness"] .lh-accent-picker {
     display: none;
+  }
+
+  .detail-hero[data-project="leharness"] .lh-transcript {
+    padding: 7px 2px;
+    gap: 5px;
+  }
+
+  .detail-hero[data-project="leharness"] .lh-line {
+    display: none;
+    font-size: 9px;
+    line-height: 1.3;
+  }
+
+  .detail-hero[data-project="leharness"] .lh-line:first-child,
+  .detail-hero[data-project="leharness"] .lh-line:nth-last-child(2) {
+    display: grid;
+  }
+
+  .detail-hero[data-project="leharness"] .lh-prompt {
+    min-height: 34px;
   }
 
   .detail-hero[data-project="skills-init"] .skills-tree {
@@ -3563,6 +3643,28 @@ button {
     overflow-x: auto;
   }
 
+  .cosmic-experience {
+    min-height: 0;
+  }
+
+  .lh-experience {
+    min-height: 170px;
+  }
+
+  .cosmic-experience .cosmic-console {
+    min-height: 220px;
+    order: -1;
+    border-bottom: 1px solid var(--page-border);
+  }
+
+  .cosmic-experience .cosmic-console ol {
+    min-height: 70px;
+  }
+
+  .cosmic-experience .cosmic-map-panel {
+    border-bottom: 0;
+  }
+
   .cosmic-vector-pocket,
   .cosmic-projection {
     min-height: 210px;
@@ -3595,6 +3697,67 @@ button {
   .skills-system,
   .skills-origin {
     margin-top: 34px;
+  }
+
+  .detail-section:is(
+    [data-project="leharness"],
+    [data-project="cosmic-hot-potato"],
+    [data-project="decyphr"],
+    [data-project="skills-init"]
+  )[data-section="experience"] {
+    padding-top: 42px;
+  }
+
+  .detail-section:is(
+    [data-project="leharness"],
+    [data-project="cosmic-hot-potato"],
+    [data-project="decyphr"],
+    [data-project="skills-init"]
+  )[data-section="experience"] h1 {
+    font-size: clamp(38px, 11.8vw, 50px);
+    line-height: 0.96;
+  }
+
+  .detail-section:is(
+    [data-project="leharness"],
+    [data-project="cosmic-hot-potato"],
+    [data-project="decyphr"],
+    [data-project="skills-init"]
+  )[data-section="experience"] .detail-section-intro {
+    margin-top: 14px;
+    color: color-mix(in oklch, var(--page-muted) 78%, var(--page-fg));
+    font-size: 16px;
+    line-height: 1.25;
+  }
+
+  .detail-section:is(
+    [data-project="leharness"],
+    [data-project="cosmic-hot-potato"],
+    [data-project="decyphr"],
+    [data-project="skills-init"]
+  )[data-section="experience"] .narrative-inline {
+    display: none;
+  }
+
+  .detail-section:is(
+    [data-project="leharness"],
+    [data-project="cosmic-hot-potato"],
+    [data-project="decyphr"],
+    [data-project="skills-init"]
+  )[data-section="experience"] :is(
+    .lh-experience,
+    .cosmic-experience,
+    .decyphr-experience,
+    .skills-experience
+  ) {
+    flex-shrink: 0;
+    margin-top: 20px;
+  }
+
+  .detail-section[data-project="cosmic-hot-potato"] .cosmic-mode-toggle button,
+  .detail-section[data-project="decyphr"] .decyphr-language-picker button,
+  .detail-section[data-project="skills-init"] .skills-mode-toggle button {
+    min-height: 36px;
   }
 
   .signal-art { display: none; }
