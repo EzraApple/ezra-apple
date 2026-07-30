@@ -2767,31 +2767,143 @@ button {
 .lh-event-log li span { color: var(--lh-dim); }
 
 .lh-origin {
-  display: grid;
   width: min(1080px, 100%);
   margin: clamp(22px, 4vh, 40px) auto 0;
-  grid-template-columns: 1.1fr 0.9fr;
+  overflow: hidden;
   border: 1px solid var(--page-border);
   background: color-mix(in oklch, var(--page-bg) 88%, #050607);
 }
-.lh-motd { padding: clamp(22px, 3vw, 38px); border-right: 1px solid var(--page-border); }
-.lh-motd > span { color: var(--lh-accent); font-size: 9px; text-transform: uppercase; }
-.lh-motd pre {
-  margin: 22px 0;
-  color: var(--lh-accent);
-  font: 700 clamp(12px, 1.5vw, 18px)/1.45 "JetBrains Mono Variable", monospace;
-}
-.lh-motd p { max-width: 600px; color: var(--page-muted); font-size: 13px; line-height: 1.55; }
-.lh-history { margin: 0; padding: 20px; list-style: none; }
-.lh-history li {
-  display: grid;
-  min-height: 50px;
-  grid-template-columns: 64px 1fr;
+.lh-origin > header,
+.lh-origin > footer {
+  display: flex;
+  min-height: 38px;
+  padding: 0 16px;
   align-items: center;
-  border-bottom: 1px solid var(--page-border);
+  justify-content: space-between;
+  color: var(--lh-dim);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.lh-origin > header { border-bottom: 1px solid var(--page-border); }
+.lh-origin > header span:first-child,
+.lh-origin > footer strong { color: var(--lh-accent); }
+.lh-origin-story {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.75fr);
+}
+.lh-origin-turn,
+.lh-origin-principle {
+  min-width: 0;
+  padding: clamp(22px, 3vw, 36px);
+}
+.lh-origin-turn {
+  display: flex;
+  min-height: 190px;
+  flex-direction: column;
+  justify-content: center;
+}
+.lh-origin-turn > span {
+  padding: 9px 12px;
+  background: color-mix(in oklch, var(--page-fg) 7%, transparent);
+  color: var(--page-fg);
   font-size: 11px;
 }
+.lh-origin-turn p {
+  display: grid;
+  max-width: 660px;
+  margin: 22px 0 0;
+  grid-template-columns: 24px minmax(0, 1fr);
+  color: var(--page-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.lh-origin-turn i {
+  color: var(--lh-accent);
+  font-style: normal;
+}
+.lh-origin-turn strong { font-weight: 500; }
+.lh-origin-principle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-left: 1px solid var(--page-border);
+  background: color-mix(in oklch, var(--lh-accent) 5%, transparent);
+}
+.lh-origin-principle > span,
+.lh-origin > footer span {
+  color: var(--lh-dim);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.lh-origin-principle > strong {
+  margin-top: 14px;
+  color: var(--page-fg);
+  font-size: clamp(22px, 2.45vw, 34px);
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+}
+.lh-origin-principle p {
+  margin: 14px 0 0;
+  color: var(--page-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.lh-history {
+  display: grid;
+  position: relative;
+  margin: 0;
+  padding: 0 16px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border-top: 1px solid var(--page-border);
+  list-style: none;
+}
+.lh-history::before {
+  position: absolute;
+  top: 26px;
+  right: 34px;
+  left: 34px;
+  height: 1px;
+  background: var(--page-border);
+  content: "";
+}
+.lh-history li {
+  position: relative;
+  min-width: 0;
+  min-height: 92px;
+  padding: 38px 12px 14px;
+}
+.lh-history li::before {
+  position: absolute;
+  top: 22px;
+  left: 12px;
+  width: 9px;
+  height: 9px;
+  border: 2px solid color-mix(in oklch, var(--page-bg) 88%, #050607);
+  border-radius: 50%;
+  background: var(--lh-accent);
+  box-shadow: 0 0 0 1px var(--lh-accent);
+  content: "";
+}
 .lh-history span { color: var(--lh-accent); font-size: 9px; }
+.lh-history strong {
+  display: block;
+  margin-top: 7px;
+  overflow-wrap: anywhere;
+  color: var(--page-fg);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.lh-origin > footer {
+  border-top: 1px solid var(--page-border);
+  text-transform: none;
+}
+.lh-origin > footer strong {
+  font-size: 10px;
+  font-weight: 500;
+}
 
 .detail-section[data-project="leharness"][data-section="origin"] h1 {
   max-width: 1040px;
@@ -4223,6 +4335,43 @@ button {
   .skills-origin-copy {
     border-right: 0;
     border-bottom: 1px solid var(--page-border);
+  }
+
+  .lh-origin-story {
+    grid-template-columns: 1fr;
+  }
+
+  .lh-origin-principle {
+    border-top: 1px solid var(--page-border);
+    border-left: 0;
+  }
+
+  .lh-history {
+    padding: 6px 18px;
+    grid-template-columns: 1fr;
+  }
+
+  .lh-history::before {
+    top: 24px;
+    right: auto;
+    bottom: 24px;
+    left: 25px;
+    width: 1px;
+    height: auto;
+  }
+
+  .lh-history li {
+    min-height: 54px;
+    padding: 11px 10px 11px 30px;
+  }
+
+  .lh-history li::before {
+    top: 18px;
+    left: 3px;
+  }
+
+  .lh-history strong {
+    margin-top: 3px;
   }
 
   .cosmic-experience {

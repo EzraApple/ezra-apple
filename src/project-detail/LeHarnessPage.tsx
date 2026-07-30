@@ -275,18 +275,28 @@ export function LeHarnessSystem() {
 export function LeHarnessOrigin() {
   return (
     <div className="lh-origin" data-accent="amber">
-      <div className="lh-motd">
-        <span>leharness / motd</span>
-        <pre aria-label="LeHarness wordmark">{`╭─ lh ─────────────────╮
-│ keep the loop visible │
-╰─────────────────────╯`}</pre>
-        <p>
-          I wanted to understand harness engineering by building the loop,
-          event log, tools, background work, subagents, and compaction myself.
-          The name came from a dream in Paris.
-        </p>
+      <header>
+        <span>leharness / origin.log</span>
+        <span>main · public</span>
+      </header>
+      <div className="lh-origin-story">
+        <div className="lh-origin-turn">
+          <span>❯ why build a harness from scratch?</span>
+          <p>
+            <i>⏺</i>
+            <strong>
+              I wanted to understand harness engineering by building the loop,
+              event log, tools, background work, subagents, and compaction myself.
+            </strong>
+          </p>
+        </div>
+        <aside className="lh-origin-principle">
+          <span>design rule / 01</span>
+          <strong>Keep the parent loop visible.</strong>
+          <p>Every durable feature should make the runtime easier to inspect, not hide it.</p>
+        </aside>
       </div>
-      <ol className="lh-history">
+      <ol aria-label="LeHarness project history" className="lh-history">
         {MILESTONES.map((milestone) => (
           <li key={`${milestone.date}-${milestone.label}`}>
             <span>{milestone.date}</span>
@@ -294,6 +304,10 @@ export function LeHarnessOrigin() {
           </li>
         ))}
       </ol>
+      <footer>
+        <span>name source</span>
+        <strong>a dream in Paris</strong>
+      </footer>
     </div>
   );
 }
