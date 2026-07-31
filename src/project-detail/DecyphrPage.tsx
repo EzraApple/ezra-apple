@@ -1,5 +1,5 @@
 import { useReducedMotion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 type Language = "Arabic" | "French" | "Japanese" | "Spanish";
 
@@ -20,6 +20,15 @@ const LANGUAGES: {
 type WorkflowNode = "web" | "source" | "dub" | "poll" | "retrieve" | "lip-sync" | "deliver";
 const WORKFLOW: WorkflowNode[] = ["web", "source", "dub", "poll", "retrieve", "lip-sync", "deliver"];
 const RETRY_WORKFLOW: WorkflowNode[] = ["web", "source", "dub", "poll", "dub", "poll", "retrieve", "lip-sync", "deliver"];
+const WORKFLOW_META: Record<WorkflowNode, { detail: string; label: string; type: string }> = {
+  web: { detail: "project + content rows", label: "Create project", type: "PRODUCT" },
+  source: { detail: "object-created trigger", label: "Upload source to S3", type: "EVENT" },
+  dub: { detail: "ElevenLabs job", label: "StartDubbingJob", type: "LAMBDA" },
+  poll: { detail: "30 s durable wait", label: "CheckDubbingStatus", type: "WAIT" },
+  retrieve: { detail: "audio into durable storage", label: "RetrieveDubbedAudio", type: "LAMBDA" },
+  "lip-sync": { detail: "Sync Labs job + polling", label: "StartLipSyncJob", type: "LAMBDA" },
+  deliver: { detail: "video + database status", label: "RetrieveLipsyncedVideo", type: "RESULT" },
+};
 
 function loadLanguage(): Language {
   if (typeof window === "undefined") return "Spanish";
@@ -202,6 +211,7 @@ export function DecyphrExperience() {
 
 export function DecyphrSystem() {
   const shouldReduceMotion = useReducedMotion() ?? false;
+  const [language, setLanguage] = useLanguage();
   const [sequence, setSequence] = useState<WorkflowNode[]>(WORKFLOW);
   const [activeStep, setActiveStep] = useState<number>(WORKFLOW.length - 1);
   const timer = useRef<number | undefined>(undefined);
@@ -226,97 +236,87 @@ export function DecyphrSystem() {
   };
 
   const activeNode = sequence[activeStep];
-  const completed = new Set(sequence.slice(0, activeStep));
   const workflowComplete = activeStep === sequence.length - 1;
   const retrying = sequence === RETRY_WORKFLOW && activeStep >= 4 && activeStep <= 5;
-  const nodes: { id: WorkflowNode; label: string; detail: string; x: number; y: number; width: number }[] = [
-    { id: "web", label: "WEB APP", detail: "upload + status", x: 18, y: 116, width: 140 },
-    { id: "source", label: "S3 SOURCE", detail: "durable media", x: 190, y: 116, width: 120 },
-    { id: "dub", label: "DUB", detail: "Lambda", x: 352, y: 96, width: 104 },
-    { id: "poll", label: "POLL", detail: "wait + retry", x: 480, y: 96, width: 104 },
-    { id: "retrieve", label: "RETRIEVE", detail: "translated audio", x: 608, y: 96, width: 112 },
-    { id: "lip-sync", label: "LIP-SYNC", detail: "Lambda", x: 480, y: 194, width: 104 },
-    { id: "deliver", label: "RESULT", detail: "S3 + web state", x: 824, y: 116, width: 148 },
-  ];
+  const retryCount = sequence
+    .slice(0, activeStep + 1)
+    .filter((node) => node === "dub").length - 1;
+  const progress = Math.round(((activeStep + 1) / sequence.length) * 100);
 
   return (
     <div className="decyphr-system">
       <header>
-        <span>one upload · one durable state machine</span>
+        <span>execution / Product-launch.mp4</span>
+        <strong data-complete={workflowComplete}>
+          <i /> {workflowComplete ? "SUCCEEDED" : retrying ? "RETRYING" : "RUNNING"}
+        </strong>
         <div className="decyphr-workflow-actions">
           <button onClick={() => replay(false)} type="button">run clean</button>
           <button onClick={() => replay(true)} type="button">simulate retry</button>
         </div>
       </header>
-      <div className="decyphr-workflow-canvas">
-        <svg aria-label="Decyphr durable video localization workflow" role="img" viewBox="0 0 990 320">
-          <defs>
-            <marker id="decyphr-arrow" markerHeight="6" markerWidth="7" orient="auto" refX="6" refY="3">
-              <path d="M0 0 L7 3 L0 6 Z" />
-            </marker>
-          </defs>
-          <rect className="decyphr-machine-boundary" height="258" width="414" x="330" y="28" />
-          <text className="decyphr-machine-label" x="352" y="55">AWS STEP FUNCTIONS · DURABLE JOB</text>
-          <g className="decyphr-workflow-paths">
-            <path d="M158 151 H190" />
-            <path d="M310 151 H352" />
-            <path d="M456 131 H480" />
-            <path d="M584 131 H608" />
-            <path d="M664 166 V216 H584" />
-            <path d="M584 229 C700 229 714 151 824 151" />
-            <path className="decyphr-retry-path" data-active={retrying} d="M532 96 C532 64 404 64 404 96" />
-            <path className="decyphr-status-path" d="M898 186 V292 H88 V186" />
-          </g>
-          <text className="decyphr-status-label" x="412" y="307">status events return to the product</text>
-          {nodes.map((node) => (
-            <g
-              className="decyphr-workflow-node"
-              data-active={activeNode === node.id}
-              data-complete={completed.has(node.id)}
-              key={node.id}
-              transform={`translate(${node.x} ${node.y})`}
-            >
-              <rect height="70" width={node.width} />
-              <circle cx="16" cy="17" r="4" />
-              <text className="decyphr-node-label" x="16" y="39">{node.label}</text>
-              <text className="decyphr-node-detail" x="16" y="56">{node.detail}</text>
-            </g>
-          ))}
-        </svg>
+      <div className="decyphr-execution-body">
+        <section className="decyphr-execution-trace">
+          <div className="decyphr-trace-heading">
+            <span>AWS STEP FUNCTIONS</span>
+            <strong>{String(activeStep + 1).padStart(2, "0")} / {String(sequence.length).padStart(2, "0")}</strong>
+          </div>
+          <ol aria-label="Decyphr state machine execution">
+            {sequence.map((node, index) => {
+              const state = index < activeStep ? "complete" : index === activeStep ? "active" : "queued";
+              const attempt = node === "dub" || node === "poll"
+                ? sequence.slice(0, index + 1).filter((item) => item === "dub").length
+                : 0;
+              return (
+                <li data-state={state} key={`${node}-${index}`}>
+                  <i />
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <div>
+                    <strong>{WORKFLOW_META[node].label}</strong>
+                    <small>{WORKFLOW_META[node].detail}</small>
+                  </div>
+                  <em>{attempt > 1 ? `TRY ${attempt}` : WORKFLOW_META[node].type}</em>
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+        <aside className="decyphr-execution-inspector">
+          <div className="decyphr-language-heading">
+            <span>LANGUAGE EXECUTIONS</span>
+            <strong>{LANGUAGES.length} PARALLEL</strong>
+          </div>
+          <div className="decyphr-language-runs">
+            {LANGUAGES.map((option) => (
+              <button
+                aria-pressed={language === option.id}
+                key={option.id}
+                onClick={() => setLanguage(option.id)}
+                type="button"
+              >
+                <span><i /> {option.id}</span>
+                <em>{workflowComplete ? "ready" : retrying ? "retrying" : `${progress}%`}</em>
+                <b style={{ "--decyphr-progress": `${progress}%` } as CSSProperties} />
+              </button>
+            ))}
+          </div>
+          <dl className="decyphr-execution-input">
+            <div><dt>project type</dt><dd>VIDEO_TRANSLATION</dd></div>
+            <div><dt>language</dt><dd>{LANGUAGES.find((item) => item.id === language)?.lang ?? "es"}</dd></div>
+            <div><dt>dubbing retry</dt><dd>{Math.max(0, retryCount)} / 3</dd></div>
+            <div><dt>status source</dt><dd>Postgres</dd></div>
+          </dl>
+        </aside>
       </div>
-      <ol className="decyphr-mobile-workflow" aria-label="Decyphr workflow states">
-        {nodes.map((node) => (
-          <li
-            data-active={activeNode === node.id}
-            data-complete={completed.has(node.id)}
-            key={node.id}
-          >
-            <i />
-            <span>
-              <strong>{node.label}</strong>
-              <small>{node.detail}</small>
-            </span>
-            <em>
-              {activeNode === node.id
-                ? workflowComplete
-                  ? "done"
-                  : retrying
-                  ? "retrying"
-                  : "running"
-                : completed.has(node.id)
-                  ? "done"
-                  : "queued"}
-            </em>
-          </li>
-        ))}
-      </ol>
       <div className="decyphr-workflow-caption">
         <p aria-live="polite">
           {retrying
-            ? "The job is still the same job: Step Functions waits, retries dubbing, and keeps web status current."
-            : `${activeNode} · ${workflowComplete ? "workflow complete" : "state persisted"}`}
+            ? "Attempt 02 stays inside the same execution; the durable wait resumes without restarting the product job."
+            : workflowComplete
+              ? `${language} output persisted · product status is ready`
+              : `${WORKFLOW_META[activeNode].label} · state persisted`}
         </p>
-        <span>product state</span><i /> <span>durable media work</span><b />
+        <span>web app polls every 5 s</span><i /> <span>database remains product truth</span><b />
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
 
 // The System section's diagram, kept deliberately simple: audio flows to
@@ -20,6 +20,15 @@ export function ShoutOutPipeline() {
     null,
   );
 
+  const runRoute = useCallback((takeBypass: boolean) => {
+    motionRef.current?.setAttribute(
+      "path",
+      takeBypass ? BYPASS_PATH : MAIN_PATH,
+    );
+    setBypassing(takeBypass);
+    if (!shouldReduceMotion) motionRef.current?.beginElement?.();
+  }, [shouldReduceMotion]);
+
   useEffect(() => {
     if (shouldReduceMotion) return;
     let cancelled = false;
@@ -28,12 +37,7 @@ export function ShoutOutPipeline() {
     const cycle = () => {
       if (cancelled) return;
       const takeBypass = Math.random() < 0.34;
-      motionRef.current?.setAttribute(
-        "path",
-        takeBypass ? BYPASS_PATH : MAIN_PATH,
-      );
-      setBypassing(takeBypass);
-      motionRef.current?.beginElement?.();
+      runRoute(takeBypass);
       timers.push(window.setTimeout(() => setBypassing(false), PULSE_MS));
       timers.push(
         window.setTimeout(cycle, PULSE_MS + 900 + Math.random() * 1400),
@@ -45,11 +49,11 @@ export function ShoutOutPipeline() {
       cancelled = true;
       for (const timer of timers) window.clearTimeout(timer);
     };
-  }, [shouldReduceMotion]);
+  }, [runRoute, shouldReduceMotion]);
 
   return (
-    <figure aria-hidden="true" className="shoutout-pipeline" data-bypass={bypassing}>
-      <svg fill="none" viewBox="0 0 700 232" xmlns="http://www.w3.org/2000/svg">
+    <figure aria-label="ShoutOut local transcription and cleanup pipeline" className="shoutout-pipeline" data-bypass={bypassing}>
+      <svg aria-hidden="true" fill="none" viewBox="0 0 700 232" xmlns="http://www.w3.org/2000/svg">
         {/* the boundary: everything happens inside this pixel box */}
         <rect className="sp-shadow" height="196" width="676" x="17" y="23" />
         <rect className="sp-boundary" height="196" width="676" x="12" y="18" />
@@ -97,7 +101,18 @@ export function ShoutOutPipeline() {
           <circle className="sp-pulse" cx="34" cy="150" r="4.5" />
         )}
       </svg>
-      <figcaption className="sp-caption">nothing leaves this box.</figcaption>
+      <div aria-label="Cleanup validation result" className="sp-route-control" role="group">
+        <button aria-pressed={!bypassing} onClick={() => runRoute(false)} type="button">
+          safe rewrite
+        </button>
+        <button aria-pressed={bypassing} onClick={() => runRoute(true)} type="button">
+          meaning risk
+        </button>
+      </div>
+      <figcaption className="sp-caption">
+        <strong>{bypassing ? "original transcript → paste" : "cleaned transcript → paste"}</strong>
+        <span>nothing leaves this box.</span>
+      </figcaption>
     </figure>
   );
 }
