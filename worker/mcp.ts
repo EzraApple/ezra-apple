@@ -2,6 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { profile, ProfileSchema } from "../content/profile";
 import { resume, ResumeSchema } from "../content/resume";
+import { writing, WritingEntrySchema } from "../content/writing";
 import {
   getProjectDetail, listProjectSummaries, ProjectDetailSchema,
   ProjectSummarySchema, ProjectSlugSchema, SearchQuerySchema,
@@ -15,6 +16,17 @@ const projects = listProjectSummaries().map(summary => ({
   text: [summary.name, summary.category, summary.summary, ...summary.tags,
     getProjectDetail(summary.slug)!.document].join(" ").toLowerCase(),
 }));
+const articles = writing.map(entry => ({
+  entry,
+  text: [entry.title, entry.description, entry.publication].join(" ").toLowerCase(),
+}));
+
+function matchTerms(text: string, terms: string[]): string[] {
+  return terms.filter(term => {
+    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp(`\\b${escaped}`).test(text);
+  });
+}
 
 function asJson(value: Record<string, unknown>) {
   return {
@@ -25,12 +37,12 @@ function asJson(value: Record<string, unknown>) {
 
 export function createMcpServer(): McpServer {
   const server = new McpServer({ name: "ezra-apple", version: "2.0.0" }, {
-    instructions: "Explore Ezra Apple's curated public work. list_projects returns a compact catalog; get_project returns one complete Markdown document including background, engineering choices, implementation, and evidence. No depth selection or follow-up section calls are needed. search_work is keyword search, not semantic search. get_resume returns structured experience, education, projects, skills, and a PDF link. Cite the public evidence links in each document; this content is authored, not independently verified.",
+    instructions: "Explore Ezra Apple's curated public work. list_projects returns a compact catalog; get_project returns one complete Markdown document including background, engineering choices, implementation, and evidence. No depth selection or follow-up section calls are needed. list_writing returns published article metadata and original URLs, not full article text. search_work is keyword search across project documents and writing metadata, not semantic search. Its results field contains projects and writingResults contains articles. get_resume returns structured experience, education, projects, skills, and a PDF link. Cite the public evidence links in each document; this content is authored, not independently verified.",
   });
 
   server.registerTool("get_profile", {
     title: "Get profile", annotations: READ_ONLY_ANNOTATIONS,
-    description: "Ezra Apple's public identity and links, identical to GET /api/profile data.",
+    description: "Ezra Apple's public identity, links, and published writing, identical to GET /api/profile data.",
     outputSchema: ProfileSchema,
   }, () => asJson(profile));
 
@@ -39,6 +51,12 @@ export function createMcpServer(): McpServer {
     description: "Compact authored project catalog. Use a slug with get_project to read its entire document in one call.",
     outputSchema: z.object({ projects: z.array(ProjectSummarySchema) }),
   }, () => asJson({ projects: listProjectSummaries() }));
+
+  server.registerTool("list_writing", {
+    title: "List writing", annotations: READ_ONLY_ANNOTATIONS,
+    description: "Published articles with titles, descriptions, publications, and original URLs. Identical to GET /api/writing data. Follow each URL to read the full article.",
+    outputSchema: z.object({ writing: z.array(WritingEntrySchema) }),
+  }, () => asJson({ writing }));
 
   server.registerTool("get_project", {
     title: "Read project document", annotations: READ_ONLY_ANNOTATIONS,
@@ -56,20 +74,24 @@ export function createMcpServer(): McpServer {
 
   server.registerTool("search_work", {
     title: "Search work", annotations: READ_ONLY_ANNOTATIONS,
-    description: "Keyword search across complete project documents. Returns at most five matching summaries and matched terms. Read a result with get_project for its full document and evidence.",
+    description: "Keyword search across project documents and writing metadata. Returns up to five projects in results and five articles in writingResults, with matched terms. Use get_project for project documents or follow an article's href for its full text.",
     inputSchema: z.object({ query: SearchQuerySchema.describe("2–200 characters, e.g. local AI dictation") }).strict(),
-    outputSchema: z.object({ query: z.string(), results: z.array(ProjectSummarySchema.extend({ matchedTerms: z.array(z.string()) })).max(5) }),
+    outputSchema: z.object({
+      query: z.string(),
+      results: z.array(ProjectSummarySchema.extend({ matchedTerms: z.array(z.string()) })).max(5),
+      writingResults: z.array(WritingEntrySchema.extend({ matchedTerms: z.array(z.string()) })).max(5),
+    }),
   }, ({ query }) => {
     const terms = [...new Set(query.toLowerCase().split(/\s+/))];
     const results = projects.map(({ summary, text }) => {
-      const matchedTerms = terms.filter(term => {
-        const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        return new RegExp(`\\b${escaped}`).test(text);
-      });
+      const matchedTerms = matchTerms(text, terms);
       return { ...summary, matchedTerms };
     }).filter(p => p.matchedTerms.length > 0)
       .sort((a, b) => b.matchedTerms.length - a.matchedTerms.length).slice(0, 5);
-    return asJson({ query, results });
+    const writingResults = articles.map(({ entry, text }) => ({ ...entry, matchedTerms: matchTerms(text, terms) }))
+      .filter(entry => entry.matchedTerms.length > 0)
+      .sort((a, b) => b.matchedTerms.length - a.matchedTerms.length).slice(0, 5);
+    return asJson({ query, results, writingResults });
   });
 
   server.registerTool("get_resume", {

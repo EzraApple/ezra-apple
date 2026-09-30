@@ -6,12 +6,14 @@ Each authored project has a compact catalog record and one complete Markdown
 `document`. The document includes its origin, product behavior, engineering
 choices, implementation, and links to public evidence. Its headings are ordinary
 prose, not an API hierarchy. Read it in one request; no depth selection is needed.
-The six project documents preserve unique authored facts and evidence while
+The project documents preserve unique authored facts and evidence while
 removing repeated captions and lists from the retired visual layout.
 
 `content/projects/*.ts` is canonical for project documents. `content/resume.ts`
 validates the structured résumé generated from the public PDF and used by the
-human-readable `/resume` page. Zod validates both content types at build/startup.
+human-readable `/resume` page. `content/writing.ts` holds validated article metadata
+shared by the homepage, profile, writing API, MCP, search, and discovery guide.
+Full articles stay at their original URLs. Zod validates content at build/startup.
 The homepage receives only names, one-sentence summaries, and links; full project
 documents never enter its static HTML. Both HTML pages ship no client JavaScript.
 
@@ -38,7 +40,8 @@ deprecation plan; adding `/v1` alone does not preserve their existing URLs. Do n
 | --- | --- |
 | `GET /api` | Endpoint index, access model, MCP discovery |
 | `GET /resume` | Static, human-readable résumé with a PDF download link |
-| `GET /api/profile` | Public identity and social links |
+| `GET /api/profile` | Public identity, social links, and published writing |
+| `GET /api/writing` | Article titles, descriptions, publications, and original URLs |
 | `GET /api/resume` | Structured résumé with experience, education, projects, skills, and PDF URL/SHA-256 |
 | `GET /api/projects` | Ordered compact catalog |
 | `GET /api/projects/:slug` | Catalog fields plus the complete Markdown `document` |
@@ -62,13 +65,16 @@ curl https://ezraapple.dev/api/projects/shoutout/document
 Configure a remote Streamable HTTP server URL of `https://ezraapple.dev/mcp`.
 No API key or login is required for this deliberately public read-only content.
 
-Five tools:
+Six tools:
 
 - `get_profile()` returns the same public profile as the API.
 - `list_projects()` provides a compact catalog with slugs.
+- `list_writing()` returns the same article metadata as `GET /api/writing`.
 - `get_project(slug)` returns the same complete project object as the API.
-- `search_work(query)` searches the complete documents by keyword and returns
-  at most five summaries with matched terms. It is not semantic search.
+- `search_work(query)` searches project documents and writing metadata by keyword.
+  It preserves up to five project summaries in `results` and adds up to five articles
+  in `writingResults`, each with matched terms. Article bodies are not indexed.
+  It is not semantic search.
 - `get_resume()` returns the same structured résumé as `GET /api/resume`,
   including a PDF link and SHA-256 hash for the human-readable file.
 

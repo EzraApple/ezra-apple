@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { decyphr } from "./projects/decyphr";
 import { siteOrigin } from "./site";
+import { writing, WritingEntrySchema } from "./writing";
 
 const TextSchema = z.string().trim().min(1);
 
@@ -14,6 +15,7 @@ export const ProfileSchema = z.object({
     projectSlug: TextSchema,
   }),
   location: TextSchema,
+  writing: z.array(WritingEntrySchema),
   resume: z.object({ pageUrl: z.url(), pdfUrl: z.url(), structuredUrl: z.url() }),
   links: z
     .array(
@@ -43,6 +45,7 @@ export const profile: Profile = ProfileSchema.parse({
     projectSlug: decyphr.slug,
   },
   location: "San Francisco",
+  writing,
   resume: {
     pageUrl: `${siteOrigin}/resume`,
     pdfUrl: `${siteOrigin}/resume.pdf`,

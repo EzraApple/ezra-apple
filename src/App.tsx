@@ -61,6 +61,8 @@ export function App({ content }: { content: HomepageContent }) {
               {content.writing.map((essay) => (
                 <li key={essay.href}>
                   <a href={essay.href}>{essay.title}</a>
+                  <span className="project-separator" aria-hidden="true"> / </span>
+                  <span className="item-description">{essay.description}</span>
                 </li>
               ))}
             </ul>

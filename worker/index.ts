@@ -4,6 +4,7 @@ import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { profile } from "../content/profile";
 import { resume } from "../content/resume";
+import { writing } from "../content/writing";
 import {
   getProjectDetail,
   getProjectsResponse,
@@ -52,14 +53,15 @@ app.get("/llms.txt", (context) => {
     `- [Résumé](${origin}/api/resume): Structured experience, education, projects, skills, and PDF metadata.`,
     `- [Résumé PDF](${resume.pdfUrl}): Human-readable document.`,
     `- [Projects](${origin}/api/projects): Ordered project summaries.`,
+    `- [Writing](${origin}/api/writing): Article titles, descriptions, publications, and original URLs.`,
     `- [MCP](${origin}/mcp): Remote Model Context Protocol server (Streamable HTTP, POST only).`,
     "",
     "The API and MCP server expose the same curated, public, read-only content. No authentication is required.",
     "Start with the API index for JSON endpoints, or connect an MCP client to /mcp and discover its tools.",
-    "MCP tools: get_profile, list_projects, get_project(slug), search_work(query), get_resume.",
+    "MCP tools: get_profile, list_projects, get_project(slug), search_work(query), get_resume, list_writing.",
     "Use get_resume for structured résumé details, or open the linked PDF for the human-readable document.",
     "Use list_projects to find a slug, then get_project for one complete Markdown document, including context, decisions, and evidence links.",
-    "Use search_work to find projects by keyword.",
+    "Use list_writing for published articles and search_work to find projects and writing by keyword. Full article text lives at the original URL, not in this API.",
     "",
     "## Example questions",
     "",
@@ -70,6 +72,10 @@ app.get("/llms.txt", (context) => {
     "",
     projects,
     "",
+    "## Writing",
+    "",
+    ...writing.map((entry) => `- [${entry.title}](${entry.href}) (${entry.publication}): ${entry.description}`),
+    "",
   ].join("\n");
 
   return context.text(guide, 200, { "Content-Type": "text/plain; charset=utf-8" });
@@ -79,11 +85,12 @@ app.get("/api", (context) => {
   const origin = new URL(context.req.url).origin;
   return context.json({
     name: "ezra-apple",
-    description: "Curated public data behind ezraapple.dev: profile, résumé, and project catalog.",
+    description: "Curated public data behind ezraapple.dev: profile, résumé, projects, and writing.",
     endpoints: {
       guide: `${origin}/llms.txt`,
       profile: `${origin}/api/profile`,
       resume: `${origin}/api/resume`,
+      writing: `${origin}/api/writing`,
       projects: `${origin}/api/projects`,
       project: `${origin}/api/projects/:slug`,
       projectDocument: `${origin}/api/projects/:slug/document`,
@@ -92,7 +99,7 @@ app.get("/api", (context) => {
     access: { public: true, readOnly: true, authentication: "none" },
     mcp: {
       transport: "streamable-http",
-      tools: ["get_profile", "list_projects", "get_project", "search_work", "get_resume"],
+      tools: ["get_profile", "list_projects", "list_writing", "get_project", "search_work", "get_resume"],
     },
     meta: { schemaVersion: 2, source: "curated" },
   });
@@ -107,6 +114,10 @@ app.get("/api/resume", (context) =>
 );
 
 app.get("/api/projects", (context) => context.json(getProjectsResponse()));
+
+app.get("/api/writing", (context) =>
+  context.json({ data: writing, meta: { schemaVersion: 2, source: "curated", count: writing.length } }),
+);
 
 app.get("/api/projects/:slug/document", (context) => {
   const project = getProjectDetail(context.req.param("slug"));
@@ -128,6 +139,7 @@ const apiMethodNotAllowed = () =>
 app.all("/api", apiMethodNotAllowed);
 app.all("/api/profile", apiMethodNotAllowed);
 app.all("/api/resume", apiMethodNotAllowed);
+app.all("/api/writing", apiMethodNotAllowed);
 app.all("/api/projects", apiMethodNotAllowed);
 app.all("/api/projects/:slug/document", apiMethodNotAllowed);
 app.all("/api/projects/:slug", apiMethodNotAllowed);
@@ -155,14 +167,15 @@ app.get("/mcp", (context, next) => {
     "Authentication: none. Public, read-only content.",
     "",
     "Add this URL as a remote MCP server in your client. Then ask your agent",
-    "about my projects, technical decisions, or background.",
+    "about my projects, writing, technical decisions, or background.",
     "",
     "Try asking: How does Spatium keep roommates' floor plans in sync?",
     "The agent can find Spatium with list_projects, then read its complete",
     "document with get_project and follow the public source link as evidence.",
     "",
-    "Tools: get_profile, list_projects, get_project, search_work, get_resume.",
+    "Tools: get_profile, list_projects, get_project, search_work, get_resume, list_writing.",
     "Use get_resume for structured experience, education, skills, and the PDF link.",
+    "Use list_writing for article descriptions, publications, and original URLs.",
     "Each project is available as one complete document.",
     "",
     `JSON API: ${origin}/api`,

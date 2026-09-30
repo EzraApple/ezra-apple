@@ -3,6 +3,7 @@ import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/
 import { describe, expect, it } from "vitest";
 import { getProjectDetail, listProjectSummaries } from "../content/projects";
 import { resume, ResumeSchema } from "../content/resume";
+import { writing } from "../content/writing";
 import app from "../worker/index";
 
 const origin = "https://ezra.example";
@@ -49,6 +50,15 @@ describe("MCP client", () => {
       const profile = await client.callTool({ name: "get_profile" });
       expect(profile.isError).not.toBe(true);
       expect(parseToolResult(profile).name).toBe("Ezra Apple");
+      expect(parseToolResult(profile).writing).toEqual(writing);
+
+      const writingResult = await client.callTool({ name: "list_writing" });
+      expect(writingResult.isError).not.toBe(true);
+      const apiWriting = await (await app.request(`${origin}/api/writing`)).json();
+      expect(parseToolResult(writingResult).writing).toEqual(apiWriting.data);
+      expect(apiWriting.data).toEqual(writing);
+      const articleSearch = await client.callTool({ name: "search_work", arguments: { query: "infrastructure Replo" } });
+      expect(parseToolResult(articleSearch).writingResults).toContainEqual({ ...writing[0], matchedTerms: ["infrastructure", "replo"] });
 
       const resumeTool = tools.tools.find((tool) => tool.name === "get_resume");
       expect(resumeTool?.outputSchema?.properties).toHaveProperty("experience");

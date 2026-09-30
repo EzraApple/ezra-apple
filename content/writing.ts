@@ -1,4 +1,20 @@
-export type WritingEntry = { title: string; href: string };
+import { z } from "zod";
 
-// Add the published essay URL here when it is ready.
-export const writing: WritingEntry[] = [];
+const TextSchema = z.string().trim().min(1);
+export const WritingEntrySchema = z.object({
+  title: TextSchema,
+  href: z.url(),
+  description: TextSchema,
+  publication: TextSchema,
+});
+export type WritingEntry = z.infer<typeof WritingEntrySchema>;
+
+// Shared by the homepage, profile, writing API, and MCP. Full articles stay at their source URLs.
+export const writing = z.array(WritingEntrySchema).parse([
+  {
+    title: "Company Context Is Infrastructure",
+    href: "https://www.replo.app/engineering-blog/company-context-is-infrastructure",
+    description: "How we made Replo’s knowledge useful across the team.",
+    publication: "Replo Engineering",
+  },
+]);
