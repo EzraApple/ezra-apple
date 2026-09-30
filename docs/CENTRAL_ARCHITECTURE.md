@@ -1,5 +1,8 @@
 # Central Architecture
 
+> Historical prototype design. The current homepage is the single-column notebook
+> described in [README](../README.md) and [Data flow](DATA_FLOW.md).
+
 ## Status
 
 Early design. This document records the current center of gravity without

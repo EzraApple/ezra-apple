@@ -1,78 +1,43 @@
 import { defineProject } from "./schema";
 
 export const shoutout = defineProject({
-  schemaVersion: 1,
   slug: "shoutout",
   order: 0,
   published: true,
   name: "ShoutOut",
   category: "Local AI product",
   status: "Shipping",
-  summary:
-    "A local-first macOS dictation app that turns speech into clean text inside the app you are already using.",
-  tags: ["macOS", "Swift", "Local AI", "Product"],
+  summary: "Local dictation for your Mac, wherever you type.",
+  tags: [
+    "macOS",
+    "Swift",
+    "Local AI",
+    "Product"
+  ],
   links: [
     {
       kind: "product",
       label: "Visit ShoutOut",
-      href: "https://shoutout.sh",
-    },
+      href: "https://shoutout.sh"
+    }
   ],
-  theme: {
-    background: "oklch(0.145 0.018 254)",
-    surface: "oklch(0.19 0.026 254)",
-    foreground: "oklch(0.95 0.016 248)",
-    muted: "oklch(0.69 0.035 250)",
-    border: "oklch(0.35 0.045 250)",
-    accent: "oklch(0.72 0.15 235)",
-    accentSoft: "oklch(0.31 0.08 243)",
-    titleFont: '"Bricolage Grotesque Variable", sans-serif',
-    titleWeight: 620,
-  },
-  artifact: {
-    kind: "flow",
-    label: "Dictation pipeline",
-    caption: "Hold, speak, release. The useful complexity stays out of the way.",
-    items: [
-      { label: "01", detail: "Listen globally" },
-      { label: "02", detail: "Transcribe locally" },
-      { label: "03", detail: "Clean conservatively" },
-      { label: "04", detail: "Paste in context" },
-    ],
-  },
-  depth: {
-    what: {
-      headline: "The subscription ran out.",
-      body: "My Wispr Flow sub lapsed, and I realized there is no world in which I cannot just make my own. It worked within the week; everything since has been tweaking.",
-      highlights: ["Replaced a lapsed subscription", "Crab from day one", "Working in a week"],
-    },
-    experience: {
-      headline: "Press, speak, and stay in flow.",
-      body: "The product is designed around the app already in front of you: hold to talk or go hands-free, and the transcript lands formatted for the field it enters.",
-      highlights: ["Fn/Globe shortcut", "Hands-free mode", "Context-aware insertion"],
-    },
-    decisions: [
-      {
-        title: "Local by default",
-        summary: "Speech and cleanup stay on the Mac in the normal product path.",
-      },
-      {
-        title: "Conservative cleanup",
-        summary: "When a rewrite risks changing meaning, the original transcript wins.",
-      },
-    ],
-    system: {
-      headline: "A native pipeline from hotkey to focused field.",
-      body: "A Swift macOS app coordinates capture, WhisperKit transcription, cleanup validation, and smart insertion, shipped as a signed and notarized DMG with Sparkle updates.",
-      stack: ["Swift", "SwiftUI", "WhisperKit", "Core ML", "Sparkle"],
-      flow: ["Global shortcut", "Audio capture", "Local transcription", "Validation", "Smart paste"],
-    },
-    proof: [
-      {
-        label: "Public product",
-        note: "Download, product details, and current release information.",
-        href: "https://shoutout.sh",
-      },
-    ],
-  },
+  document: `# ShoutOut
+
+Local dictation for your Mac, wherever you type.
+
+My Wispr Flow subscription lapsed, so I built a working version in a week. ShoutOut has grown into a native Mac app for getting spoken ideas into the field already in front of you. The crab has been there since day one.
+
+## The product
+
+Hold Fn/Globe to talk or use hands-free mode. ShoutOut transcribes speech locally, formats it for the focused field, and inserts it without a separate copy-and-paste step.
+
+## Engineering decisions
+
+The Swift and SwiftUI app coordinates audio capture, WhisperKit transcription on Core ML, cleanup validation, and insertion into the active app. Speech and cleanup stay on the Mac in the normal product path. When a rewrite risks changing meaning, ShoutOut keeps the original transcript.
+
+The app ships as a signed and notarized DMG with Sparkle updates. Keeping capture, transcription, cleanup, and insertion in one local flow makes dictation usable wherever the cursor is, while validation limits unwanted edits.
+
+## Evidence
+
+- [Public product](https://shoutout.sh): Download, product details, and current release information. ShoutOut is shipping.`,
 });

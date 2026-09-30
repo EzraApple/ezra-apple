@@ -1,5 +1,7 @@
 # Stack and Deployment
 
+> Historical prototype document. The layered UI, client framework choices, and nested content model described here have been retired. See [Data flow](DATA_FLOW.md), [Public API and MCP](STRUCTURED_CONTENT_API_MCP.md), and the [README](../README.md) for the current static homepage and deployment workflow.
+
 ## Status
 
 Implemented for the initial local prototype.

@@ -1,5 +1,8 @@
 # Project-Responsive Color
 
+> Historical prototype design. The current homepage is the single-column notebook
+> described in [README](../README.md) and [Data flow](DATA_FLOW.md).
+
 ## Status
 
 Committed direction. Final colors require visual and contrast testing.

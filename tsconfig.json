@@ -15,7 +15,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "types": ["vite/client", "@cloudflare/workers-types/2023-07-01"],
+    "types": ["vite/client", "@cloudflare/workers-types"],
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]

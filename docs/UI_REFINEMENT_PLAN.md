@@ -1,5 +1,8 @@
 # UI Refinement Plan
 
+> Historical prototype design. The current homepage is the single-column notebook
+> described in [README](../README.md) and [Data flow](DATA_FLOW.md).
+
 ## Status
 
 Proposed. Written against the current working-tree state, which includes the
