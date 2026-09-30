@@ -177,10 +177,9 @@ describe("site", () => {
     expect(rootMarkup).toContain('href="/mcp"><code>/mcp</code>');
     const resumeLink = rootMarkup?.match(/<a\b[^>]*href="\/resume\/"[^>]*>/)?.[0];
     expect(resumeLink).toBeDefined();
-    expect(resumeLink).toContain('aria-label="Résumé (opens in a new tab)"');
-    expect(resumeLink).toContain('title="Résumé (opens in a new tab)"');
-    expect(resumeLink).toContain('target="_blank"');
-    expect(resumeLink).toContain('rel="noopener noreferrer"');
+    expect(resumeLink).toContain('aria-label="Résumé"');
+    expect(resumeLink).not.toContain('target=');
+    expect(resumeLink).not.toContain('opens in a new tab');
     expect(resumeLink).not.toContain("application/pdf");
 
   });
