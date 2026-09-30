@@ -1,0 +1,114 @@
+@font-face {
+  font-family: "Resume Roman";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/lmroman10-regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Resume Roman";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/lmroman10-bold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Resume Roman";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/lmroman10-italic.woff2") format("woff2");
+}
+:root {
+  color-scheme: light;
+  font-family: "Resume Roman", "Times New Roman", serif;
+  color: #161616;
+  background: #e9eaec;
+  font-synthesis: none;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+a { color: inherit; text-underline-offset: 3px; }
+a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+.resume-actions {
+  width: min(100% - 40px, 816px);
+  margin: 24px auto 18px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  font: 13px/1.4 system-ui, sans-serif;
+  color: #484c52;
+}
+.resume-actions a { display: inline-flex; align-items: center; min-height: 44px; }
+.resume-sheet {
+  max-width: 816px;
+  margin: 0 auto 48px;
+  padding: 38px 40px 42px;
+  background: white;
+  font-size: 15px;
+  line-height: 1.28;
+  box-shadow: 0 1px 5px #00000012;
+}
+h1, h2, h3, p, ul, dl, dd { margin: 0; }
+.resume-header { text-align: center; margin-bottom: 20px; }
+h1 { font-size: 32px; line-height: 1.15; margin-bottom: 5px; }
+.resume-header p { font-size: 14px; }
+.resume-contacts {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 5px 14px;
+  list-style: none;
+  padding: 0;
+  margin-top: 8px;
+  font-size: 13px;
+}
+.resume-contacts a { display: inline-flex; align-items: center; gap: 5px; }
+.resume-contacts svg { width: 12px; height: 12px; flex: none; }
+h2 { font-size: 19px; font-weight: 400; font-variant-caps: small-caps; font-synthesis: small-caps; border-bottom: 1px solid; line-height: 1.2; margin-bottom: 6px; padding-bottom: 2px; }
+section + section { margin-top: 17px; }
+article { margin: 0 8px; }
+article + article { margin-top: 14px; }
+h3 { font-size: inherit; font-weight: 700; }
+.entry-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 12px; }
+.entry-date { white-space: nowrap; }
+.role { font-weight: 400; font-style: italic; font-size: 0.94em; }
+.role > span { font-style: normal; }
+.degree { font-style: italic; margin-top: 2px; }
+.highlights { padding-left: 17px; margin-top: 4px; }
+.highlights li + li { margin-top: 4px; }
+.resume-skills { margin: 0 8px; }
+.resume-skills div + div { margin-top: 2px; }
+.resume-skills dt { display: inline; font-weight: 700; }
+.resume-skills dd { display: inline; }
+@media (max-width: 600px) {
+  :root { background: white; }
+  .resume-actions { margin: 12px 20px; }
+  .resume-sheet { padding: 16px 20px 36px; margin-bottom: 0; box-shadow: none; font-size: 16px; line-height: 1.45; }
+  .resume-header { margin-bottom: 25px; }
+  .resume-header p { font-size: 14px; }
+  .resume-contacts { gap: 8px 14px; margin-top: 12px; }
+  .resume-contacts a { min-height: 32px; overflow-wrap: anywhere; }
+  h2 { font-size: 21px; }
+  article, .resume-skills { margin-inline: 0; }
+  .entry-heading { display: block; }
+  .entry-date { display: block; font-size: 14px; color: #484c52; margin-top: 3px; }
+  .role { display: block; }
+  .role > span { display: none; }
+  .highlights li + li { margin-top: 7px; }
+  section + section { margin-top: 24px; }
+  article + article { margin-top: 20px; }
+}
+@media print {
+  @page { size: letter; margin: 0.4in; }
+  :root { background: white; }
+  .resume-actions { display: none; }
+  .resume-sheet { padding: 0; margin: 0; max-width: none; box-shadow: none; font-size: 10pt; line-height: 1.2; }
+  .resume-header { margin-bottom: 12px; }
+  h1 { font-size: 24pt; }
+  h2 { font-size: 13pt; break-after: avoid; }
+  article { break-inside: avoid; }
+  article + article { margin-top: 10px; }
+  section + section { margin-top: 12px; }
+  a { text-decoration: none; }
+}

@@ -5,25 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Ezra Apple builds AI products, agent infrastructure, and small software worth keeping."
+      content="__PROFILE_DESCRIPTION__"
     />
-    <meta name="theme-color" content="#0b1018" />
-    <meta property="og:title" content="Ezra Apple — Software Engineer" />
+    <meta name="theme-color" content="#1c1d1f" />
+    <meta property="og:title" content="Ezra Apple" />
     <meta
       property="og:description"
-      content="Selected products, systems, and the decisions behind them."
+      content="__PROFILE_DESCRIPTION__"
     />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://ezraapple.dev" />
-    <meta property="og:image" content="https://ezraapple.dev/og.png" />
+    <link rel="canonical" href="__SITE_ORIGIN__/" />
+    <meta property="og:url" content="__SITE_ORIGIN__/" />
+    <meta property="og:image" content="__SITE_ORIGIN__/og.png" />
+    <meta property="og:image:alt" content="Ezra Apple. __PROFILE_DESCRIPTION__" />
+    <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="agent-access"
+      content="Public, read-only profile and project information is available without crawling external links. Start at /api for the JSON endpoint index, read /llms.txt for the guide, or connect an MCP client to /mcp using Streamable HTTP. No authentication required."
+    />
+    <link rel="describedby" href="/llms.txt" type="text/plain" />
+    <link rel="alternate" href="/api" type="application/json" title="Public profile and project API" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <title>Ezra Apple — Software Engineer</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+    <title>Ezra Apple</title>
   </head>
   <body>
+    <aside hidden id="agent-access">
+      <p>
+        Automated readers can access Ezra Apple's public profile, projects,
+        technical decisions, and company history without crawling every external
+        link. These endpoints are read-only and require no authentication.
+      </p>
+      <a href="/llms.txt">Agent access guide</a>
+      <a href="/api">JSON API endpoint index</a>
+      <a href="/api/resume">Structured résumé and PDF download</a>
+      <a href="/mcp">MCP endpoint (Streamable HTTP)</a>
+    </aside>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

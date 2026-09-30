@@ -1,8 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="7" fill="#0b1018"/>
-  <g stroke-linecap="round" stroke-width="2.4">
-    <path d="M8 10.5h9" stroke="#5b7a9c"/>
-    <path d="M8 16h16" stroke="#4da3e8"/>
-    <path d="M8 21.5h11" stroke="#5b7a9c"/>
-  </g>
+  <rect width="32" height="32" rx="7" fill="#1c1d1f"/>
+  <!-- IBM Plex Mono Medium lowercase e, outlined so no font loading is required. -->
+  <path fill="#e3e5e8" transform="translate(6.0000 24.6000) scale(0.033333 -0.033333)" d="M311 -12Q252 -12 205.0 7.0Q158 26 126.0 61.0Q94 96 77.0 145.5Q60 195 60 257Q60 319 77.5 369.0Q95 419 126.5 454.5Q158 490 203.0 509.0Q248 528 303 528Q357 528 401.0 509.5Q445 491 476.0 457.0Q507 423 523.5 376.0Q540 329 540 272V231H170V214Q170 153 208.0 114.5Q246 76 313 76Q363 76 398.5 97.5Q434 119 456 155L524 95Q498 50 444.5 19.0Q391 -12 311 -12ZM303 445Q274 445 249.5 435.0Q225 425 207.5 406.5Q190 388 180.0 363.0Q170 338 170 308V301H429V311Q429 372 394.5 408.5Q360 445 303 445Z"/>
 </svg>

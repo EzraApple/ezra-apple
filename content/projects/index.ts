@@ -4,6 +4,7 @@ import { leHarness } from "./leharness";
 import { shoutout } from "./shoutout";
 import { skillsInit } from "./skills-init";
 import { spatium } from "./spatium";
+import { switchboard } from "./switchboard";
 import {
   ProjectCollectionSchema,
   ProjectDetailSchema,
@@ -17,6 +18,7 @@ import {
 
 const authoredProjects = ProjectCollectionSchema.parse([
   shoutout,
+  switchboard,
   decyphr,
   spatium,
   leHarness,
@@ -51,7 +53,7 @@ export function getProjectsResponse(): ProjectsResponse {
   return ProjectsResponseSchema.parse({
     data,
     meta: {
-      schemaVersion: 1,
+      schemaVersion: 2,
       source: "curated",
       count: data.length,
     },

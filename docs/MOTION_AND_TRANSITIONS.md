@@ -1,5 +1,8 @@
 # Motion and Transitions
 
+> Historical prototype design. The current homepage is the single-column notebook
+> described in [README](../README.md) and [Data flow](DATA_FLOW.md).
+
 ## Status
 
 Committed principles; exact values should be tuned in a real browser prototype.
