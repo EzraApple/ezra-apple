@@ -4,7 +4,14 @@ import { gzipSync } from "node:zlib";
 
 const root = new URL("../dist/client/", import.meta.url);
 const html = await readFile(new URL("index.html", root), "utf8");
-assert(!/<script\b/i.test(html), "The homepage must ship without JavaScript.");
+const withoutSpeculationRules = html.replace(
+  /<script type="speculationrules">([\s\S]*?)<\/script>/g,
+  (_, rules) => {
+    JSON.parse(rules);
+    return "";
+  },
+);
+assert(!/<script\b/i.test(withoutSpeculationRules), "The homepage must ship without executable JavaScript.");
 
 // Measure the initial page, not social images or linked documents. Gzip text;
 // count already-compressed fonts/images as-is. This is a repeatable payload

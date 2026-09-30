@@ -31,7 +31,7 @@ export function App({ content }: { content: HomepageContent }) {
               return (
                 <a
                   key={label}
-                  href={label === "Résumé" ? "/resume" : href}
+                  href={label === "Résumé" ? "/resume/" : href}
                   aria-label={label === "Résumé" ? "Résumé (opens in a new tab)" : label}
                   title={label === "Résumé" ? "Résumé (opens in a new tab)" : undefined}
                   target={label === "Résumé" ? "_blank" : undefined}

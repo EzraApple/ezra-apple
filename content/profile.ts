@@ -30,7 +30,7 @@ export const profile: Profile = ProfileSchema.parse({
   location: "San Francisco",
   writing,
   resume: {
-    pageUrl: `${siteOrigin}/resume`,
+    pageUrl: `${siteOrigin}/resume/`,
     pdfUrl: `${siteOrigin}/resume.pdf`,
     structuredUrl: `${siteOrigin}/api/resume`,
   },
@@ -38,6 +38,6 @@ export const profile: Profile = ProfileSchema.parse({
     { label: "GitHub", href: "https://github.com/EzraApple" },
     { label: "X", href: "https://x.com/ezra_sf" },
     { label: "LinkedIn", href: "https://www.linkedin.com/in/ezraapple/" },
-    { label: "Résumé", href: `${siteOrigin}/resume` },
+    { label: "Résumé", href: `${siteOrigin}/resume/` },
   ],
 });

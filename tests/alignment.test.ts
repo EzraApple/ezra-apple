@@ -164,13 +164,18 @@ describe("site", () => {
       expect(rootMarkup).toContain(project.summary);
     }
 
-    expect(html).not.toMatch(/<script\b/i);
+    const speculation = [...html.matchAll(/<script type="speculationrules">([\s\S]*?)<\/script>/g)];
+    expect(speculation).toHaveLength(1);
+    expect(JSON.parse(speculation[0][1])).toEqual({
+      prefetch: [{ where: { href_matches: "/resume/" }, eagerness: "moderate" }],
+    });
+    expect(html.replace(speculation[0][0], "")).not.toMatch(/<script\b/i);
     expect(html).not.toContain("homepage-data");
     expect(html).not.toContain("__SITE_ORIGIN__");
     expect(html).toContain(`content="${siteOrigin}/og.png"`);
     expect(rootMarkup).toContain('href="/api"><code>/api</code>');
     expect(rootMarkup).toContain('href="/mcp"><code>/mcp</code>');
-    const resumeLink = rootMarkup?.match(/<a\b[^>]*href="\/resume"[^>]*>/)?.[0];
+    const resumeLink = rootMarkup?.match(/<a\b[^>]*href="\/resume\/"[^>]*>/)?.[0];
     expect(resumeLink).toBeDefined();
     expect(resumeLink).toContain('aria-label="Résumé (opens in a new tab)"');
     expect(resumeLink).toContain('title="Résumé (opens in a new tab)"');
@@ -181,7 +186,7 @@ describe("site", () => {
   });
 
   it("serves the complete HTML résumé as a distinct static page", async () => {
-    const response = await fetch(`${BASE}/resume`);
+    const response = await fetch(`${BASE}/resume/`, { redirect: "manual" });
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toContain("text/html");
     const html = await response.text();
@@ -192,7 +197,7 @@ describe("site", () => {
       .replace(/&quot;/g, '"')
       .replace(/&#x27;/g, "'");
     expect(html).toContain(`<title>${resume.name}`);
-    expect(html).toContain(`href="${siteOrigin}/resume"`);
+    expect(html).toContain(`href="${siteOrigin}/resume/"`);
     for (const section of ["Education", "Experience", "Projects", "Skills"])
       expect(html).toContain(`>${section}</h2>`);
     expect(visibleText).toContain(resume.headline);
