@@ -52,6 +52,20 @@ run `npm run build`, `uv run scripts/generate_share_image.py`, then rebuild to
 include the refreshed `public/og.png`. The generator uses the site's bundled font
 and the built page's metadata. The favicon lives in `public/favicon.svg`.
 
+The homepage preloads only its regular body font; Vite rewrites the preload and
+CSS to the same hashed file. `public/_headers` gives `/assets/*` a one-year
+immutable cache lifetime. Only content-hashed build output belongs there;
+HTML and fixed-name public files retain revalidation.
+
+After building, `npm run check:performance` checks the homepage's HTML, linked
+CSS, fonts, images, and favicon against a 45 KiB initial payload budget, with
+separate limits for each category. Text is measured with gzip and WOFF2 is
+measured as-is. It also rejects homepage scripts. The `postbuild` hook runs this
+check locally and in CI alongside
+the existing rendered-page and API/MCP tests. These are payload limits, not
+browser timing measurements; linked pages, PDFs, and social metadata images
+are not part of the initial homepage payload.
+
 The Code and agents section uses matching `/api` and `/mcp` links to the API index and MCP setup guidance. The résumé icon opens `/resume` in a new tab; that page links to the PDF. `/llms.txt` is available
 to agents and advertised through page metadata, a hidden HTML note with real
 endpoint links, and API headers. Readers that strip hidden markup may miss the
