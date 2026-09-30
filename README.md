@@ -60,13 +60,21 @@ HTML and fixed-name public files retain revalidation.
 After building, `npm run check:performance` checks the homepage's HTML, linked
 CSS, fonts, images, and favicon against a 45 KiB initial payload budget, with
 separate limits for each category. Text is measured with gzip and WOFF2 is
-measured as-is. It also rejects homepage scripts. The `postbuild` hook runs this
+measured as-is. It also rejects executable homepage JavaScript. The `postbuild` hook runs this
 check locally and in CI alongside
 the existing rendered-page and API/MCP tests. These are payload limits, not
 browser timing measurements; linked pages, PDFs, and social metadata images
 are not part of the initial homepage payload.
 
-The Code and agents section uses matching `/api` and `/mcp` links to the API index and MCP setup guidance. The résumé icon opens `/resume` in a new tab; that page links to the PDF. `/llms.txt` is available
+The résumé link uses its canonical `/resume/` URL to avoid a redirect. A small
+declarative Speculation Rules block lets supporting browsers prefetch only that
+HTML document with `moderate` eagerness (desktop hover intent, or the browser's
+touch/viewport heuristics). It adds no executable JavaScript and never selects
+external links, API/MCP endpoints, or the PDF. Ordinary navigation remains the
+fallback. See [navigation measurements](docs/NAVIGATION_PERFORMANCE.md) for the
+measured benefit, resource cost, and rejected experiments.
+
+The Code and agents section uses matching `/api` and `/mcp` links to the API index and MCP setup guidance. The résumé icon opens `/resume/` in a new tab; that page links to the PDF. `/llms.txt` is available
 to agents and advertised through page metadata, a hidden HTML note with real
 endpoint links, and API headers. Readers that strip hidden markup may miss the
 note. Existing project-detail URLs fall back to the new homepage.
