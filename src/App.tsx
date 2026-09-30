@@ -12,9 +12,6 @@ const SOCIAL_ICONS: Partial<Record<string, IconType>> = {
 };
 
 export function App({ content }: { content: HomepageContent }) {
-  const { headline, headlineLink } = content.profile;
-  const linkStart = headline.indexOf(headlineLink.text);
-
   return (
     <>
       <a className="skip-link" href="#projects">
@@ -23,13 +20,7 @@ export function App({ content }: { content: HomepageContent }) {
       <main className="homepage">
         <header className="intro">
           <h1>{content.profile.name}</h1>
-          <p className="bio">
-            {headline.slice(0, linkStart)}
-            <a href={headlineLink.href} aria-label={headlineLink.label}>
-              {headlineLink.text}
-            </a>
-            {headline.slice(linkStart + headlineLink.text.length)}
-          </p>
+          <p className="bio">{content.profile.headline}</p>
           <p className="location">
             <LuMapPin aria-hidden="true" />
             <span>Based in {content.profile.location}</span>

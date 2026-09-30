@@ -13,7 +13,8 @@ export function getHomepageContent(): HomepageContent {
   return {
     profile,
     projects: listProjectSummaries()
-      .filter(({ slug }) => slug !== profile.headlineLink.projectSlug)
+      // Decyphr remains in the résumé and full API/MCP project history.
+      .filter(({ slug }) => slug !== "decyphr")
       .map(({ slug, name, summary, links }) => ({
         slug,
         name,

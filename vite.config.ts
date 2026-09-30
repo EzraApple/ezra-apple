@@ -6,7 +6,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { getHomepageContent } from "./content/homepage";
 import { App } from "./src/App";
 import { Resume } from "./src/Resume";
-import { siteOrigin } from "./content/site";
+import { shareDescription, siteOrigin } from "./content/site";
 
 export default defineConfig({
   // Let the Worker enforce the same route-specific CORS policy locally and deployed.
@@ -38,7 +38,7 @@ export default defineConfig({
 
         const content = getHomepageContent();
         const markup = renderToStaticMarkup(createElement(App, { content }));
-        const description = content.profile.headline
+        const description = shareDescription
           .replace(/&/g, "&amp;")
           .replace(/"/g, "&quot;")
           .replace(/</g, "&lt;");

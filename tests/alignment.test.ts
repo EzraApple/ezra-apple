@@ -5,7 +5,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { profile } from "../content/profile";
 import { resume, ResumeSchema } from "../content/resume";
 import { writing } from "../content/writing";
-import { siteOrigin } from "../content/site";
+import { shareDescription, siteOrigin } from "../content/site";
 import { getHomepageContent } from "../content/homepage";
 import { getProjectDetail, listProjectSummaries } from "../content/projects";
 
@@ -119,13 +119,12 @@ describe("site", () => {
       ?.split("</body>")[0];
     expect(rootMarkup).toBeDefined();
     expect(rootMarkup).toContain(`<h1>${profile.name}</h1>`);
-    for (const segment of profile.headline.split(profile.headlineLink.text)) {
-      expect(rootMarkup).toContain(segment);
-    }
-    expect(rootMarkup).toContain(`href="${profile.headlineLink.href}"`);
-    expect(rootMarkup).toContain(`aria-label="${profile.headlineLink.label}"`);
-    expect(rootMarkup).not.toContain('id="decyphr"');
-    expect(html).toContain(`content="${profile.headline}"`);
+    expect(rootMarkup).toContain(`<p class="bio">${profile.headline}</p>`);
+    expect(rootMarkup).not.toContain("Decyphr");
+    expect(html.replace(/\s+/g, " ")).toContain(
+      `property="og:description" content="${shareDescription}"`,
+    );
+    expect(html.split("</head>")[0]).not.toContain("Decyphr");
     if (writing.length === 0)
       expect(rootMarkup).not.toContain('id="writing-title"');
     for (const essay of writing) {
@@ -189,7 +188,7 @@ describe("site", () => {
   });
 
   it("keeps Decyphr's history without advertising its expired domain", async () => {
-    for (const path of ["/", "/api/projects", "/api/projects/decyphr", "/llms.txt"]) {
+    for (const path of ["/resume", "/api/projects", "/api/projects/decyphr", "/llms.txt"]) {
       const response = await fetch(`${BASE}${path}`);
       expect(response.status, path).toBe(200);
       const body = await response.text();

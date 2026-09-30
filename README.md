@@ -39,14 +39,15 @@ state. Development includes Vite's reload client; production does not.
   Builds reject a PDF whose hash differs from the generated content. Review
   both outputs before publishing. Private LaTeX source and research notes stay
   in the private workspace; the site reads neither at runtime.
-- `content/site.ts`: canonical public origin for social metadata and the share image.
+- `content/site.ts`: canonical public origin and share description for social metadata and the share image.
 - `src/Resume.tsx` and `src/resume.css`: presentation of the public résumé at
   `/resume`, rendered into `resume/index.html` during the multipage build.
 - `content/projects/*.ts`: compact project metadata and one complete Markdown `document` per project. API and MCP return that same document; no nested depth model or presentation fields.
 - `content/writing.ts`: add a title, description, publication, and original URL when an essay is published. The same validated entries automatically feed the homepage, profile, `/api/writing`, MCP `list_writing`, writing search, and `/llms.txt`. Full articles remain at their original URLs. The writing section stays hidden when empty.
 - `src/styles.css`: the single-column dark layout and responsive styles.
 
-The social description follows the profile headline. After changing that copy,
+The social description is authored separately from the homepage headline in
+`content/site.ts`. After changing that copy,
 run `npm run build`, `uv run scripts/generate_share_image.py`, then rebuild to
 include the refreshed `public/og.png`. The generator uses the site's bundled font
 and the built page's metadata. The favicon lives in `public/favicon.svg`.
