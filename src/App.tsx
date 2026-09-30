@@ -32,10 +32,8 @@ export function App({ content }: { content: HomepageContent }) {
                 <a
                   key={label}
                   href={label === "Résumé" ? "/resume/" : href}
-                  aria-label={label === "Résumé" ? "Résumé (opens in a new tab)" : label}
-                  title={label === "Résumé" ? "Résumé (opens in a new tab)" : undefined}
-                  target={label === "Résumé" ? "_blank" : undefined}
-                  rel={label === "Résumé" ? "noopener noreferrer" : "me"}
+                  aria-label={label}
+                  rel={label === "Résumé" ? undefined : "me"}
                   className={Icon ? undefined : "text-link"}
                 >
                   {Icon ? <Icon aria-hidden="true" /> : label}
