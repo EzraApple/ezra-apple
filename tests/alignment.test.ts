@@ -99,6 +99,30 @@ describe("content source", () => {
 });
 
 describe("site", () => {
+  it("preloads the body font and only gives versioned assets immutable caching", async () => {
+    const html = await (await fetch(BASE)).text();
+    const preload = html.match(/<link\b[^>]*rel="preload"[^>]*>/)?.[0];
+    expect(preload).toContain('as="font"');
+    expect(preload).toContain('type="font/woff2"');
+    expect(preload).toContain("crossorigin");
+    const fontPath = preload?.match(/href="([^"]+)"/)?.[1];
+    expect(fontPath).toMatch(/^\/assets\/ibm-plex-mono-latin-400-normal-.+\.woff2$/);
+    const cssPath = html.match(/href="([^"]+\.css)"/)?.[1];
+    expect(cssPath).toBeDefined();
+    const css = await (await fetch(`${BASE}${cssPath}`)).text();
+    expect(css).toContain(fontPath);
+    for (const path of [fontPath, cssPath]) {
+      const response = await fetch(`${BASE}${path}`);
+      expect(response.status).toBe(200);
+      expect(response.headers.get("cache-control")).toBe("public, max-age=31536000, immutable");
+    }
+    for (const path of ["/", "/resume", "/resume.pdf", "/og.png", "/api/profile"]) {
+      const response = await fetch(`${BASE}${path}`);
+      expect(response.status, path).toBe(200);
+      expect(response.headers.get("cache-control"), path).not.toContain("immutable");
+    }
+  });
+
   it("serves the app shell at / and for deep links", async () => {
     for (const path of [
       "/",
