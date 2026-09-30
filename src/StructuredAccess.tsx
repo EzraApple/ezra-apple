@@ -5,7 +5,7 @@ export function StructuredAccess() {
         <a className="endpoint-url" href="/api"><code>/api</code></a>
         <span className="project-separator" aria-hidden="true"> / </span>{" "}
         <span className="item-description">
-          Read my profile and project documents. Start here for the JSON API.
+          Read my profile, projects, and writing. Start here for the JSON API.
         </span>
       </li>
       <li>

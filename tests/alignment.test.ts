@@ -131,6 +131,7 @@ describe("site", () => {
     for (const essay of writing) {
       expect(rootMarkup).toContain(`href="${essay.href}"`);
       expect(rootMarkup).toContain(essay.title);
+      expect(rootMarkup).toContain(essay.description);
     }
     expect(rootMarkup).not.toContain("llms.txt");
 
@@ -203,6 +204,7 @@ describe("api", () => {
     const index = await (await fetch(`${BASE}/api`)).json();
     expect(index.endpoints.profile).toBe(`${BASE}/api/profile`);
     expect(index.endpoints.resume).toBe(`${BASE}/api/resume`);
+    expect(index.endpoints.writing).toBe(`${BASE}/api/writing`);
     expect(index.endpoints.projects).toBe(`${BASE}/api/projects`);
     expect(index.endpoints.mcp).toBe(`${BASE}/mcp`);
   });
@@ -247,6 +249,35 @@ describe("api", () => {
       listProjectSummaries().map((project) => project.slug),
     );
     expect(body.meta.count).toBe(listProjectSummaries().length);
+  });
+
+  it("keeps homepage writing, profile, API, MCP, and agent discovery aligned", async () => {
+    const response = await fetch(`${BASE}/api/writing`);
+    expect(response.status).toBe(200);
+    expect(response.headers.get("etag")).toBeTruthy();
+    expect(response.headers.get("access-control-allow-origin")).toBe("*");
+    expect(response.headers.get("link")).toContain("/llms.txt");
+    const body = await response.json();
+    expect(body).toEqual({ data: writing, meta: { schemaVersion: 2, source: "curated", count: writing.length } });
+    expect(getHomepageContent().writing).toEqual(body.data);
+    expect((await (await fetch(`${BASE}/api/profile`)).json()).data.writing).toEqual(body.data);
+    expect((await mcpTool("get_profile")).writing).toEqual(body.data);
+    expect((await mcpTool("list_writing")).writing).toEqual(body.data);
+    const guide = await (await fetch(`${BASE}/llms.txt`)).text();
+    expect(guide).toContain(`${BASE}/api/writing`);
+    expect(guide).toContain("list_writing");
+    for (const entry of writing) {
+      expect(guide).toContain(entry.title);
+      expect(guide).toContain(entry.href);
+      expect(guide).toContain(entry.publication);
+      const search = await mcpTool("search_work", { query: entry.title });
+      expect(search.writingResults).toContainEqual({ ...entry, matchedTerms: [...new Set(entry.title.toLowerCase().split(/\s+/))] });
+    }
+    const cached = await fetch(`${BASE}/api/writing`, { headers: { "If-None-Match": response.headers.get("etag")! } });
+    expect(cached.status).toBe(304);
+    const write = await fetch(`${BASE}/api/writing`, { method: "POST" });
+    expect(write.status).toBe(405);
+    expect(write.headers.get("allow")).toContain("GET");
   });
 
   it("serves every project detail", async () => {
@@ -371,6 +402,7 @@ describe("mcp", () => {
       "get_project",
       "get_resume",
       "list_projects",
+      "list_writing",
       "search_work",
     ]);
   });

@@ -24,10 +24,10 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta
       name="agent-access"
-      content="Public, read-only profile and project information is available without crawling external links. Start at /api for the JSON endpoint index, read /llms.txt for the guide, or connect an MCP client to /mcp using Streamable HTTP. No authentication required."
+      content="Public, read-only profile, project documents, résumé, and writing metadata are available through /api. Read /llms.txt for the guide, or connect an MCP client to /mcp using Streamable HTTP. Full articles remain at their original URLs. No authentication required."
     />
     <link rel="describedby" href="/llms.txt" type="text/plain" />
-    <link rel="alternate" href="/api" type="application/json" title="Public profile and project API" />
+    <link rel="alternate" href="/api" type="application/json" title="Public profile, projects, and writing API" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/src/styles.css" />
     <title>Ezra Apple</title>
@@ -36,12 +36,13 @@
     <aside hidden id="agent-access">
       <p>
         Automated readers can access Ezra Apple's public profile, projects,
-        technical decisions, and company history without crawling every external
+        résumé, writing metadata, technical decisions, and company history without crawling every external
         link. These endpoints are read-only and require no authentication.
       </p>
       <a href="/llms.txt">Agent access guide</a>
       <a href="/api">JSON API endpoint index</a>
       <a href="/api/resume">Structured résumé and PDF download</a>
+      <a href="/api/writing">Published writing and original article links</a>
       <a href="/mcp">MCP endpoint (Streamable HTTP)</a>
     </aside>
     <div id="root"></div>

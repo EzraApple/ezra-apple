@@ -43,7 +43,7 @@ state. Development includes Vite's reload client; production does not.
 - `src/Resume.tsx` and `src/resume.css`: presentation of the public résumé at
   `/resume`, rendered into `resume/index.html` during the multipage build.
 - `content/projects/*.ts`: compact project metadata and one complete Markdown `document` per project. API and MCP return that same document; no nested depth model or presentation fields.
-- `content/writing.ts`: add a title and URL when an essay is published. The writing section stays hidden until it has a published entry.
+- `content/writing.ts`: add a title, description, publication, and original URL when an essay is published. The same validated entries automatically feed the homepage, profile, `/api/writing`, MCP `list_writing`, writing search, and `/llms.txt`. Full articles remain at their original URLs. The writing section stays hidden when empty.
 - `src/styles.css`: the single-column dark layout and responsive styles.
 
 The social description follows the profile headline. After changing that copy,
@@ -79,7 +79,7 @@ projects are outside the content model and must never be inferred or exposed.
 `GET /api` discovers the API. `GET /api/projects/:slug` returns a complete project
 as JSON; `/api/projects/:slug/document` returns its Markdown directly. Connect an
 MCP client to `/mcp` for `get_profile`, `list_projects`, `get_project`,
-`search_work`, and `get_resume`. The current schema marker is 2 and the MCP implementation reports 2.0.0; neither
+`search_work`, `get_resume`, and `list_writing`. Writing is also available at `/api/writing` and in the profile. Search preserves project matches in `results` and adds article metadata matches in `writingResults`. The current schema marker is 2 and the MCP implementation reports 2.0.0; neither
 is a URL version. Public routes stay unversioned. The old prototype `depth`
 parameter and `list_decisions` tool have been removed. See the compatibility
 policy in the structured-access documentation.
