@@ -51,7 +51,7 @@
     },
     {
       "organization": "Lawrence Berkeley National Laboratory",
-      "role": "Undergraduate Machine Learning Researcher",
+      "role": "Machine Learning Researcher",
       "dates": "Oct 2023 – Jun 2025",
       "highlights": [
         "Applied random forests and Bayesian optimization to ion-source diagnostic data, modeling accelerator performance and exploring configurations to maximize ion output.",
@@ -67,7 +67,7 @@
         "Built and shipped a local-first macOS dictation product in Swift with global Fn/Globe capture, AVAudioEngine recording, focused-app paste, and WPM/latency stats.",
         "Designed a low-friction interaction model with hold-to-record, double-tap hands-free mode, menu bar controls, recording overlay feedback, and first-run permission onboarding.",
         "Implemented swappable on-device transcription engines using Apple Speech, Apple Dictation, and WhisperKit/Core ML, with dictionary-aware cleanup and spoken-punctuation formatting.",
-        "Owned signed app distribution with public website, notarized DMGs, Sparkle updates, GitHub Actions artifacts, and user-local installation into ~/Applications."
+        "Managed macOS releases with signed and notarized builds and automatic updates through Sparkle."
       ]
     }
   ],
@@ -127,13 +127,14 @@
     "25+ languages",
     "AWS",
     "S3, Lambda, Step Functions, SES",
-    "10+ content creators",
+    "closed beta with 10+ content creators",
     "Lawrence Berkeley National Laboratory",
     "random forests and Bayesian optimization",
     "heavy-element synthesis research",
     "ShoutOut",
     "Swift",
     "Apple Speech",
+    "Apple Dictation",
     "WhisperKit/Core ML",
     "Sparkle",
     "Languages",
@@ -141,5 +142,5 @@
     "Backend & Infrastructure",
     "Frontend & Desktop"
   ],
-  "pdfSha256": "9379cb1fe7265578c91d82d1447358acf351c93ef2ec2f7e6cb5344e399fe7fe"
+  "pdfSha256": "d4fcecdb8c50c50ea90f5da837e271afeae7424b0ccc5ea83dce1e924694c967"
 }
