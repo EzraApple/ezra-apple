@@ -80,9 +80,17 @@ def extract_resume(source):
     if not links:
         raise ValueError("Missing resume contact links")
     emphasis = []
+    visible_text = " ".join(text.split())
     def record_emphasis(value, _cm, _tm, font, _size):
         if font and "CMBX" in str(font.get("/BaseFont", "")):
             phrase = " ".join(value.split())
+            if phrase:
+                # PDF font spacing can split words such as "AWS" into "A WS".
+                pattern = r"\s*".join(re.escape(char) for char in "".join(phrase.split()))
+                match = re.search(pattern, visible_text)
+                if not match:
+                    raise ValueError(f"Bold phrase is missing from visible resume text: {phrase}")
+                phrase = match.group()
             if phrase and phrase not in emphasis:
                 emphasis.append(phrase)
     reader.pages[0].extract_text(visitor_text=record_emphasis)

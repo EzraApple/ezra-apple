@@ -211,8 +211,10 @@ describe("site", () => {
       ...resume.experience.flatMap((entry) => entry.highlights),
       ...resume.projects.flatMap((entry) => entry.highlights),
     ];
-    expect(highlights).toHaveLength(14);
+    expect(highlights).toHaveLength(13);
     for (const highlight of highlights) expect(visibleText).toContain(highlight);
+    expect(html).toContain("<strong>AWS</strong>");
+    expect(html).toContain("<strong>S3, Lambda, Step Functions, SES</strong>");
   });
 
   it("keeps Decyphr's history without advertising its expired domain", async () => {

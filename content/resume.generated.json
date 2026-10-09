@@ -1,6 +1,6 @@
 {
   "name": "Ezra Apple",
-  "headline": "Software Engineer | AI Product & Agent Infrastructure",
+  "headline": "Software Engineer | AI Products | Former Co-Founder",
   "links": [
     {
       "label": "Website",
@@ -32,10 +32,10 @@
       "role": "Software Engineer, AI Agent Platform",
       "dates": "Oct 2025 – Present",
       "highlights": [
-        "Built and launched storefront creation and editing workflows for Replo’s customer-facing AI website builder, including Component Library, reusable templates, and live page previews.",
-        "Designed persistent user and project memory for Replo Agent, combining scoped context, automatic curation, and on-demand retrieval to retain knowledge across sessions.",
-        "Led consolidation of Replo’s internal agent skills and development workflows, making engineering, design, and support knowledge discoverable and reusable across coding agents.",
-        "Improved preview and publishing reliability for Replo’s AI website builder, building automatic preview recovery, asset-readiness checks, and observability for diagnosing customer failures."
+        "Helped architect and launch Replo’s new AI platform for e-commerce through closed beta, open beta, and general availability, with work spanning reusable templates, agent behavior, and live page previews.",
+        "Redesigned Replo Agent’s persistent memory around compact user and project context, on-demand retrieval, and automatic curation, and shipped a user-facing memory browser.",
+        "Designed and ran agent evaluations of context and instruction changes using customer-derived and synthetic editing tasks, measuring task correctness, cost, and latency.",
+        "Led consolidation of Replo’s internal agent skills and development workflows, making engineering, design, and support knowledge discoverable and reusable across coding agents."
       ]
     },
     {
@@ -45,8 +45,8 @@
       "highlights": [
         "Co-founded AI video translation startup, accepted into UC Berkeley SkyDeck Pad-13 incubator program.",
         "Owned end-to-end MVP for AI-driven video translation across 25+ languages, spanning authentication, media upload, processing orchestration, and launch site.",
-        "Architected a serverless media-processing pipeline on AWS (S3, Lambda, Step Functions, SES) with fault-tolerant retries for long-running translation jobs.",
-        "Ran closed beta with 10+ content creators, translating feedback into product refinements and go-to-market validation."
+        "Ran closed beta with 10+ content creators, translating feedback into product refinements and go-to-market validation.",
+        "Architected a serverless media-processing pipeline on AWS (S3, Lambda, Step Functions, SES) with fault-tolerant retries for long-running translation jobs."
       ]
     },
     {
@@ -64,10 +64,9 @@
       "name": "ShoutOut",
       "description": "Local-First macOS Dictation App",
       "highlights": [
-        "Built and shipped a local-first macOS dictation product in Swift with global Fn/Globe capture, AVAudioEngine recording, focused-app paste, and WPM/latency stats.",
+        "Built and shipped a local-first macOS dictation app in Swift that inserts transcribed speech into other apps, with signed, notarized releases and automatic updates.",
         "Designed a low-friction interaction model with hold-to-record, double-tap hands-free mode, menu bar controls, recording overlay feedback, and first-run permission onboarding.",
-        "Implemented swappable on-device transcription engines using Apple Speech, Apple Dictation, and WhisperKit/Core ML, with dictionary-aware cleanup and spoken-punctuation formatting.",
-        "Managed macOS releases with signed and notarized builds and automatic updates through Sparkle."
+        "Implemented swappable on-device transcription engines using Apple Speech, Apple Dictation, and WhisperKit/Core ML, with dictionary-aware cleanup and spoken-punctuation formatting."
       ]
     }
   ],
@@ -85,10 +84,20 @@
       "category": "AI & Agents",
       "items": [
         "Agent workflows",
+        "agent evaluation",
         "persistent memory",
         "internal agent skills",
-        "MCP integrations",
-        "sandboxed execution"
+        "MCP integrations"
+      ]
+    },
+    {
+      "category": "ML & Data",
+      "items": [
+        "PyTorch",
+        "Hugging Face Transformers",
+        "scikit-learn",
+        "NumPy",
+        "pandas"
       ]
     },
     {
@@ -118,16 +127,16 @@
     "Ezra Apple",
     "University of California, Berkeley",
     "Replo (YC S21)",
-    "storefront creation and editing workflows",
-    "persistent user and project memory",
+    "new AI platform for e-commerce",
+    "persistent memory",
+    "agent evaluations",
     "internal agent skills and development workflows",
-    "preview and publishing reliability",
     "Decyphr AI",
     "UC Berkeley SkyDeck Pad-13",
     "25+ languages",
+    "closed beta with 10+ content creators",
     "AWS",
     "S3, Lambda, Step Functions, SES",
-    "closed beta with 10+ content creators",
     "Lawrence Berkeley National Laboratory",
     "random forests and Bayesian optimization",
     "heavy-element synthesis research",
@@ -136,11 +145,11 @@
     "Apple Speech",
     "Apple Dictation",
     "WhisperKit/Core ML",
-    "Sparkle",
     "Languages",
     "AI & Agents",
+    "ML & Data",
     "Backend & Infrastructure",
     "Frontend & Desktop"
   ],
-  "pdfSha256": "d4fcecdb8c50c50ea90f5da837e271afeae7424b0ccc5ea83dce1e924694c967"
+  "pdfSha256": "c2d3f91434fdaf820a1b0918a0c85ccf974f5d7c9a990174bcf3e757cce09745"
 }
