@@ -51,7 +51,7 @@ export function Resume() {
           <h2 id="experience-title">Experience</h2>
           {resume.experience.map((entry) => <article key={entry.organization}>
             <div className="entry-heading">
-              <h3>{entry.organization}<span className="role"><span aria-hidden="true"> | </span>{entry.role}</span></h3>
+              <h3>{entry.href ? <a href={entry.href}>{entry.organization}</a> : entry.organization}<span className="role"><span aria-hidden="true"> | </span>{entry.role}</span></h3>
               <span className="entry-date">{entry.dates}</span>
             </div>
             <Highlights items={entry.highlights} />
@@ -60,7 +60,7 @@ export function Resume() {
         <section aria-labelledby="resume-projects-title">
           <h2 id="resume-projects-title">Projects</h2>
           {resume.projects.map((entry) => <article key={entry.name}>
-            <h3>{entry.name}<span className="role"><span aria-hidden="true"> | </span>{entry.description}</span></h3>
+            <h3>{entry.href ? <a href={entry.href}>{entry.name}</a> : entry.name}<span className="role"><span aria-hidden="true"> | </span>{entry.description}</span></h3>
             <Highlights items={entry.highlights} />
           </article>)}
         </section>

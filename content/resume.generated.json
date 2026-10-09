@@ -36,7 +36,8 @@
         "Redesigned Replo Agent’s persistent memory around compact user and project context, on-demand retrieval, and automatic curation, and shipped a user-facing memory browser.",
         "Designed and ran agent evaluations of context and instruction changes using customer-derived and synthetic editing tasks, measuring task correctness, cost, and latency.",
         "Led consolidation of Replo’s internal agent skills and development workflows, making engineering, design, and support knowledge discoverable and reusable across coding agents."
-      ]
+      ],
+      "href": "https://www.replo.app/"
     },
     {
       "organization": "Decyphr AI",
@@ -47,7 +48,8 @@
         "Owned end-to-end MVP for AI-driven video translation across 25+ languages, spanning authentication, media upload, processing orchestration, and launch site.",
         "Ran closed beta with 10+ content creators, translating feedback into product refinements and go-to-market validation.",
         "Architected a serverless media-processing pipeline on AWS (S3, Lambda, Step Functions, SES) with fault-tolerant retries for long-running translation jobs."
-      ]
+      ],
+      "href": "https://www.linkedin.com/company/106859432/"
     },
     {
       "organization": "Lawrence Berkeley National Laboratory",
@@ -56,7 +58,8 @@
       "highlights": [
         "Applied random forests and Bayesian optimization to ion-source diagnostic data, modeling accelerator performance and exploring configurations to maximize ion output.",
         "Presented findings to senior researchers supporting heavy-element synthesis research, including the element 120 program."
-      ]
+      ],
+      "href": "https://www.lbl.gov/"
     }
   ],
   "projects": [
@@ -67,7 +70,8 @@
         "Built and shipped a local-first macOS dictation app in Swift that inserts transcribed speech into other apps, with signed, notarized releases and automatic updates.",
         "Designed a low-friction interaction model with hold-to-record, double-tap hands-free mode, menu bar controls, recording overlay feedback, and first-run permission onboarding.",
         "Implemented swappable on-device transcription engines using Apple Speech, Apple Dictation, and WhisperKit/Core ML, with dictionary-aware cleanup and spoken-punctuation formatting."
-      ]
+      ],
+      "href": "https://shoutout.sh"
     }
   ],
   "skills": [

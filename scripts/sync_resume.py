@@ -40,6 +40,32 @@ def parse_entries(lines, dated):
     return entries
 
 
+def attach_entry_links(page, annotations, entries):
+    """Match PDF link rectangles to heading text, independent of annotation order."""
+    labels = [[] for _ in annotations]
+
+    def record_link_text(value, cm, tm, _font, _size):
+        x = tm[4] * cm[0] + tm[5] * cm[2] + cm[4]
+        y = tm[4] * cm[1] + tm[5] * cm[3] + cm[5]
+        for annotation, parts in zip(annotations, labels):
+            left, bottom, right, top = map(float, annotation["/Rect"])
+            if left <= x <= right and bottom <= y <= top:
+                parts.append(value)
+
+    page.extract_text(visitor_text=record_link_text)
+    for annotation, parts in zip(annotations, labels):
+        label = "".join("".join(parts).split())
+        matches = [entry for entry in entries
+                   if "".join(entry.get("organization", entry.get("name", "")).split()) == label]
+        href = str(annotation["/A"]["/URI"])
+        if len(matches) != 1 or urlparse(href).scheme != "https":
+            raise ValueError(f"Unrecognized resume heading link: {label!r} ({href})")
+        entry = matches[0]
+        if "href" in entry and entry["href"] != href:
+            raise ValueError(f"Conflicting resume heading links: {label!r}")
+        entry["href"] = href
+
+
 def extract_resume(source):
     reader = PdfReader(source)
     if len(reader.pages) != 1:
@@ -63,13 +89,17 @@ def extract_resume(source):
     for line in sections["Skills"]:
         category, items = line.split(": ", 1)
         skills.append(dict(category=category, items=items.split(", ")))
+    experience = parse_entries(sections["Experience"], True)
+    projects = parse_entries(sections["Projects"], False)
     # Contact links occupy the top annotation row; lower rows are employer/project links.
     annotations = [item.get_object() for item in reader.pages[0].get("/Annots", [])]
     urls = [item for item in annotations if item.get("/A", {}).get("/URI")]
     top = max(float(item["/Rect"][3]) for item in urls)
     links = []
+    entry_annotations = []
     for item in urls:
         if abs(float(item["/Rect"][3]) - top) > 1:
+            entry_annotations.append(item)
             continue
         href = str(item["/A"]["/URI"])
         url = urlparse(href)
@@ -79,6 +109,7 @@ def extract_resume(source):
         links.append(dict(label=label or ("Email" if url.scheme == "mailto" else "Website"), href=href))
     if not links:
         raise ValueError("Missing resume contact links")
+    attach_entry_links(reader.pages[0], entry_annotations, experience + projects)
     emphasis = []
     visible_text = " ".join(text.split())
     def record_emphasis(value, _cm, _tm, font, _size):
@@ -95,8 +126,7 @@ def extract_resume(source):
                 emphasis.append(phrase)
     reader.pages[0].extract_text(visitor_text=record_emphasis)
     return dict(name=lines[0], headline=lines[1], links=links, education=education,
-                experience=parse_entries(sections["Experience"], True),
-                projects=parse_entries(sections["Projects"], False), skills=skills,
+                experience=experience, projects=projects, skills=skills,
                 emphasis=emphasis, pdfSha256=hashlib.sha256(source.read_bytes()).hexdigest())
 
 
