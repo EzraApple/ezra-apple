@@ -26,7 +26,7 @@ export type Profile = z.infer<typeof ProfileSchema>;
 // get_profile tool.
 export const profile: Profile = ProfileSchema.parse({
   name: "Ezra Apple",
-  headline: "I’m a software engineer. I build apps and developer tools.",
+  headline: "I build AI products, with a focus on agent behavior, evaluation and intuitive user experiences.",
   location: "San Francisco",
   writing,
   resume: {
