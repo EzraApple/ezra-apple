@@ -19,7 +19,7 @@ export const decyphr = defineProject({
     {
       kind: "profile",
       label: "Decyphr on LinkedIn",
-      href: "https://www.linkedin.com/company/decyphrai/"
+      href: "https://www.linkedin.com/company/106859432/"
     }
   ],
   document: `# Decyphr
@@ -40,5 +40,5 @@ The AWS pipeline solved reliability problems before demand justified that comple
 
 ## Evidence
 
-- [Company history](https://www.linkedin.com/company/decyphrai/): Decyphr's company page and updates on LinkedIn. The product is no longer operating.`,
+- [Company history](https://www.linkedin.com/company/106859432/): Decyphr's company page and updates on LinkedIn. The product is no longer operating.`,
 });
