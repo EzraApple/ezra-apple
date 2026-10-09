@@ -203,6 +203,12 @@ describe("site", () => {
     expect(visibleText).toContain(resume.education[0].institution);
     expect(visibleText).toContain(resume.experience[0].organization);
     expect(visibleText).toContain(resume.projects[0].name);
+    for (const [label, href] of [
+      ["Replo (YC S21)", "https://www.replo.app/"],
+      ["Decyphr AI", "https://www.linkedin.com/company/106859432/"],
+      ["Lawrence Berkeley National Laboratory", "https://www.lbl.gov/"],
+      ["ShoutOut", "https://shoutout.sh"],
+    ]) expect(html).toContain(`<a href="${href}">${label}</a>`);
     expect(html).toContain('href="/resume.pdf"');
     expect(html).not.toContain("Code and agents");
     expect(html).not.toMatch(/<script\b/i);
