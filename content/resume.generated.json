@@ -30,7 +30,7 @@
     {
       "organization": "Replo (YC S21)",
       "role": "Software Engineer, AI Agent Platform",
-      "dates": "Oct 2025 – Present",
+      "dates": "Oct 2025 – Oct 2026",
       "highlights": [
         "Helped architect and launch Replo’s new AI platform for e-commerce through closed beta, open beta, and general availability, with work spanning reusable templates, agent behavior, and live page previews.",
         "Redesigned Replo Agent’s persistent memory around compact user and project context, on-demand retrieval, and automatic curation, and shipped a user-facing memory browser.",
@@ -155,5 +155,5 @@
     "Backend & Infrastructure",
     "Frontend & Desktop"
   ],
-  "pdfSha256": "c2d3f91434fdaf820a1b0918a0c85ccf974f5d7c9a990174bcf3e757cce09745"
+  "pdfSha256": "cf2d070daf9c526dfddc46bff791a895307128e64591e9ad28044fa6ecb9f1eb"
 }
