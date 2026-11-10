@@ -19,13 +19,18 @@ export const shoutout = defineProject({
       kind: "product",
       label: "Visit ShoutOut",
       href: "https://shoutout.sh"
+    },
+    {
+      kind: "repository",
+      label: "View source and credits",
+      href: "https://github.com/EzraApple/shoutout"
     }
   ],
   document: `# ShoutOut
 
 Local dictation for your Mac, wherever you type.
 
-My Wispr Flow subscription lapsed, so I built a working version in a week. ShoutOut has grown into a native Mac app for getting spoken ideas into the field already in front of you. The crab has been there since day one.
+My Wispr Flow subscription lapsed, so I built a working version in a week. I started from [Inputalk](https://github.com/sebi75/inputalk), an MIT-licensed macOS dictation app by the Inputalk contributors. ShoutOut has grown into a native Mac app for getting spoken ideas into the field already in front of you. The crab has been there since day one.
 
 ## The product
 
@@ -39,5 +44,6 @@ The app ships as a signed and notarized DMG with Sparkle updates. Keeping captur
 
 ## Evidence
 
-- [Public product](https://shoutout.sh): Download, product details, and current release information. ShoutOut is shipping.`,
+- [Public product](https://shoutout.sh): Download, product details, and current release information. ShoutOut is shipping.
+- [Public source and credits](https://github.com/EzraApple/shoutout): Implementation, Inputalk attribution, and source licensing details.`,
 });
