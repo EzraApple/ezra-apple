@@ -7,7 +7,7 @@ export const shoutout = defineProject({
   name: "ShoutOut",
   category: "Local AI product",
   status: "Shipping",
-  summary: "Local dictation for your Mac, wherever you type.",
+  summary: "Local dictation for macOS that types into the active app.",
   tags: [
     "macOS",
     "Swift",
@@ -22,28 +22,19 @@ export const shoutout = defineProject({
     },
     {
       kind: "repository",
-      label: "View source and credits",
+      label: "GitHub",
       href: "https://github.com/EzraApple/shoutout"
     }
   ],
   document: `# ShoutOut
 
-Local dictation for your Mac, wherever you type.
+Local dictation for macOS that types into the active app.
 
-My Wispr Flow subscription lapsed, so I built a working version in a week. I started from [Inputalk](https://github.com/sebi75/inputalk), an MIT-licensed macOS dictation app by the Inputalk contributors. ShoutOut has grown into a native Mac app for getting spoken ideas into the field already in front of you. The crab has been there since day one.
+Hold Fn/Globe to dictate into the app you’re using, or double-tap for hands-free recording. Transcription runs on your Mac and streams while you talk, reducing the wait after you release the shortcut. A custom dictionary helps with names, and searchable history keeps past dictations accessible.
 
-## The product
+My Wispr Flow subscription lapsed, so I built a working version in a week, starting from [Inputalk](https://github.com/sebi75/inputalk), an MIT-licensed macOS dictation app. The app is written in Swift and SwiftUI.
 
-Hold Fn/Globe to talk or use hands-free mode. ShoutOut transcribes speech locally, formats it for the focused field, and inserts it without a separate copy-and-paste step.
+For cleanup, I fine-tuned BERT Mini to predict which words to keep or delete. It removes likely fillers and repetitions rather than generating a new sentence. Cleanup is optional and runs locally through Core ML.
 
-## Engineering decisions
-
-The Swift and SwiftUI app coordinates audio capture, WhisperKit transcription on Core ML, cleanup validation, and insertion into the active app. Speech and cleanup stay on the Mac in the normal product path. When a rewrite risks changing meaning, ShoutOut keeps the original transcript.
-
-The app ships as a signed and notarized DMG with Sparkle updates. Keeping capture, transcription, cleanup, and insertion in one local flow makes dictation usable wherever the cursor is, while validation limits unwanted edits.
-
-## Evidence
-
-- [Public product](https://shoutout.sh): Download, product details, and current release information. ShoutOut is shipping.
-- [Public source and credits](https://github.com/EzraApple/shoutout): Implementation, Inputalk attribution, and source licensing details.`,
+The app ships as a signed and notarized Mac app with automatic updates.`,
 });

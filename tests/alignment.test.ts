@@ -2,6 +2,7 @@ import { spawn, execSync, type ChildProcess } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { marked } from "marked";
 import { profile } from "../content/profile";
 import { resume, ResumeSchema } from "../content/resume";
 import { writing } from "../content/writing";
@@ -123,7 +124,7 @@ describe("site", () => {
     }
   });
 
-  it("serves the app shell at / and for deep links", async () => {
+  it("serves static pages at / and for project links", async () => {
     for (const path of [
       "/",
       "/projects/shoutout",
@@ -144,7 +145,12 @@ describe("site", () => {
     expect(rootMarkup).toBeDefined();
     expect(rootMarkup).toContain(`<h1>${profile.name}</h1>`);
     expect(rootMarkup).toContain(`<p class="bio">${profile.headline}</p>`);
-    expect(rootMarkup).not.toContain("Decyphr");
+    expect(rootMarkup).not.toContain('id="previously"');
+    expect(rootMarkup).toContain(`<p class="background">${marked.parseInline(profile.background)}</p>`);
+    expect(rootMarkup).toContain('href="#projects">Skip to projects</a>');
+    for (const work of profile.previousWork) {
+      expect(rootMarkup).toContain(work.name);
+    }
     expect(html.replace(/\s+/g, " ")).toContain(
       `property="og:description" content="${shareDescription}"`,
     );
@@ -159,8 +165,7 @@ describe("site", () => {
     expect(rootMarkup).not.toContain("llms.txt");
 
     for (const project of getHomepageContent().projects) {
-      expect(rootMarkup).toContain(`>${project.label}</${project.links[0] ? "a" : "span"}>`);
-      if (project.links[0]) expect(rootMarkup).toContain(`href="${project.links[0].href}"`);
+      expect(rootMarkup).toContain(`href="/projects/${project.slug}/">${project.label}</a>`);
       expect(rootMarkup).toContain(project.summary);
     }
 
@@ -181,7 +186,53 @@ describe("site", () => {
     expect(resumeLink).not.toContain('target=');
     expect(resumeLink).not.toContain('opens in a new tab');
     expect(resumeLink).not.toContain("application/pdf");
+    expect(rootMarkup).toContain('>Résumé</a>');
+    expect(rootMarkup).toContain('>Email</a>');
 
+  });
+
+  it("renders every project as a complete static page with breadcrumbs and external links", async () => {
+    for (const summary of listProjectSummaries()) {
+      const project = getProjectDetail(summary.slug)!;
+      const response = await fetch(`${BASE}/projects/${summary.slug}/`, { redirect: "manual" });
+      expect(response.status, summary.slug).toBe(200);
+      const html = await response.text();
+      expect(html).toContain(`<title>${project.name} — Ezra Apple</title>`);
+      expect(html).toContain(`href="${siteOrigin}/projects/${project.slug}/"`);
+      expect(html).toContain('aria-label="Breadcrumb"');
+      expect(html).toContain('<a href="/">Ezra Apple</a>');
+      expect(html).toContain(`aria-current="page">${project.name}</span>`);
+      expect(html.match(/<h1>/g)).toHaveLength(1);
+      const paragraphs = marked.lexer(project.document).filter((token) => token.type === "paragraph");
+      for (const paragraph of paragraphs.slice(1)) {
+        expect(html).toContain(marked.parser([paragraph]).trim());
+      }
+      for (const link of project.links) expect(html).toContain(`href="${link.href}"`);
+      expect(html).toContain('href="/#projects">Back to projects</a>');
+      expect(html).not.toMatch(/__PROJECT_/);
+      const scripts = html.match(/<script\b[^>]*>[\s\S]*?<\/script>/g);
+      expect(scripts).toEqual(['<script src="/project-navigation.js" defer></script>']);
+      expect((await fetch(`${BASE}/project-navigation.js`)).status).toBe(200);
+      const cssPaths = [...html.matchAll(/href="([^"]+\.css)"/g)].map((match) => match[1]);
+      expect(cssPaths.length).toBeGreaterThan(0);
+      for (const cssPath of cssPaths) expect((await fetch(`${BASE}${cssPath}`)).status).toBe(200);
+    }
+    const shoutout = await (await fetch(`${BASE}/projects/shoutout/`)).text();
+    expect(shoutout).toContain('href="https://github.com/sebi75/inputalk"');
+    const cosmic = await (await fetch(`${BASE}/projects/cosmic-hot-potato/`)).text();
+    expect(cosmic).toContain('href="https://semantle.com/"');
+    expect(cosmic.match(/A 3D word game based on semantic similarity\.<\/p>/g)).toHaveLength(1);
+  });
+
+  it("redirects old project routes and returns 404 for unknown projects", async () => {
+    for (const path of ["/projects/shoutout", "/projects/shoutout/experience"]) {
+      const response = await fetch(`${BASE}${path}`, { redirect: "manual" });
+      expect(response.status).toBe(301);
+      expect(response.headers.get("location")).toBe("/projects/shoutout/");
+    }
+    const response = await fetch(`${BASE}/projects/not-a-project/`);
+    expect(response.status).toBe(404);
+    expect(await response.text()).toContain("Project not found");
   });
 
   it("serves the complete HTML résumé as a distinct static page", async () => {
@@ -476,7 +527,6 @@ describe("mcp", () => {
       expect(full).toEqual(api.data);
       expect(full).toEqual(getProjectDetail(slug));
       expect(full.document).toBe(markdown);
-      expect(full.document).toContain("## Evidence");
       expect(full).not.toHaveProperty("depth");
       expect(full).not.toHaveProperty("theme");
       expect(full).not.toHaveProperty("artifact");

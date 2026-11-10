@@ -14,8 +14,12 @@ validates the structured résumé generated from the public PDF and used by the
 human-readable `/resume` page. `content/writing.ts` holds validated article metadata
 shared by the homepage, profile, writing API, MCP, search, and discovery guide.
 Full articles stay at their original URLs. Zod validates content at build/startup.
-The homepage receives only names, one-sentence summaries, and links; full project
-documents never enter its static HTML. Both HTML pages ship no client JavaScript.
+The homepage receives names, one-sentence summaries, and links, plus
+a linked background paragraph from the profile. Full project documents appear on their
+own static `/projects/:slug/` pages, with external evidence links and a breadcrumb
+home. They do not enter the homepage HTML. The homepage and résumé ship no client JavaScript.
+Project pages use a small navigation script so “Back to projects” restores the
+previous homepage scroll position, with an ordinary link fallback for direct visits.
 
 API schema version 2 removes `theme`, `artifact`, `order`, and `depth` from the
 public project contract. Internal ordering and publication flags remain authored.
@@ -40,6 +44,7 @@ deprecation plan; adding `/v1` alone does not preserve their existing URLs. Do n
 | --- | --- |
 | `GET /api` | Endpoint index, access model, MCP discovery |
 | `GET /resume` | Static, human-readable résumé with a PDF download link |
+| `GET /projects/:slug/` | Static, human-readable project document with external links |
 | `GET /api/profile` | Public identity, social links, and published writing |
 | `GET /api/writing` | Article titles, descriptions, publications, and original URLs |
 | `GET /api/resume` | Structured résumé with experience, education, projects, skills, and PDF URL/SHA-256 |

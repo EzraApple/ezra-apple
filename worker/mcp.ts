@@ -60,7 +60,7 @@ export function createMcpServer(): McpServer {
 
   server.registerTool("get_project", {
     title: "Read project document", annotations: READ_ONLY_ANNOTATIONS,
-    description: "One complete project document with its background, experience, engineering decisions, implementation, and public evidence links. Identical to GET /api/projects/:slug data. No depth parameter is needed.",
+    description: "One complete project document with a concise overview, implementation details, and public source links. Identical to GET /api/projects/:slug data. No depth parameter is needed.",
     inputSchema: z.object({ slug: ProjectSlugSchema.describe("Slug from list_projects, e.g. shoutout") }).strict(),
     outputSchema: ProjectDetailSchema,
   }, ({ slug }) => {

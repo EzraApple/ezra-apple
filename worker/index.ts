@@ -16,6 +16,17 @@ import { createMcpServer } from "./mcp";
 const app = new Hono<WorkerEnvironment>();
 const agentGuideLink = '</llms.txt>; rel="describedby"; type="text/plain"';
 
+app.get("/projects/*", (context) => {
+  const path = new URL(context.req.url).pathname;
+  const slug = path.split("/")[2];
+  if (!getProjectDetail(slug)) {
+    return context.html('<!doctype html><html lang="en"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Project not found — Ezra Apple</title><main><h1>Project not found</h1><p><a href="/">Back to Ezra Apple</a></p></main></html>', 404);
+  }
+  const canonicalPath = `/projects/${slug}/`;
+  if (path !== canonicalPath) return context.redirect(canonicalPath, 301);
+  return context.env.ASSETS.fetch(context.req.raw);
+});
+
 app.onError((error) => {
   if (error instanceof HTTPException) {
     const response = error.getResponse();

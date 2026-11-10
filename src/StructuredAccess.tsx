@@ -5,14 +5,14 @@ export function StructuredAccess() {
         <a className="endpoint-url" href="/api"><code>/api</code></a>
         <span className="project-separator" aria-hidden="true"> / </span>{" "}
         <span className="item-description">
-          Read my profile, projects, and writing. Start here for the JSON API.
+          Start here. GET this URL for all available routes.
         </span>
       </li>
       <li>
         <a className="endpoint-url" href="/mcp"><code>/mcp</code></a>
         <span className="project-separator" aria-hidden="true"> / </span>{" "}
         <span className="item-description">
-          Query the same material through your agent's MCP client.
+          Connect an MCP client using Streamable HTTP. No authentication required.
         </span>
       </li>
     </ul>

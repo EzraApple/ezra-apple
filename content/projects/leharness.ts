@@ -6,8 +6,8 @@ export const leHarness = defineProject({
   published: true,
   name: "LeHarness",
   category: "Agent runtime",
-  status: "Open source",
-  summary: "An agent runtime with durable, event-sourced sessions.",
+  status: "Public source",
+  summary: "A command-line agent runtime with event-sourced sessions.",
   tags: [
     "Agent runtime",
     "CLI",
@@ -28,22 +28,15 @@ export const leHarness = defineProject({
   ],
   document: `# LeHarness
 
-An agent runtime with durable, event-sourced sessions.
+A command-line agent runtime with event-sourced sessions.
 
-I built LeHarness to understand the machinery underneath agents by making the model loop, tools, and session state explicit.
+I built LeHarness to understand how agent runtimes work. The TypeScript core is separate from the terminal interface, so the same agent loop can support other interfaces.
 
-## The product
+An append-only event log records each session. The runtime rebuilds session state from those events, keeping prompts, tool results, and artifacts in one history. This avoids separate stores that can drift out of sync.
 
-The published lh command runs as an interactive TUI or takes one prompt and exits. It supports OpenAI, DeepSeek, and Ollama, with local session state under the working directory. Tools, background work, subagents, artifacts, skills, MCP support, and compaction extend that core loop.
+Compaction works in stages as the context budget fills: removing older reasoning, moving large tool outputs to files, and summarizing older turns. Summaries are cached against the original events, so the runtime can reuse them without repeatedly summarizing the same history. The full event log stays intact.
 
-## Engineering decisions
+Background tasks and subagents let the parent agent keep working while other work runs. Their results feed back into the event log between model steps, keeping task handling inside the same session model.
 
-An append-only event log is the source of truth for each session. LeHarness rebuilds the current view from those events, so prompts, notifications, and artifacts do not need parallel stores that can drift apart. The kernel coordinates model steps and tool execution; longer-running tasks and subagents remain explicit services around it.
-
-The TypeScript and Node.js core is designed to serve a CLI now and other interfaces later without putting interface assumptions into the agent loop.
-
-## Evidence
-
-- [npm package](https://www.npmjs.com/package/leharness): Installable as leharness with the lh command.
-- [Public source](https://github.com/EzraApple/leharness): Kernel, CLI, research notes, and feature plans.`,
+The experimental lh command runs interactively or takes a single prompt. It supports OpenAI, DeepSeek, and Ollama, with skills and MCP connections.`,
 });

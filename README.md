@@ -26,9 +26,9 @@ state. Development includes Vite's reload client; production does not.
 
 ## Editing content
 
-- `content/profile.ts`: bio, location, and social links.
+- `content/profile.ts`: headline, linked background paragraph, location, structured previous-work summaries, and social links.
 - `public/resume.pdf`: the approved public résumé, available for download from
-  the HTML résumé page linked by the document icon.
+  the HTML résumé page linked from the homepage.
 - `content/resume.generated.json`: structured content extracted from that PDF;
   `content/resume.ts` validates it for `/api/resume` and MCP `get_resume`.
   After rebuilding the approved resume in the private resume repository, run
@@ -43,6 +43,7 @@ state. Development includes Vite's reload client; production does not.
 - `src/Resume.tsx` and `src/resume.css`: presentation of the public résumé at
   `/resume`, rendered into `resume/index.html` during the multipage build.
 - `content/projects/*.ts`: compact project metadata and one complete Markdown `document` per project. API and MCP return that same document; no nested depth model or presentation fields.
+- `src/Project.tsx` and `src/project.css`: readable project pages at `/projects/:slug/`, with a breadcrumb back home and the project's external links. `build/project-pages.ts` renders the shared Markdown documents into static pages using `projects/index.html`; no client router or Markdown runtime ships to the browser.
 - `content/writing.ts`: add a title, description, publication, and original URL when an essay is published. The same validated entries automatically feed the homepage, profile, `/api/writing`, MCP `list_writing`, writing search, and `/llms.txt`. Full articles remain at their original URLs. The writing section stays hidden when empty.
 - `src/styles.css`: the single-column dark layout and responsive styles.
 
@@ -74,10 +75,10 @@ external links, API/MCP endpoints, or the PDF. Ordinary navigation remains the
 fallback. See [navigation measurements](docs/NAVIGATION_PERFORMANCE.md) for the
 measured benefit, resource cost, and rejected experiments.
 
-The Code and agents section uses matching `/api` and `/mcp` links to the API index and MCP setup guidance. The résumé icon opens `/resume/` in a new tab; that page links to the PDF. `/llms.txt` is available
+The For agents section uses matching `/api` and `/mcp` links to the API index and MCP setup guidance. The Résumé link opens `/resume/` in the same tab; that page links to the PDF. `/llms.txt` is available
 to agents and advertised through page metadata, a hidden HTML note with real
 endpoint links, and API headers. Readers that strip hidden markup may miss the
-note. Existing project-detail URLs fall back to the new homepage.
+note. Homepage project links open the local project pages; product, source, and package links live on those pages. Old nested project-detail URLs redirect to their project page, and unknown project slugs return 404.
 
 ## Architecture
 
