@@ -7,7 +7,7 @@ export const skillsInit = defineProject({
   name: "skills-init",
   category: "Cross-harness tooling",
   status: "Open source",
-  summary: "One set of skills, shared across your coding agents.",
+  summary: "Share one set of skills across coding agents.",
   tags: [
     "Agent harnesses",
     "CLI",
@@ -28,22 +28,9 @@ export const skillsInit = defineProject({
   ],
   document: `# skills-init
 
-One set of skills, shared across your coding agents.
+Share one set of skills across coding agents.
 
-I made skills-init to keep agent instructions in one place when a repo is used with several coding agents.
+[skills-init](https://github.com/EzraApple/skills-init#readme) installs a shared set of engineering skills for Codex, Claude, Cursor, and OpenCode. It keeps the files in .agents/skills and creates relative links where each agent expects them. Each agent reads the same files, so an update does not leave other copies out of date.
 
-## The product
-
-Run npx skills-init to install a selected profile, including a core skill pack. The CLI previews its writes with a dry run and can be run again without duplicating the installation.
-
-## Engineering decisions
-
-The installer writes canonical skills under .agents, then links them into the paths Codex, Claude, Cursor, and OpenCode expect. Those tool folders are views over one source, so instructions do not drift into independent copies.
-
-Profiles hold the installation content as data rather than adding branches to the Node.js and TypeScript installer for each pack. That keeps the command small while allowing different repo defaults.
-
-## Evidence
-
-- [npm package](https://www.npmjs.com/package/skills-init): Installable as npx skills-init.
-- [Public source](https://github.com/EzraApple/skills-init): CLI, profiles, bundled skills, and tests.`,
+The JavaScript CLI has no runtime dependencies. It supports dry runs and repeat installs, and preserves local edits when pruning retired skills. Install it with npx skills-init from [npm](https://www.npmjs.com/package/skills-init).`,
 });

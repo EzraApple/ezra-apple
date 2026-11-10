@@ -14,7 +14,7 @@ export const writing = z.array(WritingEntrySchema).parse([
   {
     title: "Company Context Is AI Infrastructure",
     href: "https://www.replo.app/engineering/company-context-is-infrastructure",
-    description: "How we made Replo’s knowledge useful across the team.",
+    description: "How we brought Replo’s tools and team knowledge into one repo for coding agents.",
     publication: "Replo Engineering",
   },
 ]);

@@ -1,5 +1,6 @@
 import { FaGithub, FaLinkedinIn, FaXTwitter } from "react-icons/fa6";
-import { LuFileText, LuMapPin } from "react-icons/lu";
+import { LuMapPin } from "react-icons/lu";
+import { marked } from "marked";
 import type { IconType } from "react-icons";
 import type { HomepageContent } from "../content/homepage";
 import { StructuredAccess } from "./StructuredAccess";
@@ -8,7 +9,6 @@ const SOCIAL_ICONS: Partial<Record<string, IconType>> = {
   GitHub: FaGithub,
   X: FaXTwitter,
   LinkedIn: FaLinkedinIn,
-  Résumé: LuFileText,
 };
 
 export function App({ content }: { content: HomepageContent }) {
@@ -21,6 +21,8 @@ export function App({ content }: { content: HomepageContent }) {
         <header className="intro">
           <h1>{content.profile.name}</h1>
           <p className="bio">{content.profile.headline}</p>
+          {/* Checked-in Markdown renders at build time, as on project pages. */}
+          <p className="background" dangerouslySetInnerHTML={{ __html: marked.parseInline(content.profile.background, { async: false }) }} />
           <p className="location">
             <LuMapPin aria-hidden="true" />
             <span>Based in {content.profile.location}</span>
@@ -64,11 +66,7 @@ export function App({ content }: { content: HomepageContent }) {
             {content.projects.map((project) => (
               <li key={project.slug} id={project.slug}>
                 <span className="project-name">
-                  {project.links[0] ? (
-                    <a href={project.links[0].href}>{project.label}</a>
-                  ) : (
-                    <span>{project.label}</span>
-                  )}
+                  <a href={`/projects/${project.slug}/`}>{project.label}</a>
                   <span className="project-separator" aria-hidden="true"> / </span>
                 </span>{" "}
                 <span className="item-description">{project.summary}</span>
@@ -78,7 +76,7 @@ export function App({ content }: { content: HomepageContent }) {
         </section>
 
         <section aria-labelledby="access-title">
-          <h2 id="access-title">Code and agents</h2>
+          <h2 id="access-title">For agents</h2>
           <StructuredAccess />
         </section>
       </main>

@@ -1,6 +1,7 @@
 import type { MiddlewareHandler } from "hono";
 
 export interface WorkerBindings {
+  ASSETS: Fetcher;
   API_RATE_LIMIT?: RateLimit;
   MCP_RATE_LIMIT?: RateLimit;
   WORKER_VERSION?: { id: string };

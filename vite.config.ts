@@ -7,6 +7,7 @@ import { getHomepageContent } from "./content/homepage";
 import { App } from "./src/App";
 import { Resume } from "./src/Resume";
 import { shareDescription, siteOrigin } from "./content/site";
+import { projectPages } from "./build/project-pages";
 
 export default defineConfig({
   // Let the Worker enforce the same route-specific CORS policy locally and deployed.
@@ -19,6 +20,7 @@ export default defineConfig({
           input: {
             main: fileURLToPath(new URL("./index.html", import.meta.url)),
             resume: fileURLToPath(new URL("./resume/index.html", import.meta.url)),
+            projects: fileURLToPath(new URL("./projects/index.html", import.meta.url)),
           },
         },
       },
@@ -26,9 +28,11 @@ export default defineConfig({
   },
   plugins: [
     cloudflare(),
+    projectPages(),
     {
       name: "prerender-pages",
       transformIndexHtml(html, context) {
+        if (context.filename.endsWith("/projects/index.html")) return html;
         if (context.filename.endsWith("/resume/index.html")) {
           const markup = renderToStaticMarkup(createElement(Resume));
           return html

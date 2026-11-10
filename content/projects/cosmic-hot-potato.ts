@@ -7,7 +7,7 @@ export const cosmicHotPotato = defineProject({
   name: "Cosmic Hot Potato",
   category: "Semantic word game",
   status: "Live",
-  summary: "A daily word game that maps how semantically close your guesses are in 2D or 3D.",
+  summary: "A 3D word game based on semantic similarity.",
   tags: [
     "Word game",
     "Embeddings",
@@ -23,21 +23,9 @@ export const cosmicHotPotato = defineProject({
   ],
   document: `# Cosmic Hot Potato
 
-A daily word game that maps how semantically close your guesses are in 2D or 3D.
+A 3D word game based on semantic similarity.
 
-Cosmic Hot Potato makes semantic distance something you can see and explore, rather than only a rank in a list.
+I built [Cosmic Hot Potato](https://cosmic-hot-potato.vercel.app/) as a visual take on [Semantle](https://semantle.com/). Guess a daily word and see how close each guess is in meaning, with an interactive map alongside the ranked list.
 
-## The product
-
-Each daily answer sits in a word embedding space. A guess gets a similarity score and a position around the target, with ranked guesses, temperature feedback, and an interactive map that switches between 2D and 3D.
-
-## Engineering decisions
-
-The game ships int8-quantized, 50-dimensional GloVe vectors, so it can score any of 317,000 guesses inside the deployment without an embedding service. Cosine similarity measures closeness; UMAP places each neighborhood in the explorable scene.
-
-The Next.js and Three.js interface keeps a 2D view available when depth makes comparison harder. Quantizing the vectors trades precision for a vocabulary that can ship with the game; both views use the same semantic feedback.
-
-## Evidence
-
-- [Playable product](https://cosmic-hot-potato.vercel.app/): The live daily word game and its public explanation of the map math.`,
+The game scores guesses using cosine similarity between 50-dimensional GloVe vectors, with a vocabulary of over 317,000 words. UMAP projects nearby words into 3D, and similarity rank sets their distance from the answer. You can switch to a 2D view to compare guesses without the depth.`,
 });

@@ -18,7 +18,7 @@ export function getHomepageContent(): HomepageContent {
       .map(({ slug, name, summary, links }) => ({
         slug,
         name,
-        label: slug === "shoutout" ? "shoutout.sh" : name,
+        label: name,
         summary,
         links,
       })),

@@ -14,7 +14,7 @@ export const ProjectSummarySchema = z.object({
   slug: ProjectSlugSchema,
   name: TextSchema,
   category: TextSchema,
-  status: z.enum(["Live", "Shipping", "Open source", "Closed beta", "Archived"]),
+  status: z.enum(["Live", "Shipping", "Open source", "Public source", "Closed beta", "Archived"]),
   summary: TextSchema,
   tags: z.array(TextSchema).min(1).max(6),
   links: z.array(ProjectLinkSchema),
@@ -22,7 +22,7 @@ export const ProjectSummarySchema = z.object({
 
 // A project is one complete Markdown document plus a small discovery record.
 export const ProjectDetailSchema = ProjectSummarySchema.extend({
-  document: TextSchema.describe("Complete Markdown project document, including engineering decisions and public evidence links."),
+  document: TextSchema.describe("Complete Markdown project document, including implementation details and public source links."),
 });
 export const ProjectSchema = ProjectDetailSchema.extend({
   order: z.number().int().nonnegative(),
