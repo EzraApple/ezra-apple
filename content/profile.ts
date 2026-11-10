@@ -30,10 +30,10 @@ export type Profile = z.infer<typeof ProfileSchema>;
 export const profile: Profile = ProfileSchema.parse({
   name: "Ezra Apple",
   headline: "I build AI products, with a focus on agent behavior, evaluation and intuitive user experiences.",
-  background: "Previously at [Replo](https://www.replo.app/), building its AI commerce platform. Before that, I co-founded [Decyphr](https://www.linkedin.com/company/106859432/) as CTO and did machine learning research at [Berkeley Lab](https://www.lbl.gov/).",
+  background: "Previously at [Replo](https://www.replo.app/), building its AI e-commerce platform. Before that, I co-founded [Decyphr](https://www.linkedin.com/company/106859432/) as CTO and did machine learning research at [Berkeley Lab](https://www.lbl.gov/).",
   location: "San Francisco",
   previousWork: [
-    { name: "Replo", summary: "Helped build and launch Replo’s AI commerce platform: product UI, live page previews, agent memory, and evaluations.", href: "https://www.replo.app/" },
+    { name: "Replo", summary: "Helped build and launch Replo’s AI e-commerce platform: product UI, live page previews, agent memory, and evaluations.", href: "https://www.replo.app/" },
     { name: "Decyphr", summary: "Co-founder and CTO of an AI video translation startup.", href: "https://www.linkedin.com/company/106859432/" },
     { name: "Berkeley Lab", summary: "Applied machine learning to ion-source diagnostics for accelerator research.", href: "https://www.lbl.gov/" },
   ],
