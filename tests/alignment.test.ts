@@ -268,10 +268,10 @@ describe("site", () => {
       ...resume.experience.flatMap((entry) => entry.highlights),
       ...resume.projects.flatMap((entry) => entry.highlights),
     ];
-    expect(highlights).toHaveLength(13);
+    expect(highlights).toHaveLength(14);
     for (const highlight of highlights) expect(visibleText).toContain(highlight);
-    expect(html).toContain("<strong>AWS</strong>");
-    expect(html).toContain("<strong>S3, Lambda, Step Functions, SES</strong>");
+    expect(html).toContain("<strong>asynchronous media-processing pipeline on AWS</strong>");
+    expect(html).toContain("<strong>BERT Mini</strong>");
   });
 
   it("keeps Decyphr's history without advertising its expired domain", async () => {
