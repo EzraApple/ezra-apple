@@ -1,3 +1,4 @@
+import { shoutoutArticleUrl } from "../writing";
 import { defineProject } from "./schema";
 
 export const shoutout = defineProject({
@@ -36,5 +37,7 @@ My Wispr Flow subscription lapsed, so I built a working version in a week, start
 
 For cleanup, I fine-tuned BERT Mini to predict which words to keep or delete. It removes likely fillers and repetitions rather than generating a new sentence. Cleanup is optional and runs locally through Core ML.
 
-The app ships as a signed and notarized Mac app with automatic updates.`,
+The app ships as a signed and notarized Mac app with automatic updates.
+
+[Read how I got ShoutOut’s median dictation wait down to 187 ms](${shoutoutArticleUrl}).`,
 });
