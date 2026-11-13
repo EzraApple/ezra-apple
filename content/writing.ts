@@ -9,6 +9,8 @@ export const WritingEntrySchema = z.object({
 });
 export type WritingEntry = z.infer<typeof WritingEntrySchema>;
 
+export const shoutoutArticleUrl = "https://x.com/i/article/2120250098546626560";
+
 // Shared by the homepage, profile, writing API, and MCP. Full articles stay at their source URLs.
 export const writing = z.array(WritingEntrySchema).parse([
   {
@@ -16,5 +18,11 @@ export const writing = z.array(WritingEntrySchema).parse([
     href: "https://www.replo.app/engineering/company-context-is-infrastructure",
     description: "How we brought Replo’s tools and team knowledge into one repo for coding agents.",
     publication: "Replo Engineering",
+  },
+  {
+    title: "My Wispr Flow subscription lapsed, so I built my own",
+    href: shoutoutArticleUrl,
+    description: "How I cut local dictation latency to 187 ms on my M3 Max.",
+    publication: "X",
   },
 ]);
