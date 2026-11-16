@@ -32,11 +32,11 @@
       "role": "Software Engineer, AI Agent Platform",
       "dates": "Oct 2025 – Oct 2026",
       "highlights": [
-        "Owned reusable-content workflows for Replo’s AI e-commerce platform, from service APIs and authentication through editor integration and live previews. Built the Component Library and template installation to let merchants reuse React storefront components across pages, contributing to the team’s beta-to-GA launch.",
-        "Designed and ran agent evaluations using customer-derived and synthetic editing tasks, comparing context and instruction changes on edit-target correctness, cost, and latency.",
-        "Redesigned persistent agent memory with scoped user/project context, compact working indexes, and automatically curated topic pages retrieved on demand; shipped a memory browser for inspecting saved context.",
-        "Hardened cloud-sandbox editing and live previews against stale builds and styles, adding runtime checks, bounded automatic recovery, actionable diagnostics, and preview restart controls.",
-        "Led consolidation of Replo’s agent skills and development workflows, organizing engineering, design, and support guidance; reduced the agent-facing catalog from 75 to 42 skills and added authoring standards, CI checks, and routing tests across Claude Code, Codex, Cursor, and opencode."
+        "Built and launched Replo’s Component Library and template installation so merchants could reuse React components across storefront pages; owned APIs, editor integration, and live previews.",
+        "Designed and ran agent evaluations on customer-derived and synthetic editing tasks, measuring how context and instruction changes affected edit-target correctness, cost, and latency.",
+        "Redesigned persistent agent memory around scoped user/project context and automatically curated topic pages retrieved on demand; shipped a memory browser so users could inspect saved context.",
+        "Added automatic recovery to cloud-sandbox previews, detecting stale compiled CSS and repairing stalled style updates with bounded recovery attempts and actionable diagnostics.",
+        "Consolidated Replo’s coding-agent skills from 119 files to 42 routed entry points, cutting always-loaded description tokens by about 82%; added CI-enforced description budgets and fresh-agent routing checks."
       ],
       "href": "https://www.replo.app/"
     },
@@ -45,9 +45,9 @@
       "role": "Co-Founder & CTO",
       "dates": "Jan 2025 – Aug 2025",
       "highlights": [
-        "Co-founded AI video translation startup, accepted into UC Berkeley SkyDeck Pad-13 incubator program.",
+        "Co-founded an AI video translation startup, accepted into UC Berkeley SkyDeck Pad-13 incubator program.",
+        "Owned the video-translation MVP, combining ElevenLabs dubbing with lip-sync and building authentication, media upload, processing orchestration, and the launch site.",
         "Architected an asynchronous media-processing pipeline on AWS (S3, Lambda, Step Functions, SES) with fault-tolerant retries for long-running translation jobs and user-visible processing and failure states.",
-        "Owned an end-to-end video-translation MVP combining ElevenLabs dubbing with lip-sync, spanning authentication, media upload, processing orchestration, and launch site.",
         "Ran a closed beta with 10+ content creators, using their feedback to refine the product and go-to-market."
       ],
       "href": "https://www.linkedin.com/company/106859432/"
@@ -132,16 +132,17 @@
     "Ezra Apple",
     "University of California, Berkeley",
     "Replo (YC S21)",
-    "reusable-content workflows",
+    "Component Library and template installation",
     "agent evaluations",
     "persistent agent memory",
-    "cloud-sandbox editing and live previews",
-    "agent skills and development workflows",
+    "automatic recovery to cloud-sandbox previews",
+    "coding-agent skills",
+    "about 82%",
     "Decyphr AI",
     "UC Berkeley SkyDeck Pad-13",
-    "asynchronous media-processing pipeline on AWS",
-    "end-to-end video-translation MVP",
+    "video-translation MVP",
     "ElevenLabs dubbing",
+    "asynchronous media-processing pipeline on AWS",
     "closed beta with 10+ content creators",
     "Lawrence Berkeley National Laboratory",
     "random forests and Bayesian optimization",
@@ -157,5 +158,5 @@
     "Backend & Infrastructure",
     "Frontend & Desktop"
   ],
-  "pdfSha256": "2f240b3e606067e42c67be664cc7c9cbec98d9d5f32cecf88ee1a8f56b86ae1e"
+  "pdfSha256": "5b2124ffb19e44b26d34f5c9dbd2f824a157e729450a9a1fa13e8dd57d9053b8"
 }
