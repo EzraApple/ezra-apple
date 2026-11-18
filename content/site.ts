@@ -2,4 +2,4 @@
 export const siteOrigin = "https://ezraapple.dev";
 
 // Share previews stand alone and need not include the full homepage biography.
-export const shareDescription = "I’m a software engineer. I build apps and developer tools.";
+export const shareDescription = "I build AI products and the systems behind them.";

@@ -50,7 +50,7 @@ def text(position, value, size, color):
 
 
 text((96, 182), "Ezra Apple", 72, "#e3e5e8")
-for index, line in enumerate(textwrap.wrap(metadata.description, width=45, break_on_hyphens=False)):
+for index, line in enumerate(textwrap.wrap(metadata.description, width=55, break_on_hyphens=False)):
     text((100, 302 + index * 43), line, 26, "#a3a7ad")
 text((100, 518), urlparse(metadata.origin).netloc, 20, "#a3a7ad")
 image.resize((1200, 630), Image.Resampling.LANCZOS).save(ROOT / "public/og.png")
